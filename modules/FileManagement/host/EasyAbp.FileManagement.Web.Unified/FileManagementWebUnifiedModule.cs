@@ -46,189 +46,191 @@ using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement.Web;
 using Volo.Abp.Threading;
 using Volo.Abp.VirtualFileSystem;
+using Volo.Abp.BlobStoring.Minio;
 
 namespace EasyAbp.FileManagement
 {
-    [DependsOn(
-        typeof(FileManagementWebModule),
-        typeof(FileManagementApplicationModule),
-        typeof(FileManagementHttpApiModule),
-        typeof(FileManagementEntityFrameworkCoreModule),
-        typeof(AbpAuditLoggingEntityFrameworkCoreModule),
-        typeof(AbpAutofacModule),
-        typeof(AbpAccountWebModule),
-        typeof(AbpAccountApplicationModule),
-        typeof(AbpAccountHttpApiModule),
-        typeof(AbpBlobStoringFileSystemModule),
-        typeof(AbpEntityFrameworkCoreSqlServerModule),
-        typeof(AbpSettingManagementApplicationModule),
-        typeof(AbpSettingManagementHttpApiModule),
-        typeof(AbpSettingManagementWebModule),
-        typeof(AbpSettingManagementEntityFrameworkCoreModule),
-        typeof(AbpPermissionManagementEntityFrameworkCoreModule),
-        typeof(AbpPermissionManagementApplicationModule),
-        typeof(AbpPermissionManagementHttpApiModule),
-        typeof(AbpIdentityWebModule),
-        typeof(AbpIdentityApplicationModule),
-        typeof(AbpIdentityHttpApiModule),
-        typeof(AbpIdentityEntityFrameworkCoreModule),
-        typeof(AbpPermissionManagementDomainIdentityModule),
-        typeof(AbpFeatureManagementWebModule),
-        typeof(AbpFeatureManagementApplicationModule),
-        typeof(AbpFeatureManagementHttpApiModule),
-        typeof(AbpFeatureManagementEntityFrameworkCoreModule),
-        typeof(AbpTenantManagementWebModule),
-        typeof(AbpTenantManagementApplicationModule),
-        typeof(AbpTenantManagementHttpApiModule),
-        typeof(AbpTenantManagementEntityFrameworkCoreModule),
-        typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
-        typeof(AbpAspNetCoreSerilogModule),
-        typeof(AbpSwashbuckleModule),
-        typeof(AbpBackgroundJobsModule)
-    )]
-    public class FileManagementWebUnifiedModule : AbpModule
+  [DependsOn(
+      typeof(FileManagementWebModule),
+      typeof(FileManagementApplicationModule),
+      typeof(FileManagementHttpApiModule),
+      typeof(FileManagementEntityFrameworkCoreModule),
+      typeof(AbpAuditLoggingEntityFrameworkCoreModule),
+      typeof(AbpAutofacModule),
+      typeof(AbpAccountWebModule),
+      typeof(AbpAccountApplicationModule),
+      typeof(AbpAccountHttpApiModule),
+      typeof(AbpBlobStoringFileSystemModule),
+      typeof(AbpBlobStoringMinioModule),
+      typeof(AbpEntityFrameworkCoreSqlServerModule),
+      typeof(AbpSettingManagementApplicationModule),
+      typeof(AbpSettingManagementHttpApiModule),
+      typeof(AbpSettingManagementWebModule),
+      typeof(AbpSettingManagementEntityFrameworkCoreModule),
+      typeof(AbpPermissionManagementEntityFrameworkCoreModule),
+      typeof(AbpPermissionManagementApplicationModule),
+      typeof(AbpPermissionManagementHttpApiModule),
+      typeof(AbpIdentityWebModule),
+      typeof(AbpIdentityApplicationModule),
+      typeof(AbpIdentityHttpApiModule),
+      typeof(AbpIdentityEntityFrameworkCoreModule),
+      typeof(AbpPermissionManagementDomainIdentityModule),
+      typeof(AbpFeatureManagementWebModule),
+      typeof(AbpFeatureManagementApplicationModule),
+      typeof(AbpFeatureManagementHttpApiModule),
+      typeof(AbpFeatureManagementEntityFrameworkCoreModule),
+      typeof(AbpTenantManagementWebModule),
+      typeof(AbpTenantManagementApplicationModule),
+      typeof(AbpTenantManagementHttpApiModule),
+      typeof(AbpTenantManagementEntityFrameworkCoreModule),
+      typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
+      typeof(AbpAspNetCoreSerilogModule),
+      typeof(AbpSwashbuckleModule),
+      typeof(AbpBackgroundJobsModule)
+  )]
+  public class FileManagementWebUnifiedModule : AbpModule
+  {
+    public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        public override void ConfigureServices(ServiceConfigurationContext context)
+      var hostingEnvironment = context.Services.GetHostingEnvironment();
+      var configuration = context.Services.GetConfiguration();
+
+      Configure<AbpDbContextOptions>(options =>
+      {
+        options.UseSqlServer();
+      });
+
+      if (hostingEnvironment.IsDevelopment())
+      {
+        Configure<AbpVirtualFileSystemOptions>(options =>
         {
-            var hostingEnvironment = context.Services.GetHostingEnvironment();
-            var configuration = context.Services.GetConfiguration();
+          options.FileSets.ReplaceEmbeddedByPhysical<FileManagementDomainSharedModule>(Path.Combine(hostingEnvironment.ContentRootPath, string.Format("..{0}..{0}src{0}EasyAbp.FileManagement.Domain.Shared", Path.DirectorySeparatorChar)));
+          options.FileSets.ReplaceEmbeddedByPhysical<FileManagementDomainModule>(Path.Combine(hostingEnvironment.ContentRootPath, string.Format("..{0}..{0}src{0}EasyAbp.FileManagement.Domain", Path.DirectorySeparatorChar)));
+          options.FileSets.ReplaceEmbeddedByPhysical<FileManagementApplicationContractsModule>(Path.Combine(hostingEnvironment.ContentRootPath, string.Format("..{0}..{0}src{0}EasyAbp.FileManagement.Application.Contracts", Path.DirectorySeparatorChar)));
+          options.FileSets.ReplaceEmbeddedByPhysical<FileManagementApplicationModule>(Path.Combine(hostingEnvironment.ContentRootPath, string.Format("..{0}..{0}src{0}EasyAbp.FileManagement.Application", Path.DirectorySeparatorChar)));
+          options.FileSets.ReplaceEmbeddedByPhysical<FileManagementWebModule>(Path.Combine(hostingEnvironment.ContentRootPath, string.Format("..{0}..{0}src{0}EasyAbp.FileManagement.Web", Path.DirectorySeparatorChar)));
+        });
+      }
 
-            Configure<AbpDbContextOptions>(options =>
-            {
-                options.UseSqlServer();
-            });
+      context.Services.AddAbpSwaggerGen(
+          options =>
+          {
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "FileManagement API", Version = "v1" });
+            options.DocInclusionPredicate((docName, description) => true);
+            options.CustomSchemaIds(type => type.FullName);
+          });
 
-            if (hostingEnvironment.IsDevelopment())
-            {
-                Configure<AbpVirtualFileSystemOptions>(options =>
-                {
-                    options.FileSets.ReplaceEmbeddedByPhysical<FileManagementDomainSharedModule>(Path.Combine(hostingEnvironment.ContentRootPath, string.Format("..{0}..{0}src{0}EasyAbp.FileManagement.Domain.Shared", Path.DirectorySeparatorChar)));
-                    options.FileSets.ReplaceEmbeddedByPhysical<FileManagementDomainModule>(Path.Combine(hostingEnvironment.ContentRootPath, string.Format("..{0}..{0}src{0}EasyAbp.FileManagement.Domain", Path.DirectorySeparatorChar)));
-                    options.FileSets.ReplaceEmbeddedByPhysical<FileManagementApplicationContractsModule>(Path.Combine(hostingEnvironment.ContentRootPath, string.Format("..{0}..{0}src{0}EasyAbp.FileManagement.Application.Contracts", Path.DirectorySeparatorChar)));
-                    options.FileSets.ReplaceEmbeddedByPhysical<FileManagementApplicationModule>(Path.Combine(hostingEnvironment.ContentRootPath, string.Format("..{0}..{0}src{0}EasyAbp.FileManagement.Application", Path.DirectorySeparatorChar)));
-                    options.FileSets.ReplaceEmbeddedByPhysical<FileManagementWebModule>(Path.Combine(hostingEnvironment.ContentRootPath, string.Format("..{0}..{0}src{0}EasyAbp.FileManagement.Web", Path.DirectorySeparatorChar)));
-                });
-            }
+      Configure<AbpLocalizationOptions>(options =>
+      {
+        options.Languages.Add(new LanguageInfo("cs", "cs", "Čeština"));
+        options.Languages.Add(new LanguageInfo("en", "en", "English"));
+        options.Languages.Add(new LanguageInfo("en-GB", "en-GB", "English (UK)"));
+        options.Languages.Add(new LanguageInfo("fi", "fi", "Finnish"));
+        options.Languages.Add(new LanguageInfo("fr", "fr", "Français"));
+        options.Languages.Add(new LanguageInfo("hi", "hi", "Hindi", "in"));
+        options.Languages.Add(new LanguageInfo("it", "it", "Italian", "it"));
+        options.Languages.Add(new LanguageInfo("hu", "hu", "Magyar"));
+        options.Languages.Add(new LanguageInfo("pt-BR", "pt-BR", "Português (Brasil)"));
+        options.Languages.Add(new LanguageInfo("ru", "ru", "Русский"));
+        options.Languages.Add(new LanguageInfo("sk", "sk", "Slovak"));
+        options.Languages.Add(new LanguageInfo("tr", "tr", "Türkçe"));
+        options.Languages.Add(new LanguageInfo("zh-Hans", "zh-Hans", "简体中文"));
+        options.Languages.Add(new LanguageInfo("zh-Hant", "zh-Hant", "繁體中文"));
+      });
 
-            context.Services.AddAbpSwaggerGen(
-                options =>
-                {
-                    options.SwaggerDoc("v1", new OpenApiInfo { Title = "FileManagement API", Version = "v1" });
-                    options.DocInclusionPredicate((docName, description) => true);
-                    options.CustomSchemaIds(type => type.FullName);
-                });
+      Configure<AbpMultiTenancyOptions>(options =>
+      {
+        options.IsEnabled = MultiTenancyConsts.IsEnabled;
+      });
 
-            Configure<AbpLocalizationOptions>(options =>
-            {
-                options.Languages.Add(new LanguageInfo("cs", "cs", "Čeština"));
-                options.Languages.Add(new LanguageInfo("en", "en", "English"));
-                options.Languages.Add(new LanguageInfo("en-GB", "en-GB", "English (UK)"));
-                options.Languages.Add(new LanguageInfo("fi", "fi", "Finnish"));
-                options.Languages.Add(new LanguageInfo("fr", "fr", "Français"));
-                options.Languages.Add(new LanguageInfo("hi", "hi", "Hindi", "in"));
-                options.Languages.Add(new LanguageInfo("it", "it", "Italian", "it"));
-                options.Languages.Add(new LanguageInfo("hu", "hu", "Magyar"));
-                options.Languages.Add(new LanguageInfo("pt-BR", "pt-BR", "Português (Brasil)"));
-                options.Languages.Add(new LanguageInfo("ru", "ru", "Русский"));
-                options.Languages.Add(new LanguageInfo("sk", "sk", "Slovak"));
-                options.Languages.Add(new LanguageInfo("tr", "tr", "Türkçe"));
-                options.Languages.Add(new LanguageInfo("zh-Hans", "zh-Hans", "简体中文"));
-                options.Languages.Add(new LanguageInfo("zh-Hant", "zh-Hant", "繁體中文"));
-            });
-
-            Configure<AbpMultiTenancyOptions>(options =>
-            {
-                options.IsEnabled = MultiTenancyConsts.IsEnabled;
-            });
-            
-            Configure<AbpBlobStoringOptions>(options =>
-            {
-                options.Containers.Configure<LocalFileSystemBlobContainer>(container =>
-                {
-                    container.IsMultiTenant = true;
-                    container.UseFileSystem(fileSystem =>
-                    {
-                        // fileSystem.BasePath = "C:\\my-files";
-                        fileSystem.BasePath = Path.Combine(hostingEnvironment.ContentRootPath, "my-files");
-                    });
-                });
-            });
-            
-            Configure<FileManagementOptions>(options =>
-            {
-                options.DefaultFileDownloadProviderType = typeof(LocalFileDownloadProvider);
-                options.Containers.Configure<CommonFileContainer>(container =>
-                {
-                    // private container never be used by non-owner users (except user who has the "File.Manage" permission).
-                    container.FileContainerType = FileContainerType.Public;
-                    container.AbpBlobContainerName = BlobContainerNameAttribute.GetContainerName<LocalFileSystemBlobContainer>();
-                    container.AbpBlobDirectorySeparator = "/";
-                    
-                    container.RetainUnusedBlobs = false;
-                    container.EnableAutoRename = true;
-
-                    container.MaxByteSizeForEachFile = 5 * 1024 * 1024;
-                    container.MaxByteSizeForEachUpload = 10 * 1024 * 1024;
-                    container.MaxFileQuantityForEachUpload = 2;
-
-                    container.AllowOnlyConfiguredFileExtensions = true;
-                    container.FileExtensionsConfiguration.Add(".jpg", true);
-                    container.FileExtensionsConfiguration.Add(".PNG", true);
-                    // container.FileExtensionsConfiguration.Add(".tar.gz", true);
-                    // container.FileExtensionsConfiguration.Add(".exe", false);
-
-                    container.GetDownloadInfoTimesLimitEachUserPerMinute = 10;
-                });
-            });
-        }
-
-        public override void OnApplicationInitialization(ApplicationInitializationContext context)
+      Configure<AbpBlobStoringOptions>(options =>
+      {
+        options.Containers.Configure<LocalFileSystemBlobContainer>(container =>
         {
-            var app = context.GetApplicationBuilder();
-            var env = context.GetEnvironment();
+          container.IsMultiTenant = true;
+          container.UseFileSystem(fileSystem =>
+          {
+            // fileSystem.BasePath = "C:\\my-files";
+            fileSystem.BasePath = Path.Combine(hostingEnvironment.ContentRootPath, "my-files");
+          });
+        });
+      });
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseErrorPage();
-                app.UseHsts();
-            }
+      Configure<FileManagementOptions>(options =>
+      {
+        options.DefaultFileDownloadProviderType = typeof(LocalFileDownloadProvider);
+        options.Containers.Configure<CommonFileContainer>(container =>
+              {
+                // private container never be used by non-owner users (except user who has the "File.Manage" permission).
+                container.FileContainerType = FileContainerType.Public;
+                container.AbpBlobContainerName = BlobContainerNameAttribute.GetContainerName<LocalFileSystemBlobContainer>();
+                container.AbpBlobDirectorySeparator = "/";
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseRouting();
-            app.UseAuthentication();
+                container.RetainUnusedBlobs = false;
+                container.EnableAutoRename = true;
 
-            if (MultiTenancyConsts.IsEnabled)
-            {
-                app.UseMultiTenancy();
-            }
+                container.MaxByteSizeForEachFile = 5 * 1024 * 1024;
+                container.MaxByteSizeForEachUpload = 10 * 1024 * 1024;
+                container.MaxFileQuantityForEachUpload = 2;
 
-            app.UseAbpRequestLocalization();
-            app.UseAuthorization();
+                container.AllowOnlyConfiguredFileExtensions = true;
+                container.FileExtensionsConfiguration.Add(".jpg", true);
+                container.FileExtensionsConfiguration.Add(".PNG", true);
+                // container.FileExtensionsConfiguration.Add(".tar.gz", true);
+                // container.FileExtensionsConfiguration.Add(".exe", false);
 
-            app.UseSwagger();
-            app.UseAbpSwaggerUI(options =>
-            {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Support APP API");
-            });
-
-            app.UseAuditing();
-            app.UseAbpSerilogEnrichers();
-            app.UseConfiguredEndpoints();
-
-            using (var scope = context.ServiceProvider.CreateScope())
-            {
-                AsyncHelper.RunSync(async () =>
-                {
-                    await scope.ServiceProvider
-                        .GetRequiredService<IDataSeeder>()
-                        .SeedAsync();
-                });
-            }
-        }
+                container.GetDownloadInfoTimesLimitEachUserPerMinute = 10;
+              });
+      });
     }
+
+    public override void OnApplicationInitialization(ApplicationInitializationContext context)
+    {
+      var app = context.GetApplicationBuilder();
+      var env = context.GetEnvironment();
+
+      if (env.IsDevelopment())
+      {
+        app.UseDeveloperExceptionPage();
+      }
+      else
+      {
+        app.UseErrorPage();
+        app.UseHsts();
+      }
+
+      app.UseHttpsRedirection();
+      app.UseStaticFiles();
+      app.UseRouting();
+      app.UseAuthentication();
+
+      if (MultiTenancyConsts.IsEnabled)
+      {
+        app.UseMultiTenancy();
+      }
+
+      app.UseAbpRequestLocalization();
+      app.UseAuthorization();
+
+      app.UseSwagger();
+      app.UseAbpSwaggerUI(options =>
+      {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Support APP API");
+      });
+
+      app.UseAuditing();
+      app.UseAbpSerilogEnrichers();
+      app.UseConfiguredEndpoints();
+
+      using (var scope = context.ServiceProvider.CreateScope())
+      {
+        AsyncHelper.RunSync(async () =>
+        {
+          await scope.ServiceProvider
+                      .GetRequiredService<IDataSeeder>()
+                      .SeedAsync();
+        });
+      }
+    }
+  }
 }

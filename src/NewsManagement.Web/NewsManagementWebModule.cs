@@ -43,6 +43,7 @@ using EasyAbp.FileManagement;
 using EasyAbp.FileManagement.Files;
 using EasyAbp.FileManagement.Containers;
 using Volo.Abp.BlobStoring;
+using Volo.Abp.BlobStoring.Minio;
 
 namespace NewsManagement.Web;
 
@@ -58,7 +59,8 @@ namespace NewsManagement.Web;
     typeof(AbpTenantManagementWebModule),
     typeof(FileManagementWebModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(AbpBlobStoringMinioModule)
     )]
 public class NewsManagementWebModule : AbpModule
 {
@@ -80,10 +82,10 @@ public class NewsManagementWebModule : AbpModule
     {
       builder.AddValidation(options =>
           {
-          options.AddAudiences("NewsManagement");
-          options.UseLocalServer();
-          options.UseAspNetCore();
-        });
+            options.AddAudiences("NewsManagement");
+            options.UseLocalServer();
+            options.UseAspNetCore();
+          });
     });
   }
 
@@ -97,6 +99,21 @@ public class NewsManagementWebModule : AbpModule
     ConfigureBundles();
     ConfigureAutoMapper();
     ConfigureVirtualFileSystem(hostingEnvironment);
+
+    Configure<AbpBlobStoringOptions>(options =>
+    {
+      options.Containers.ConfigureDefault(container =>
+      {
+        container.IsMultiTenant = true;
+        container.UseMinio(minio =>
+        {
+          minio.EndPoint = "localhost:9000";
+          minio.AccessKey = "91SeWqvmiDpCEVjre26j";
+          minio.SecretKey = "NZv0m4gcZr8WzYm7vgmqXVoxzQrho2kOGr3QoGKt";
+          minio.BucketName = "newsmanagement";
+        });
+      });
+    });
 
     Configure<FileManagementOptions>(options =>
     {
@@ -151,8 +168,8 @@ public class NewsManagementWebModule : AbpModule
               LeptonXLiteThemeBundles.Styles.Global,
               bundle =>
               {
-              bundle.AddFiles("/global-styles.css");
-            }
+                bundle.AddFiles("/global-styles.css");
+              }
           );
     });
   }
