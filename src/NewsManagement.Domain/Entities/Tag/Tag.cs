@@ -9,6 +9,6 @@ namespace NewsManagement.Entities.Tag
 {
   public class Tag : ListableContent
   {
-    public string Name { get; set; }
+    public string TagName { get; set; }
   }
 }
