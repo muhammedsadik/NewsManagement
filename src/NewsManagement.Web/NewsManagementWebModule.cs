@@ -43,6 +43,7 @@ using EasyAbp.FileManagement;
 using EasyAbp.FileManagement.Files;
 using EasyAbp.FileManagement.Containers;
 using Volo.Abp.BlobStoring;
+using Volo.Abp.BlobStoring.Minio;
 
 namespace NewsManagement.Web;
 
@@ -80,10 +81,10 @@ public class NewsManagementWebModule : AbpModule
     {
       builder.AddValidation(options =>
           {
-          options.AddAudiences("NewsManagement");
-          options.UseLocalServer();
-          options.UseAspNetCore();
-        });
+            options.AddAudiences("NewsManagement");
+            options.UseLocalServer();
+            options.UseAspNetCore();
+          });
     });
   }
 
@@ -98,32 +99,47 @@ public class NewsManagementWebModule : AbpModule
     ConfigureAutoMapper();
     ConfigureVirtualFileSystem(hostingEnvironment);
 
-    Configure<FileManagementOptions>(options =>
+    Configure<AbpBlobStoringOptions>(options =>
     {
-      options.DefaultFileDownloadProviderType = typeof(LocalFileDownloadProvider);
-      options.Containers.Configure<CommonFileContainer>(container =>
+      options.Containers.ConfigureDefault(container =>
       {
-        // private container never be used by non-owner users (except user who has the "File.Manage" permission).
-        container.FileContainerType = FileContainerType.Public;
-        container.AbpBlobContainerName = BlobContainerNameAttribute.GetContainerName<LocalFileSystemBlobContainer>();
-        container.AbpBlobDirectorySeparator = "/";
-
-        container.RetainUnusedBlobs = false;
-        container.EnableAutoRename = true;
-
-        container.MaxByteSizeForEachFile = 5 * 1024 * 1024;
-        container.MaxByteSizeForEachUpload = 10 * 1024 * 1024;
-        container.MaxFileQuantityForEachUpload = 2;
-
-        container.AllowOnlyConfiguredFileExtensions = true;
-        container.FileExtensionsConfiguration.Add(".jpg", true);
-        container.FileExtensionsConfiguration.Add(".PNG", true);
-        // container.FileExtensionsConfiguration.Add(".tar.gz", true);
-        // container.FileExtensionsConfiguration.Add(".exe", false);
-
-        container.GetDownloadInfoTimesLimitEachUserPerMinute = 10;
+        container.IsMultiTenant = true;
+        container.UseMinio(minio =>
+        {
+          minio.EndPoint = "localhost:9000";
+          minio.AccessKey = "hPNRYFw3pdCz2NtFzjlq";
+          minio.SecretKey = "QJp0GgVzJbWExP5w0fLgxJg6eqH60Cn6MDhe8JOM";
+          minio.BucketName = "newsmanagement";
+        });
       });
     });
+
+    //Configure<FileManagementOptions>(options =>
+    //{
+    //  options.DefaultFileDownloadProviderType = typeof(LocalFileDownloadProvider);
+    //  options.Containers.Configure<CommonFileContainer>(container =>
+    //  {
+    //    // private container never be used by non-owner users (except user who has the "File.Manage" permission).
+    //    container.FileContainerType = FileContainerType.Public;
+    //    container.AbpBlobContainerName = BlobContainerNameAttribute.GetContainerName<LocalFileSystemBlobContainer>();
+    //    container.AbpBlobDirectorySeparator = "/";
+
+    //    container.RetainUnusedBlobs = false;
+    //    container.EnableAutoRename = true;
+
+    //    container.MaxByteSizeForEachFile = 5 * 1024 * 1024;
+    //    container.MaxByteSizeForEachUpload = 10 * 1024 * 1024;
+    //    container.MaxFileQuantityForEachUpload = 2;
+
+    //    container.AllowOnlyConfiguredFileExtensions = true;
+    //    container.FileExtensionsConfiguration.Add(".jpg", true);
+    //    container.FileExtensionsConfiguration.Add(".PNG", true);
+    //    // container.FileExtensionsConfiguration.Add(".tar.gz", true);
+    //    // container.FileExtensionsConfiguration.Add(".exe", false);
+
+    //    container.GetDownloadInfoTimesLimitEachUserPerMinute = 10;
+    //  });
+    //});
 
     ConfigureNavigationServices();
     ConfigureAutoApiControllers();
@@ -151,8 +167,8 @@ public class NewsManagementWebModule : AbpModule
               LeptonXLiteThemeBundles.Styles.Global,
               bundle =>
               {
-              bundle.AddFiles("/global-styles.css");
-            }
+                bundle.AddFiles("/global-styles.css");
+              }
           );
     });
   }
