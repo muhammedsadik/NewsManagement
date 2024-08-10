@@ -1,4 +1,4 @@
-﻿using NewsManagement.Entities.Tag;
+﻿using NewsManagement.Entities.Tags;
 using NewsManagement.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

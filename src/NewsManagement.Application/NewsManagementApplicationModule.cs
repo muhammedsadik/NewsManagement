@@ -2,6 +2,7 @@
 using Volo.Abp.Account;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
+using Volo.Abp.FluentValidation;
 using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
@@ -19,7 +20,8 @@ namespace NewsManagement;
     typeof(AbpTenantManagementApplicationModule),
     typeof(AbpFeatureManagementApplicationModule),
     typeof(FileManagementApplicationModule),
-    typeof(AbpSettingManagementApplicationModule)
+    typeof(AbpSettingManagementApplicationModule),
+    typeof(AbpFluentValidationModule)
     )]
 public class NewsManagementApplicationModule : AbpModule
 {

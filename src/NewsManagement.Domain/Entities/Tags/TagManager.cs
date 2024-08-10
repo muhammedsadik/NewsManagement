@@ -13,7 +13,7 @@ using Volo.Abp.Application.Dtos;
 using NewsManagement.Entities.Exceptions;
 using Volo.Abp;
 
-namespace NewsManagement.Entities.Tag
+namespace NewsManagement.Entities.Tags
 {
   public class TagManager : DomainService
   {

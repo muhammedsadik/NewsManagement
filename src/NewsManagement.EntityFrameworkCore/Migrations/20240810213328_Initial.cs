@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -368,6 +369,61 @@ namespace NewsManagement.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AbpUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AppTag",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TagName = table.Column<string>(type: "text", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: true),
+                    ExtraProperties = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
+                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppTag", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EasyAbpFileManagementFiles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: true),
+                    ParentId = table.Column<Guid>(type: "uuid", nullable: true),
+                    FileContainerName = table.Column<string>(type: "text", nullable: true),
+                    FileName = table.Column<string>(type: "text", nullable: true),
+                    MimeType = table.Column<string>(type: "text", nullable: true),
+                    FileType = table.Column<int>(type: "integer", nullable: false),
+                    SubFilesQuantity = table.Column<int>(type: "integer", nullable: false),
+                    ByteSize = table.Column<long>(type: "bigint", nullable: false),
+                    Hash = table.Column<string>(type: "text", nullable: true),
+                    BlobName = table.Column<string>(type: "text", nullable: true),
+                    OwnerUserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Flag = table.Column<string>(type: "text", nullable: true),
+                    ExtraProperties = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    DeleterId = table.Column<Guid>(type: "uuid", nullable: true),
+                    DeletionTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EasyAbpFileManagementFiles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -947,6 +1003,26 @@ namespace NewsManagement.Migrations
                 column: "UserName");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EasyAbpFileManagementFiles_BlobName",
+                table: "EasyAbpFileManagementFiles",
+                column: "BlobName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EasyAbpFileManagementFiles_FileName_OwnerUserId_FileContain~",
+                table: "EasyAbpFileManagementFiles",
+                columns: new[] { "FileName", "OwnerUserId", "FileContainerName" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EasyAbpFileManagementFiles_Hash",
+                table: "EasyAbpFileManagementFiles",
+                column: "Hash");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EasyAbpFileManagementFiles_ParentId_OwnerUserId_FileContain~",
+                table: "EasyAbpFileManagementFiles",
+                columns: new[] { "ParentId", "OwnerUserId", "FileContainerName", "FileType" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OpenIddictApplications_ClientId",
                 table: "OpenIddictApplications",
                 column: "ClientId");
@@ -1045,6 +1121,12 @@ namespace NewsManagement.Migrations
 
             migrationBuilder.DropTable(
                 name: "AbpUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "AppTag");
+
+            migrationBuilder.DropTable(
+                name: "EasyAbpFileManagementFiles");
 
             migrationBuilder.DropTable(
                 name: "OpenIddictScopes");

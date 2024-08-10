@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories;
 
-namespace NewsManagement.Entities.Tag
+namespace NewsManagement.Entities.Tags
 {
   public interface ITagRepository : IRepository<Tag, int>
   {

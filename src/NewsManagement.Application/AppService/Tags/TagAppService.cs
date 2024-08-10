@@ -1,4 +1,4 @@
-﻿using NewsManagement.Entities.Tag;
+﻿using NewsManagement.Entities.Tags;
 using NewsManagement.EntityDtos.PagedAndSortedDtos;
 using NewsManagement.EntityDtos.TagDtos;
 using System;

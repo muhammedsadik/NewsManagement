@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using NewsManagement.Entities.Tag;
+using NewsManagement.Entities.Tags;
 using NewsManagement.EntityDtos.TagDtos;
 
 namespace NewsManagement;

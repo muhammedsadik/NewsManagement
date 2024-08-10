@@ -13,7 +13,8 @@ using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using EasyAbp.FileManagement.EntityFrameworkCore;
-using NewsManagement.Entities.Tag;
+using NewsManagement.Entities.Tags;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 
 namespace NewsManagement.EntityFrameworkCore;
 
@@ -67,13 +68,13 @@ public class NewsManagementDbContext :
     builder.ConfigureTenantManagement();
     builder.ConfigureFileManagement();
 
-    /* Configure your own tables/entities inside here */
 
-    //builder.Entity<YourEntity>(b =>
-    //{
-    //    b.ToTable(NewsManagementConsts.DbTablePrefix + "YourEntities", NewsManagementConsts.DbSchema);
-    //    b.ConfigureByConvention(); //auto configure for the base class props
-    //    //...
-    //});
+    builder.Entity<Tag>(b =>
+    {
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "Tag", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+
+
+    });
   }
 }
