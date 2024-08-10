@@ -2,5 +2,7 @@
 
 public static class NewsManagementDomainErrorCodes
 {
-    /* You can add your business exception error codes here, as constants */
+  public const string NotFound = "NewsManagement:500";
+  public const string AlreadyExists = "NewsManagement:501";
+  public const string FilterLimitsError = "agency_transfercenter:502";
 }

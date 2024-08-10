@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\modules\FileManagement\src\EasyAbp.FileManagement.Domain\EasyAbp.FileManagement.Domain.csproj" />
+    <ProjectReference Include="..\NewsManagement.Application.Contracts\NewsManagement.Application.Contracts.csproj" />
     <ProjectReference Include="..\NewsManagement.Domain.Shared\NewsManagement.Domain.Shared.csproj" />
   </ItemGroup>
 
