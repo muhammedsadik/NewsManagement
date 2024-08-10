@@ -84,7 +84,7 @@ namespace NewsManagement.Entities.Tags
     public async Task DeleteAsync(int id)
     {
       var isTagExist = await _tagRepository.AnyAsync(t => t.Id == id);
-      if (isTagExist)
+      if (!isTagExist)
         throw new EntityNotFoundException(typeof(Tag), id);
     }
 
