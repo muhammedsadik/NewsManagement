@@ -60,7 +60,7 @@ namespace EasyAbp.FileManagement
       typeof(AbpAccountWebModule),
       typeof(AbpAccountApplicationModule),
       typeof(AbpAccountHttpApiModule),
-      //typeof(AbpBlobStoringFileSystemModule),
+      typeof(AbpBlobStoringFileSystemModule),
       typeof(AbpBlobStoringMinioModule),
       typeof(AbpEntityFrameworkCoreSqlServerModule),
       typeof(AbpSettingManagementApplicationModule),
@@ -145,56 +145,43 @@ namespace EasyAbp.FileManagement
 
       Configure<AbpBlobStoringOptions>(options =>
       {
-
-        options.Containers.ConfigureDefault(container =>
+        options.Containers.Configure<LocalFileSystemBlobContainer>(container =>
         {
           container.IsMultiTenant = true;
-          container.UseMinio(minio =>
+          container.UseFileSystem(fileSystem =>
           {
-            minio.EndPoint = "localhost:9000";
-            minio.AccessKey = "hPNRYFw3pdCz2NtFzjlq";
-            minio.SecretKey = "QJp0GgVzJbWExP5w0fLgxJg6eqH60Cn6MDhe8JOM";
-            minio.BucketName = "newsmanagement";
+            // fileSystem.BasePath = "C:\\my-files";
+            fileSystem.BasePath = Path.Combine(hostingEnvironment.ContentRootPath, "my-files");
           });
         });
-
-        //options.Containers.Configure<LocalFileSystemBlobContainer>(container =>
-        //{
-        //    container.IsMultiTenant = true;
-        //    container.UseFileSystem(fileSystem =>
-        //    {
-        //        // fileSystem.BasePath = "C:\\my-files";
-        //        fileSystem.BasePath = Path.Combine(hostingEnvironment.ContentRootPath, "my-files");
-        //    });
-        //});
       });
 
-      //Configure<FileManagementOptions>(options =>
-      //{
-      //  options.DefaultFileDownloadProviderType = typeof(LocalFileDownloadProvider);
-      //  options.Containers.Configure<CommonFileContainer>(container =>
-      //        {
-      //          // private container never be used by non-owner users (except user who has the "File.Manage" permission).
-      //      container.FileContainerType = FileContainerType.Public;
-      //      container.AbpBlobContainerName = BlobContainerNameAttribute.GetContainerName<LocalFileSystemBlobContainer>();
-      //      container.AbpBlobDirectorySeparator = "/";
+      Configure<FileManagementOptions>(options =>
+      {
+        options.DefaultFileDownloadProviderType = typeof(LocalFileDownloadProvider);
+        options.Containers.Configure<CommonFileContainer>(container =>
+              {
+                // private container never be used by non-owner users (except user who has the "File.Manage" permission).
+                container.FileContainerType = FileContainerType.Public;
+                container.AbpBlobContainerName = BlobContainerNameAttribute.GetContainerName<LocalFileSystemBlobContainer>();
+                container.AbpBlobDirectorySeparator = "/";
 
-      //      container.RetainUnusedBlobs = false;
-      //      container.EnableAutoRename = true;
+                container.RetainUnusedBlobs = false;
+                container.EnableAutoRename = true;
 
-      //      container.MaxByteSizeForEachFile = 5 * 1024 * 1024;
-      //      container.MaxByteSizeForEachUpload = 10 * 1024 * 1024;
-      //      container.MaxFileQuantityForEachUpload = 2;
+                container.MaxByteSizeForEachFile = 5 * 1024 * 1024;
+                container.MaxByteSizeForEachUpload = 10 * 1024 * 1024;
+                container.MaxFileQuantityForEachUpload = 2;
 
-      //      container.AllowOnlyConfiguredFileExtensions = true;
-      //      container.FileExtensionsConfiguration.Add(".jpg", true);
-      //      container.FileExtensionsConfiguration.Add(".PNG", true);
-      //          // container.FileExtensionsConfiguration.Add(".tar.gz", true);
-      //          // container.FileExtensionsConfiguration.Add(".exe", false);
+                container.AllowOnlyConfiguredFileExtensions = true;
+                container.FileExtensionsConfiguration.Add(".jpg", true);
+                container.FileExtensionsConfiguration.Add(".PNG", true);
+                // container.FileExtensionsConfiguration.Add(".tar.gz", true);
+                // container.FileExtensionsConfiguration.Add(".exe", false);
 
-      //      container.GetDownloadInfoTimesLimitEachUserPerMinute = 10;
-      //    });
-      //});
+                container.GetDownloadInfoTimesLimitEachUserPerMinute = 10;
+              });
+      });
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
