@@ -10,7 +10,7 @@ namespace NewsManagement.Validations.TagValidation
 {
   public class UpdateTagDtoValidator : AbstractValidator<UpdateTagDto>
   {
-    public UpdateTagDtoValidator(IStringLocalizer<NewsManagementResource> localizer)
+    public UpdateTagDtoValidator()
     {
       RuleFor(t => t.TagName).NotEmpty();
     }

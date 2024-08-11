@@ -6,9 +6,14 @@
     "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information, visit abp.io.",
 
     "Permission:Tags": "Tag",
-    "Permission:Tags.Create": "Creating a new tag.",
-    "Permission:Tags.Edit": "Editing the tag.",
-    "Permission:Tags.Delete": "Deleting the tag.",
+    "Permission:Tags.Create": "Create",
+    "Permission:Tags.Edit": "Edit",
+    "Permission:Tags.Delete": "Delete",
+
+    "Permission:Cities": "City",
+    "Permission:Cities.Create": "Create",
+    "Permission:Cities.Edit": "Edit",
+    "Permission:Cities.Delete": "Delete",
 
 
 

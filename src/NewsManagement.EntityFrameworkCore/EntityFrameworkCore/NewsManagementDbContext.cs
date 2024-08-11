@@ -15,6 +15,7 @@ using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using EasyAbp.FileManagement.EntityFrameworkCore;
 using NewsManagement.Entities.Tags;
 using Volo.Abp.EntityFrameworkCore.Modeling;
+using NewsManagement.Entities.Cities;
 
 namespace NewsManagement.EntityFrameworkCore;
 
@@ -28,6 +29,7 @@ public class NewsManagementDbContext :
 {
   /* Add DbSet properties for your Aggregate Roots / Entities here. */
   public DbSet<Tag> Tags { get; set; }
+  public DbSet<City> Cities { get; set; }
 
   #region Entities from the modules
 
@@ -76,5 +78,15 @@ public class NewsManagementDbContext :
 
 
     });
+
+    builder.Entity<City>(b =>
+    {
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "City", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+
+
+    });
+
+
   }
 }

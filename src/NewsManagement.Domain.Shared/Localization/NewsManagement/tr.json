@@ -6,9 +6,14 @@
     "LongWelcomeMessage": "Uygulamaya hoşgeldiniz. Bu, ABP framework'ü üzerine bina edilmiş bir başlangıç projesidir. Daha fazla bilgi için abp.io adresini ziyaret edebilirsiniz.",
 
     "Permission:Tags": "Etiket",
-    "Permission:Tags.Create": "Etiket oluşturma.",
-    "Permission:Tags.Edit": "Etiket düzenleme.",
-    "Permission:Tags.Delete": "Etiket silme.",
+    "Permission:Tags.Create": "Oluşturma",
+    "Permission:Tags.Edit": "Düzenleme",
+    "Permission:Tags.Delete": "Silme",
+
+    "Permission:Cities": "Şehir",
+    "Permission:Cities.Create": "Oluşturma",
+    "Permission:Cities.Edit": "Düzenleme",
+    "Permission:Cities.Delete": "Silme",
 
 
 

@@ -1,4 +1,5 @@
-﻿using NewsManagement.Entities.Tags;
+﻿using NewsManagement.Entities.Cities;
+using NewsManagement.Entities.Tags;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,21 +14,21 @@ namespace NewsManagement
   public class NewsManagementDataSeederContributor : IDataSeedContributor, ITransientDependency
   {
     private readonly IRepository<Tag, int> _tagRepository;
+    private readonly IRepository<City, int> _cityRepository;
 
-
-    public NewsManagementDataSeederContributor(IRepository<Tag, int> tagRepository)
+    public NewsManagementDataSeederContributor(IRepository<Tag, int> tagRepository, IRepository<City, int> cityRepository)
     {
       _tagRepository = tagRepository;
-
+      _cityRepository = cityRepository;
     }
 
     public async Task SeedAsync(DataSeedContext context)
     {
       await SeedTagAsync();
+      await SeedCityAsync();
     }
 
     #region Tag
-
     private async Task SeedTagAsync()
     {
       if (await _tagRepository.CountAsync() > 0)
@@ -40,7 +41,7 @@ namespace NewsManagement
         },
         autoSave: true
       );
-      
+
       await _tagRepository.InsertAsync(
         new Tag()
         {
@@ -48,7 +49,7 @@ namespace NewsManagement
         },
         autoSave: true
       );
-      
+
       await _tagRepository.InsertAsync(
         new Tag()
         {
@@ -58,11 +59,39 @@ namespace NewsManagement
       );
 
     }
-
     #endregion
 
+    #region City
+    private async Task SeedCityAsync()
+    {
+      if (await _cityRepository.CountAsync() > 0)
+        return;
 
+      await _cityRepository.InsertAsync(
+        new City()
+        {
+          CityName = "İstanbul",
+          CityCode = 34
+        }
+      );
+      
+      await _cityRepository.InsertAsync(
+        new City()
+        {
+          CityName = "Ankara",
+          CityCode = 06
+        }
+      );
+      
+      await _cityRepository.InsertAsync(
+        new City()
+        {
+          CityName = "Diyarbakır",
+          CityCode = 21
+        }
+      );
 
-
+    }
+    #endregion
   }
 }

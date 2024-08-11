@@ -10,11 +10,23 @@ public class NewsManagementPermissionDefinitionProvider : PermissionDefinitionPr
   {
     var newsManagement = context.AddGroup(NewsManagementPermissions.GroupName);
 
-
+    #region Tag
     var tagsPermission = newsManagement.AddPermission(NewsManagementPermissions.Tags.Default, L("Permission:Tags"));
     tagsPermission.AddChild(NewsManagementPermissions.Tags.Create, L("Permission:Tags.Create"));
     tagsPermission.AddChild(NewsManagementPermissions.Tags.Edit, L("Permission:Tags.Edit"));
     tagsPermission.AddChild(NewsManagementPermissions.Tags.Delete, L("Permission:Tags.Delete"));
+    #endregion
+    
+    #region City
+    var citysPermission = newsManagement.AddPermission(NewsManagementPermissions.Cities.Default, L("Permission:Cities"));
+    citysPermission.AddChild(NewsManagementPermissions.Cities.Create, L("Permission:Cities.Create"));
+    citysPermission.AddChild(NewsManagementPermissions.Cities.Edit, L("Permission:Cities.Edit"));
+    citysPermission.AddChild(NewsManagementPermissions.Cities.Delete, L("Permission:Cities.Delete"));
+    #endregion
+
+
+
+
 
   }
 
