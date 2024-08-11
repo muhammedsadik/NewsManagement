@@ -139,8 +139,6 @@ namespace NewsManagement
         },
         autoSave: true
       );
-
-
     }
     #endregion
 

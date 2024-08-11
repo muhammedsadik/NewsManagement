@@ -1,4 +1,5 @@
-﻿using NewsManagement.Entities.Cities;
+﻿using NewsManagement.Entities.Categories;
+using NewsManagement.Entities.Cities;
 using NewsManagement.Entities.Tags;
 using System.Threading.Tasks;
 using Volo.Abp.Data;
@@ -11,16 +12,24 @@ public class NewsManagementTestDataSeedContributor : IDataSeedContributor, ITran
 {
   private readonly IRepository<Tag, int> _tagRepository;
   private readonly IRepository<City, int> _cityRepository;
-  public NewsManagementTestDataSeedContributor(IRepository<Tag, int> tagRepository, IRepository<City, int> cityRepository)
+  private readonly IRepository<Category, int> _categoryRepository;
+  public NewsManagementTestDataSeedContributor(
+    IRepository<Tag, int> tagRepository,
+    IRepository<City, int> cityRepository,
+    IRepository<Category, int> categoryRepository
+  )
   {
     _tagRepository = tagRepository;
     _cityRepository = cityRepository;
+    _categoryRepository = categoryRepository;
   }
 
   public async Task SeedAsync(DataSeedContext context)
   {
     await SeedTagAsync();
-  
+    await SeedCityAsync();
+    await SeedCategoryAsync();
+
   }
 
   #region Tag
@@ -86,6 +95,44 @@ public class NewsManagementTestDataSeedContributor : IDataSeedContributor, ITran
       }
     );
 
+  }
+  #endregion
+
+  #region Category
+  private async Task SeedCategoryAsync()
+  {
+    if (await _categoryRepository.CountAsync() > 0)
+      return;
+
+    await _categoryRepository.InsertAsync(
+      new Category()
+      {
+        CategoryName = "Kültür",
+        ColorCode = "#f9e79f",
+        IsActive = true
+      },
+    autoSave: true
+    );
+
+    await _categoryRepository.InsertAsync(
+      new Category()
+      {
+        CategoryName = "Ekonomi",
+        ColorCode = "#148f77",
+        IsActive = true
+      },
+    autoSave: true
+    );
+
+    await _categoryRepository.InsertAsync(
+      new Category()
+      {
+        CategoryName = "Siyaset",
+        ColorCode = "#ec7063",
+        IsActive = true
+      },
+      autoSave: true
+    );
   }
   #endregion
 
