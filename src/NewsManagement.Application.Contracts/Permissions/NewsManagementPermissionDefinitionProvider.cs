@@ -23,6 +23,13 @@ public class NewsManagementPermissionDefinitionProvider : PermissionDefinitionPr
     citysPermission.AddChild(NewsManagementPermissions.Cities.Edit, L("Permission:Cities.Edit"));
     citysPermission.AddChild(NewsManagementPermissions.Cities.Delete, L("Permission:Cities.Delete"));
     #endregion
+    
+    #region Category
+    var categoriesPermission = newsManagement.AddPermission(NewsManagementPermissions.Categories.Default, L("Permission:Categories"));
+    categoriesPermission.AddChild(NewsManagementPermissions.Categories.Create, L("Permission:Categories.Create"));
+    categoriesPermission.AddChild(NewsManagementPermissions.Categories.Edit, L("Permission:Categories.Edit"));
+    categoriesPermission.AddChild(NewsManagementPermissions.Categories.Delete, L("Permission:Categories.Delete"));
+    #endregion
 
 
 

@@ -15,7 +15,10 @@
     "Permission:Cities.Edit": "Düzenleme",
     "Permission:Cities.Delete": "Silme",
 
-
+    "Permission:Categories": "Kategori",
+    "Permission:Categories.Create": "Oluşturma",
+    "Permission:Categories.Edit": "Düzenleme",
+    "Permission:Categories.Delete": "Silme",
 
 
 
