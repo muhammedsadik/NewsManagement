@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using NewsManagement.Entities.Cities;
-using NewsManagement.Entities.Tags;
 using NewsManagement.EntityDtos.CityDtos;
 using NewsManagement.EntityDtos.PagedAndSortedDtos;
-using NewsManagement.EntityDtos.TagDtos;
 using NewsManagement.Permissions;
 using System;
 using System.Collections.Generic;
@@ -38,7 +36,7 @@ namespace NewsManagement.AppService.Cities
       return await _cityManager.UpdateAsync(id, updateCityDto);
     }
 
-    public async override Task<PagedResultDto<TagDto>> GetListAsync(GetListPagedAndSortedDto input)
+    public async override Task<PagedResultDto<CityDto>> GetListAsync(GetListPagedAndSortedDto input)
     {
       return await _cityManager.GetListAsync(input);
     }
