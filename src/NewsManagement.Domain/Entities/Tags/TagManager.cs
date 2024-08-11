@@ -44,11 +44,11 @@ namespace NewsManagement.Entities.Tags
 
     public async Task<TagDto> UpdateAsync(int id, UpdateTagDto updateTag)
     {
+      var existingTag = await _tagRepository.GetAsync(id);
+            
       var isExistTag = await _tagRepository.AnyAsync(t => t.TagName == updateTag.TagName && t.Id != id);
       if (isExistTag)
         throw new AlreadyExistException(typeof(Tag), updateTag.TagName);
-
-      var existingTag = await _tagRepository.GetAsync(id);
 
       _objectMapper.Map(updateTag, existingTag);
 
@@ -66,7 +66,7 @@ namespace NewsManagement.Entities.Tags
         : await _tagRepository.CountAsync(t => t.TagName.Contains(input.Filter));
 
       if (totalCount == 0)
-        throw new EntityNotFoundException(typeof(Tag), input.Filter ?? string.Empty);
+        throw new NotFoundException(typeof(Tag), input.Filter ?? string.Empty);
 
       if (input.SkipCount >= totalCount)
         throw new BusinessException(NewsManagementDomainErrorCodes.FilterLimitsError);

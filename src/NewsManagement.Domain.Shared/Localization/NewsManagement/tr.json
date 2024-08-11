@@ -3,6 +3,18 @@
   "texts": {
     "Menu:Home": "Ana sayfa",
     "Welcome": "Hoşgeldiniz",
-    "LongWelcomeMessage": "Uygulamaya hoşgeldiniz. Bu, ABP framework'ü üzerine bina edilmiş bir başlangıç projesidir. Daha fazla bilgi için abp.io adresini ziyaret edebilirsiniz."
+    "LongWelcomeMessage": "Uygulamaya hoşgeldiniz. Bu, ABP framework'ü üzerine bina edilmiş bir başlangıç projesidir. Daha fazla bilgi için abp.io adresini ziyaret edebilirsiniz.",
+
+
+    "NewsManagement:500": "{0} = {1} Bulunamadı.",
+    "NewsManagement:501": "{1} ile aynı isimli bir {0} önceden oluşturulmuş.",
+    "NewsManagement:502": "Filitre istek sınırı aşıldı."
+
+
+
+
+
+
+
   }
 }

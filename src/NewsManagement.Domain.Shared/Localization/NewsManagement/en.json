@@ -3,6 +3,17 @@
   "texts": {
     "Menu:Home": "Home",
     "Welcome": "Welcome",
-    "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information, visit abp.io."
+    "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information, visit abp.io.",
+
+    "NewsManagement:500": "{0} = {1} Not Found.",
+    "NewsManagement:501": "There is already {0} with the same name: {1}.",
+    "NewsManagement:502": "Filter request limit exceeded."
+
+
+
+
+
+
+
   }
 }
