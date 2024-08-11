@@ -5,6 +5,13 @@
     "Welcome": "Welcome",
     "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information, visit abp.io.",
 
+    "Permission:Tags": "Tag",
+    "Permission:Tags.Create": "Creating a new tag.",
+    "Permission:Tags.Edit": "Editing the tag.",
+    "Permission:Tags.Delete": "Deleting the tag.",
+
+
+
     "NewsManagement:500": "{0} = {1} Not Found.",
     "NewsManagement:501": "There is already {0} with the same name: {1}.",
     "NewsManagement:502": "Filter request limit exceeded."
