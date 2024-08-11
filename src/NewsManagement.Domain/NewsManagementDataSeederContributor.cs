@@ -1,4 +1,5 @@
-﻿using NewsManagement.Entities.Cities;
+﻿using NewsManagement.Entities.Categories;
+using NewsManagement.Entities.Cities;
 using NewsManagement.Entities.Tags;
 using System;
 using System.Collections.Generic;
@@ -15,17 +16,23 @@ namespace NewsManagement
   {
     private readonly IRepository<Tag, int> _tagRepository;
     private readonly IRepository<City, int> _cityRepository;
+    private readonly IRepository<Category, int> _categoryRepository;
 
-    public NewsManagementDataSeederContributor(IRepository<Tag, int> tagRepository, IRepository<City, int> cityRepository)
+    public NewsManagementDataSeederContributor(
+      IRepository<Tag, int> tagRepository,
+      IRepository<City, int> cityRepository,
+      IRepository<Category, int> categoryRepository)
     {
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
+      _categoryRepository = categoryRepository;
     }
 
     public async Task SeedAsync(DataSeedContext context)
     {
       await SeedTagAsync();
       await SeedCityAsync();
+      await SeedCategoryAsync();
     }
 
     #region Tag
@@ -72,29 +79,70 @@ namespace NewsManagement
         {
           CityName = "İstanbul",
           CityCode = 34
-        }
+        },
+        autoSave: true
       );
-      
+
       await _cityRepository.InsertAsync(
         new City()
         {
           CityName = "Ankara",
           CityCode = 06
-        }
+        },
+        autoSave: true
       );
-      
+
       await _cityRepository.InsertAsync(
         new City()
         {
           CityName = "Diyarbakır",
           CityCode = 21
-        }
+        },
+        autoSave: true
       );
 
     }
     #endregion
 
+    #region Category
+    private async Task SeedCategoryAsync()
+    {
+      if (await _categoryRepository.CountAsync() > 0)
+        return;
 
+      await _categoryRepository.InsertAsync(
+        new Category()
+        {
+          CategoryName = "Kültür",
+          ColorCode = "#f9e79f",
+          IsActive = true          
+        },
+        autoSave: true
+      );
+      
+      await _categoryRepository.InsertAsync(
+        new Category()
+        {
+          CategoryName = "Ekonomi",
+          ColorCode = "#148f77",
+          IsActive = true          
+        },
+        autoSave: true
+      );
+      
+      await _categoryRepository.InsertAsync(
+        new Category()
+        {
+          CategoryName = "Siyaset",
+          ColorCode = "#ec7063",
+          IsActive = true          
+        },
+        autoSave: true
+      );
+
+
+    }
+    #endregion
 
   }
 }

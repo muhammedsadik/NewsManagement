@@ -15,6 +15,11 @@
     "Permission:Cities.Edit": "Edit",
     "Permission:Cities.Delete": "Delete",
 
+    "Permission:Categories": "Category",
+    "Permission:Categories.Create": "Create",
+    "Permission:Categories.Edit": "Edit",
+    "Permission:Categories.Delete": "Delete",
+
 
 
     "NewsManagement:500": "{0} = {1} Not Found.",
