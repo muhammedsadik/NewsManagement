@@ -56,5 +56,10 @@ namespace NewsManagement.AppService.Categories
     {
       await _categoryManager.DeleteHardAsync(id);
     }
+
+    public async Task<List<Category>> GetSubCategoriesById(int id)
+    {
+      return await _categoryManager.GetSubCategoriesById(id);
+    }
   }
 }

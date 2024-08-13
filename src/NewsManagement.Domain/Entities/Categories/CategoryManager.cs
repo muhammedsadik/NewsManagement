@@ -32,7 +32,7 @@ namespace NewsManagement.Entities.Categories
     {
       if (!createCategoryDto.ParentCategoryId.HasValue)
         await CheckMainCategoryIsValidAsync(createCategoryDto.CategoryName);
-      
+
       if (createCategoryDto.ParentCategoryId.HasValue)
         await CheckSubCategoryIsValidAsync(createCategoryDto.CategoryName, (int)createCategoryDto.ParentCategoryId);
 
@@ -53,7 +53,7 @@ namespace NewsManagement.Entities.Categories
     public async Task CheckSubCategoryIsValidAsync(string categoryName, int parentCategoryId, int? id = null)
     {
       var isExistCategory = await _categoryRepository.AnyAsync(
-        c => c.CategoryName == categoryName 
+        c => c.CategoryName == categoryName
         && c.ParentCategoryId == parentCategoryId
         && c.Id != id
       );
@@ -120,6 +120,26 @@ namespace NewsManagement.Entities.Categories
       await _categoryRepository.HardDeleteAsync(category);
     }
 
+    public async Task<List<Category>> GetSubCategoriesById(int id)
+    {
+      var category = await _categoryRepository.GetAsync(id);
+
+      List<Category> listCategory = new();
+
+      if (!category.ParentCategoryId.HasValue)
+      {
+        listCategory.AddRange(await _categoryRepository.GetListAsync(c => c.ParentCategoryId == id));
+        listCategory.Add(category);
+      }
+
+      if (category.ParentCategoryId.HasValue)
+      {
+        listCategory.AddRange(await _categoryRepository.GetListAsync(c => c.ParentCategoryId == category.ParentCategoryId));
+        listCategory.Add(await _categoryRepository.GetAsync((int)category.ParentCategoryId));
+      }
+
+      return listCategory;
+    }
 
 
   }
