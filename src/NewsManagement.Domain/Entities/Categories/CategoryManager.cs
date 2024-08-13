@@ -106,16 +106,33 @@ namespace NewsManagement.Entities.Categories
       return new PagedResultDto<CategoryDto>(totalCount, categoryDtoList);
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task<List<Category>> DeleteAsync(int id)
     {
-      var isCategoryExist = await _categoryRepository.AnyAsync(c => c.Id == id);
-      if (!isCategoryExist)
-        throw new EntityNotFoundException(typeof(Category), id);
+      var category = await _categoryRepository.GetAsync(c => c.Id == id);
+
+      var deletingList = new List<Category>();
+
+      if (!category.ParentCategoryId.HasValue)
+      {
+        deletingList.AddRange(await _categoryRepository.GetListAsync(c => c.ParentCategoryId == id));
+      }
+
+      deletingList.Add(category);
+
+      return deletingList;
     }
 
     public async Task DeleteHardAsync(int id)
     {
       var category = await _categoryRepository.GetAsync(id);
+
+      if (!category.ParentCategoryId.HasValue)
+      {
+        var deletingList = await _categoryRepository.GetListAsync(c => c.ParentCategoryId == id);
+        deletingList.Add(category);
+
+        await _categoryRepository.HardDeleteAsync(deletingList);
+      }
 
       await _categoryRepository.HardDeleteAsync(category);
     }

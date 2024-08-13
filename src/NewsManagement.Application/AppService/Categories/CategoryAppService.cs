@@ -46,9 +46,10 @@ namespace NewsManagement.AppService.Categories
     [Authorize(NewsManagementPermissions.Categories.Delete)]
     public override async Task DeleteAsync(int id)
     {
-      await _categoryManager.DeleteAsync(id);
+      var category = await _categoryManager.DeleteAsync(id);
 
-      await base.DeleteAsync(id);
+      foreach (var item in category)
+        await base.DeleteAsync(item.Id);
     }
 
     [Authorize(NewsManagementPermissions.Categories.Delete)]
