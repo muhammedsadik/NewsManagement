@@ -60,7 +60,7 @@ namespace NewsManagement.City
     }
 
     [Fact]
-    public async Task DeleteAsynce_IdInValid_EntityNotFoundException()
+    public async Task DeleteAsync_IdInValid_EntityNotFoundException()
     {
       int cityId = 30;
 
@@ -71,7 +71,7 @@ namespace NewsManagement.City
     }
 
     [Fact]
-    public async Task DeleteHardAsynce_IdInValid_EntityNotFoundException()
+    public async Task DeleteHardAsync_IdInValid_EntityNotFoundException()
     {
       int cityId = 30;
 

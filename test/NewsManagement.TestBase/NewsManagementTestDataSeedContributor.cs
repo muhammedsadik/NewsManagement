@@ -99,6 +99,7 @@ public class NewsManagementTestDataSeedContributor : IDataSeedContributor, ITran
   #endregion
 
   #region Category
+
   private async Task SeedCategoryAsync()
   {
     if (await _categoryRepository.CountAsync() > 0)
@@ -109,9 +110,10 @@ public class NewsManagementTestDataSeedContributor : IDataSeedContributor, ITran
       {
         CategoryName = "Kültür",
         ColorCode = "#f9e79f",
-        IsActive = true
+        IsActive = true,
+        ParentCategoryId = null
       },
-    autoSave: true
+      autoSave: true
     );
 
     await _categoryRepository.InsertAsync(
@@ -119,9 +121,10 @@ public class NewsManagementTestDataSeedContributor : IDataSeedContributor, ITran
       {
         CategoryName = "Ekonomi",
         ColorCode = "#148f77",
-        IsActive = true
+        IsActive = true,
+        ParentCategoryId = null
       },
-    autoSave: true
+      autoSave: true
     );
 
     await _categoryRepository.InsertAsync(
@@ -129,21 +132,22 @@ public class NewsManagementTestDataSeedContributor : IDataSeedContributor, ITran
       {
         CategoryName = "Siyaset",
         ColorCode = "#ec7063",
-        IsActive = true
+        IsActive = true,
+        ParentCategoryId = null
       },
       autoSave: true
     );
 
     await _categoryRepository.InsertAsync(
-        new Category()
-        {
-          CategoryName = "Asya Kültürü",
-          ColorCode = "#ec70ff",
-          IsActive = true,
-          ParentCategoryId = 1
-        },
-        autoSave: true
-      );
+      new Category()
+      {
+        CategoryName = "Asya Kültürü",
+        ColorCode = "#ec70ff",
+        IsActive = true,
+        ParentCategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id
+      },
+      autoSave: true
+    );
 
     await _categoryRepository.InsertAsync(
       new Category()
@@ -151,7 +155,7 @@ public class NewsManagementTestDataSeedContributor : IDataSeedContributor, ITran
         CategoryName = "Yaşam",
         ColorCode = "#8c7063",
         IsActive = true,
-        ParentCategoryId = 1
+        ParentCategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id
       },
       autoSave: true
     );
@@ -162,7 +166,7 @@ public class NewsManagementTestDataSeedContributor : IDataSeedContributor, ITran
         CategoryName = "Makroekonomi",
         ColorCode = "#7c0e63",
         IsActive = true,
-        ParentCategoryId = 2
+        ParentCategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Ekonomi")).Id
       },
       autoSave: true
     );
