@@ -133,6 +133,40 @@ public class NewsManagementTestDataSeedContributor : IDataSeedContributor, ITran
       },
       autoSave: true
     );
+
+    await _categoryRepository.InsertAsync(
+        new Category()
+        {
+          CategoryName = "Asya Kültürü",
+          ColorCode = "#ec70ff",
+          IsActive = true,
+          ParentCategoryId = 1
+        },
+        autoSave: true
+      );
+
+    await _categoryRepository.InsertAsync(
+      new Category()
+      {
+        CategoryName = "Yaşam",
+        ColorCode = "#8c7063",
+        IsActive = true,
+        ParentCategoryId = 1
+      },
+      autoSave: true
+    );
+
+    await _categoryRepository.InsertAsync(
+      new Category()
+      {
+        CategoryName = "Makroekonomi",
+        ColorCode = "#7c0e63",
+        IsActive = true,
+        ParentCategoryId = 2
+      },
+      autoSave: true
+    );
+
   }
   #endregion
 

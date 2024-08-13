@@ -16,6 +16,7 @@ using EasyAbp.FileManagement.EntityFrameworkCore;
 using NewsManagement.Entities.Tags;
 using Volo.Abp.EntityFrameworkCore.Modeling;
 using NewsManagement.Entities.Cities;
+using NewsManagement.Entities.Categories;
 
 namespace NewsManagement.EntityFrameworkCore;
 
@@ -30,6 +31,7 @@ public class NewsManagementDbContext :
   /* Add DbSet properties for your Aggregate Roots / Entities here. */
   public DbSet<Tag> Tags { get; set; }
   public DbSet<City> Cities { get; set; }
+  public DbSet<Category> Categories { get; set; }
 
   #region Entities from the modules
 
@@ -58,8 +60,6 @@ public class NewsManagementDbContext :
   {
     base.OnModelCreating(builder);
 
-    /* Include modules to your migration db context */
-
     builder.ConfigurePermissionManagement();
     builder.ConfigureSettingManagement();
     builder.ConfigureBackgroundJobs();
@@ -84,6 +84,13 @@ public class NewsManagementDbContext :
       b.ToTable(NewsManagementConsts.DbTablePrefix + "City", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
 
+
+    });
+        
+    builder.Entity<Category>(b =>
+    {
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "Category", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
 
     });
 

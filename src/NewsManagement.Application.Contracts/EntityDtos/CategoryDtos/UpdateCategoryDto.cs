@@ -10,5 +10,6 @@ namespace NewsManagement.EntityDtos.CategoryDtos
     public bool IsActive { get; set; }
     public string CategoryName { get; set; }
     public string ColorCode { get; set; }
+    public int? ParentCategoryId { get; set; }
   }
 }

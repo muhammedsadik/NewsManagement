@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NewsManagement.EntityConsts.CategoryConsts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,12 +15,11 @@ namespace NewsManagement.Entities.Categories
     public string CategoryName { get; set; }
     public bool IsActive { get; set; }
     public string ColorCode { get; set; }
+    public int? ParentCategoryId { get; set; }
 
 
     internal Category()
     {
     }
-
-
   }
 }
