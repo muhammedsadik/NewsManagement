@@ -1,4 +1,5 @@
 ﻿using NewsManagement.AppService.Categories;
+using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Exceptions;
 using NewsManagement.EntityDtos.CategoryDtos;
 using NewsManagement.EntityDtos.PagedAndSortedDtos;
@@ -34,7 +35,7 @@ namespace NewsManagement.Category
         await _categoryAppService.CreateAsync(category);
       });
     }
-    
+
     [Fact]
     public async Task CreateAsync_SubCategoryNameInValid_AlreadyExistException()
     {
@@ -45,7 +46,7 @@ namespace NewsManagement.Category
         await _categoryAppService.CreateAsync(category);
       });
     }
-    
+
     [Fact]
     public async Task CreateAsync_SubCategory_BusinessException()
     {
@@ -78,7 +79,7 @@ namespace NewsManagement.Category
     }
 
     [Fact]
-    public async Task DeleteAsynce_IdInValid_EntityNotFoundException()
+    public async Task DeleteAsync_IdInValid_EntityNotFoundException()
     {
       int categoryId = 0;
 
@@ -89,7 +90,7 @@ namespace NewsManagement.Category
     }
 
     [Fact]
-    public async Task DeleteHardAsynce_IdInValid_EntityNotFoundException()
+    public async Task DeleteHardAsync_IdInValid_EntityNotFoundException()
     {
       int categoryId = 0;
 
@@ -98,5 +99,17 @@ namespace NewsManagement.Category
         await _categoryAppService.DeleteHardAsync(categoryId);
       });
     }
+
+    [Fact]
+    public async Task GetSubCategoriesById_IdValid_ReturnEntity()
+    {
+      var id = 5;
+      var categories = await _categoryAppService.GetSubCategoriesById(id);
+
+      Assert.NotNull(categories);
+      Assert.Equal(3, categories.Count);
+    }
+
+
   }
 }

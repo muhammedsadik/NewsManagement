@@ -18,7 +18,7 @@ namespace NewsManagement.Entities.Categories
     public int? ParentCategoryId { get; set; }
 
 
-    internal Category()
+    public Category()
     {
     }
   }
