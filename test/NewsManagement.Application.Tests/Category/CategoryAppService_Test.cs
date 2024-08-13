@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 using Xunit;
 
@@ -24,19 +25,40 @@ namespace NewsManagement.Category
     }
 
     [Fact]
-    public async Task CreateAsync_TagNameInValid_AlreadyExistException()
+    public async Task CreateAsync_MainCategoryNameInValid_AlreadyExistException()
     {
-      CreateCategoryDto category = new() { CategoryName = "Sanat", ColorCode = "#a6e79f", IsActive = true };
+      CreateCategoryDto category = new() { CategoryName = "Kültür", ColorCode = "#a6e79f", IsActive = true };
 
       await Assert.ThrowsAsync<AlreadyExistException>(async () =>
       {
         await _categoryAppService.CreateAsync(category);
       });
+    }
+    
+    [Fact]
+    public async Task CreateAsync_SubCategoryNameInValid_AlreadyExistException()
+    {
+      CreateCategoryDto category = new() { CategoryName = "Yaşam", ColorCode = "#a6e79f", IsActive = true, ParentCategoryId = 1 };
 
+      await Assert.ThrowsAsync<AlreadyExistException>(async () =>
+      {
+        await _categoryAppService.CreateAsync(category);
+      });
+    }
+    
+    [Fact]
+    public async Task CreateAsync_SubCategory_BusinessException()
+    {
+      CreateCategoryDto category = new() { CategoryName = "Spor", ColorCode = "#f6e79f", IsActive = true, ParentCategoryId = 5 };
+
+      await Assert.ThrowsAsync<BusinessException>(async () =>
+      {
+        await _categoryAppService.CreateAsync(category);
+      });
     }
 
     [Fact]
-    public async Task UpdateAsync_ReturnValue_TagDto()
+    public async Task UpdateAsync_ReturnValue_CategoryDto()
     {
       int categoryId = 2;
       UpdateCategoryDto category = new() { CategoryName = "Eğitim", ColorCode = "#ff179a", IsActive = true };
@@ -50,15 +72,15 @@ namespace NewsManagement.Category
     [Fact]
     public async Task GetListAsync_RetrunValue_FilterData()
     {
-      var tagList = await _categoryAppService.GetListAsync(new GetListPagedAndSortedDto() { Filter = "Tek" });
+      var categoryList = await _categoryAppService.GetListAsync(new GetListPagedAndSortedDto() { Filter = "Siya" });
 
-      tagList.Items.ShouldContain(c => c.CategoryName == "Teknoloji");
+      categoryList.Items.ShouldContain(c => c.CategoryName == "Siyaset");
     }
 
     [Fact]
     public async Task DeleteAsynce_IdInValid_EntityNotFoundException()
     {
-      int categoryId = 30;
+      int categoryId = 0;
 
       await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
       {
@@ -69,7 +91,7 @@ namespace NewsManagement.Category
     [Fact]
     public async Task DeleteHardAsynce_IdInValid_EntityNotFoundException()
     {
-      int categoryId = 30;
+      int categoryId = 0;
 
       await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
       {

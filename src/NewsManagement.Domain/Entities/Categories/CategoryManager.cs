@@ -28,19 +28,41 @@ namespace NewsManagement.Entities.Categories
       _objectMapper = objectMapper;
     }
 
-
     public async Task<CategoryDto> CreateAsync(CreateCategoryDto createCategoryDto)
     {
-      var isExistCategory = await _categoryRepository.AnyAsync(c => c.CategoryName == createCategoryDto.CategoryName);
-
-      if (isExistCategory)
-        throw new AlreadyExistException(typeof(Category), createCategoryDto.CategoryName);
+      if (!createCategoryDto.ParentCategoryId.HasValue)
+        await CheckMainCategoryIsValidAsync(createCategoryDto);
+      
+      if (createCategoryDto.ParentCategoryId.HasValue)
+        await CheckSubCategoryIsValidAsync(createCategoryDto);
 
       var createCategory = _objectMapper.Map<CreateCategoryDto, Category>(createCategoryDto);
 
       var category = await _categoryRepository.InsertAsync(createCategory);
       var categoryDto = _objectMapper.Map<Category, CategoryDto>(category);
       return categoryDto;
+    }
+
+    public async Task CheckMainCategoryIsValidAsync(CreateCategoryDto createCategoryDto)
+    {
+      var isExistCategory = await _categoryRepository.AnyAsync(c => c.CategoryName == createCategoryDto.CategoryName);
+      if (isExistCategory)
+        throw new AlreadyExistException(typeof(Category), createCategoryDto.CategoryName);
+    }
+
+    public async Task CheckSubCategoryIsValidAsync(CreateCategoryDto createCategoryDto)
+    {
+      var isExistCategory = await _categoryRepository.AnyAsync(
+        c => c.CategoryName == createCategoryDto.CategoryName 
+        && c.ParentCategoryId == createCategoryDto.ParentCategoryId
+      );
+      if (isExistCategory)
+        throw new AlreadyExistException(typeof(Category), createCategoryDto.CategoryName);
+
+      var category = await _categoryRepository.GetAsync((int)createCategoryDto.ParentCategoryId);
+
+      if (category.ParentCategoryId.HasValue)
+        throw new BusinessException(NewsManagementDomainErrorCodes.JustOneSubCategory);
     }
 
     public async Task<CategoryDto> UpdateAsync(int id, UpdateCategoryDto updateCategoryDto)

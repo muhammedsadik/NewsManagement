@@ -115,7 +115,8 @@ namespace NewsManagement
         {
           CategoryName = "Kültür",
           ColorCode = "#f9e79f",
-          IsActive = true          
+          IsActive = true,
+          ParentCategoryId = null
         },
         autoSave: true
       );
@@ -125,7 +126,8 @@ namespace NewsManagement
         {
           CategoryName = "Ekonomi",
           ColorCode = "#148f77",
-          IsActive = true          
+          IsActive = true,
+          ParentCategoryId = null
         },
         autoSave: true
       );
@@ -135,10 +137,45 @@ namespace NewsManagement
         {
           CategoryName = "Siyaset",
           ColorCode = "#ec7063",
-          IsActive = true          
+          IsActive = true,
+          ParentCategoryId = null
         },
         autoSave: true
       );
+
+      await _categoryRepository.InsertAsync(
+        new Category()
+        {
+          CategoryName = "Asya Kültürü",
+          ColorCode = "#ec70ff",
+          IsActive = true,
+          ParentCategoryId = (await _categoryRepository.GetAsync(c=>c.CategoryName == "Kültür")).Id
+        },
+        autoSave: true
+      );
+      
+      await _categoryRepository.InsertAsync(
+        new Category()
+        {
+          CategoryName = "Yaşam",
+          ColorCode = "#8c7063",
+          IsActive = true,
+          ParentCategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id
+        },
+        autoSave: true
+      );
+      
+      await _categoryRepository.InsertAsync(
+        new Category()
+        {
+          CategoryName = "Makroekonomi",
+          ColorCode = "#7c0e63",
+          IsActive = true,
+          ParentCategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Ekonomi")).Id
+        },
+        autoSave: true
+      );
+
     }
     #endregion
 
