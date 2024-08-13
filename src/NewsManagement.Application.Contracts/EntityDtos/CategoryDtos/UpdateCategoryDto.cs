@@ -7,8 +7,8 @@ namespace NewsManagement.EntityDtos.CategoryDtos
 {
   public class UpdateCategoryDto : EntityDto
   {
-    public bool IsActive { get; set; }
     public string CategoryName { get; set; }
+    public bool IsActive { get; set; }
     public string ColorCode { get; set; }
     public int? ParentCategoryId { get; set; }
   }
