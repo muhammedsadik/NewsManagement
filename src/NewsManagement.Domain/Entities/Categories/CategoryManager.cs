@@ -88,11 +88,11 @@ namespace NewsManagement.Entities.Categories
       if (!existingCategory.ParentCategoryId.HasValue)
         await CheckMainCategoryIsValidAsync(existingCategory);
 
-      if (!existingCategory.ParentCategoryId.HasValue)
-        await ChangingParentOfMainCategory(existingCategory);
-
       if (existingCategory.ParentCategoryId.HasValue)
         existingCategory = await CheckSubCategoryIsValidAsync(existingCategory, id);
+
+      if (existingCategory.ParentCategoryId.HasValue)
+        await ChangingParentOfMainCategory(existingCategory);
 
       var category = await _categoryRepository.UpdateAsync(existingCategory);
 
