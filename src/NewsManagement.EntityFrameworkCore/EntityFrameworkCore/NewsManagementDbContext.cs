@@ -17,6 +17,10 @@ using NewsManagement.Entities.Tags;
 using Volo.Abp.EntityFrameworkCore.Modeling;
 using NewsManagement.Entities.Cities;
 using NewsManagement.Entities.Categories;
+using NewsManagement.Entities.Videos;
+using NewsManagement.Entities.Galleries;
+using NewsManagement.Entities.Newses;
+using NewsManagement.Entities.ListableContents;
 
 namespace NewsManagement.EntityFrameworkCore;
 
@@ -28,10 +32,19 @@ public class NewsManagementDbContext :
     IIdentityDbContext,
     ITenantManagementDbContext
 {
-  /* Add DbSet properties for your Aggregate Roots / Entities here. */
+
+
+  public DbSet<ListableContent> ListableContents { get; set; }
+  public DbSet<Gallery> Galleries { get; set; }
+  public DbSet<Video> Videos { get; set; }
+  public DbSet<News> Newses { get; set; }
   public DbSet<Tag> Tags { get; set; }
   public DbSet<City> Cities { get; set; }
   public DbSet<Category> Categories { get; set; }
+  public DbSet<ListableContentTag> ListableContentTags { get; set; }
+  public DbSet<ListableContentCity> ListableContentCities { get; set; }
+  public DbSet<ListableContentCategory> ListableContentCategories { get; set; }
+
 
   #region Entities from the modules
 
@@ -71,9 +84,66 @@ public class NewsManagementDbContext :
     builder.ConfigureFileManagement();
 
 
+    builder.Entity<Gallery>(b =>
+    {
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "Galleries", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+
+
+    });
+    
+    builder.Entity<Video>(b =>
+    {
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "Videos", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+
+
+    });
+    
+    builder.Entity<News>(b =>
+    {
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "Newses", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+
+
+    });
+    
+    builder.Entity<ListableContent>(b =>
+    {
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContents", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+
+
+    });
+    
+    builder.Entity<ListableContentTag>(b =>
+    {
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContentTags", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+
+
+    });
+    
+    builder.Entity<ListableContentCity>(b =>
+    {
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContentCities", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+
+
+    });
+    
+    
+    builder.Entity<ListableContentCategory>(b =>
+    {
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContentCategories", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+
+
+    });
+
     builder.Entity<Tag>(b =>
     {
-      b.ToTable(NewsManagementConsts.DbTablePrefix + "Tag", NewsManagementConsts.DbSchema);
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "Tags", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
 
 
@@ -81,7 +151,7 @@ public class NewsManagementDbContext :
 
     builder.Entity<City>(b =>
     {
-      b.ToTable(NewsManagementConsts.DbTablePrefix + "City", NewsManagementConsts.DbSchema);
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "Cities", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
 
 
@@ -89,7 +159,7 @@ public class NewsManagementDbContext :
         
     builder.Entity<Category>(b =>
     {
-      b.ToTable(NewsManagementConsts.DbTablePrefix + "Category", NewsManagementConsts.DbSchema);
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "Categories", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
 
     });
