@@ -14,6 +14,7 @@ using Volo.Abp.Domain.Repositories;
 using NewsManagement.EntityDtos.CategoryDtos;
 using Microsoft.AspNetCore.Authorization;
 using NewsManagement.Permissions;
+using Volo.Abp.Data;
 
 namespace NewsManagement.Entities.Categories
 {
@@ -21,10 +22,11 @@ namespace NewsManagement.Entities.Categories
   {
     private readonly IObjectMapper _objectMapper;
     private readonly ICategoryRepository _categoryRepository;
-
-    public CategoryManager(ICategoryRepository categoryRepository, IObjectMapper objectMapper)
+    private readonly IDataFilter<ISoftDelete> _softDeleteFilter;
+    public CategoryManager(ICategoryRepository categoryRepository, IObjectMapper objectMapper, IDataFilter<ISoftDelete> softDeleteFilter)
     {
       _categoryRepository = categoryRepository;
+      _softDeleteFilter = softDeleteFilter;
       _objectMapper = objectMapper;
     }
 
@@ -128,10 +130,13 @@ namespace NewsManagement.Entities.Categories
 
       if (!category.ParentCategoryId.HasValue)
       {
-        var deletingList = await _categoryRepository.GetListAsync(c => c.ParentCategoryId == id);
-        deletingList.Add(category);
+        using (_softDeleteFilter.Disable())
+        {
+          var deletingList = await _categoryRepository.GetListAsync(c => c.ParentCategoryId == id);
+          deletingList.Add(category);
 
-        await _categoryRepository.HardDeleteAsync(deletingList);
+          await _categoryRepository.HardDeleteAsync(deletingList);
+        }
       }
 
       await _categoryRepository.HardDeleteAsync(category);
