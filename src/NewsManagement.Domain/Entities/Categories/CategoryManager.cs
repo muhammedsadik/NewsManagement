@@ -32,53 +32,64 @@ namespace NewsManagement.Entities.Categories
 
     public async Task<CategoryDto> CreateAsync(CreateCategoryDto createCategoryDto)
     {
-      if (!createCategoryDto.ParentCategoryId.HasValue)
-        await CheckMainCategoryIsValidAsync(createCategoryDto.CategoryName);
+      var category = _objectMapper.Map<CreateCategoryDto, Category>(createCategoryDto);
 
-      if (createCategoryDto.ParentCategoryId.HasValue)
-        await CheckSubCategoryIsValidAsync(createCategoryDto.CategoryName, (int)createCategoryDto.ParentCategoryId);
+      if (!category.ParentCategoryId.HasValue)
+        await CheckMainCategoryIsValidAsync(category);
 
-      var createCategory = _objectMapper.Map<CreateCategoryDto, Category>(createCategoryDto);
+      if (category.ParentCategoryId.HasValue)
+        category = await CheckSubCategoryIsValidAsync(category);
 
-      var category = await _categoryRepository.InsertAsync(createCategory);
-      var categoryDto = _objectMapper.Map<Category, CategoryDto>(category);
+      var createdCategory = await _categoryRepository.InsertAsync(category);
+
+      var categoryDto = _objectMapper.Map<Category, CategoryDto>(createdCategory);
+
       return categoryDto;
     }
 
-    public async Task CheckMainCategoryIsValidAsync(string categoryName)
-    {
-      var isExistCategory = await _categoryRepository.AnyAsync(c => c.CategoryName == categoryName);
-      if (isExistCategory)
-        throw new AlreadyExistException(typeof(Category), categoryName);
-    }
-
-    public async Task CheckSubCategoryIsValidAsync(string categoryName, int parentCategoryId, int? id = null)
+    public async Task CheckMainCategoryIsValidAsync(Category category)
     {
       var isExistCategory = await _categoryRepository.AnyAsync(
-        c => c.CategoryName == categoryName
-        && c.ParentCategoryId == parentCategoryId
+        c => c.CategoryName == category.CategoryName
+        && c.ParentCategoryId == category.ParentCategoryId
+        && c.Id != category.Id
+      );
+      if (isExistCategory)
+        throw new AlreadyExistException(typeof(Category), category.CategoryName);
+    }
+
+    public async Task<Category> CheckSubCategoryIsValidAsync(Category category, int? id = null)
+    {
+      var isExistCategory = await _categoryRepository.AnyAsync(
+        c => c.CategoryName == category.CategoryName
+        && c.ParentCategoryId == category.ParentCategoryId
         && c.Id != id
       );
       if (isExistCategory)
-        throw new AlreadyExistException(typeof(Category), categoryName);
+        throw new AlreadyExistException(typeof(Category), category.CategoryName);
 
-      var category = await _categoryRepository.GetAsync(parentCategoryId);
+      var parentCategory = await _categoryRepository.GetAsync((int)category.ParentCategoryId);
 
-      if (category.ParentCategoryId.HasValue)
+      if (parentCategory.ParentCategoryId.HasValue)
         throw new BusinessException(NewsManagementDomainErrorCodes.JustOneSubCategory);
+
+      if (parentCategory.IsActive == false)
+        category.IsActive = parentCategory.IsActive;
+
+      return category;
     }
 
     public async Task<CategoryDto> UpdateAsync(int id, UpdateCategoryDto updateCategoryDto)
     {
       var existingCategory = await _categoryRepository.GetAsync(id);
 
-      if (!updateCategoryDto.ParentCategoryId.HasValue)
-        await CheckMainCategoryIsValidAsync(updateCategoryDto.CategoryName);
-
-      if (updateCategoryDto.ParentCategoryId.HasValue)
-        await CheckSubCategoryIsValidAsync(updateCategoryDto.CategoryName, (int)updateCategoryDto.ParentCategoryId, id);
-
       _objectMapper.Map(updateCategoryDto, existingCategory);
+
+      if (!existingCategory.ParentCategoryId.HasValue)
+        await CheckMainCategoryIsValidAsync(existingCategory);
+
+      if (existingCategory.ParentCategoryId.HasValue)
+        existingCategory = await CheckSubCategoryIsValidAsync(existingCategory, id);
 
       var category = await _categoryRepository.UpdateAsync(existingCategory);
 
