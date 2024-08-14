@@ -1,11 +1,11 @@
-﻿using NewsManagement.EntityDtos.ListableContentsDto;
+﻿using NewsManagement.EntityDtos.ListableContentDtos;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace NewsManagement.EntityDtos.NewsDtos
 {
-  public class NewsDto : ListableConentDto
+  public class NewsDto : ListableContentDto
   {
   }
 }
