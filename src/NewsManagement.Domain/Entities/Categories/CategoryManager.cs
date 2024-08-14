@@ -81,31 +81,32 @@ namespace NewsManagement.Entities.Categories
 
     public async Task<CategoryDto> UpdateAsync(int id, UpdateCategoryDto updateCategoryDto)
     {
+      if (!(await _categoryRepository.GetAsync(id)).ParentCategoryId.HasValue && updateCategoryDto.ParentCategoryId.HasValue)
+        await ChangingParentIdOfMainCategory(id);
+
       var existingCategory = await _categoryRepository.GetAsync(id);
 
-      _objectMapper.Map(updateCategoryDto, existingCategory);
+      var updatingCategory = _objectMapper.Map(updateCategoryDto, existingCategory);
 
-      if (!existingCategory.ParentCategoryId.HasValue)
-        await CheckMainCategoryIsValidAsync(existingCategory);
+      if (!updatingCategory.ParentCategoryId.HasValue)
+        await CheckMainCategoryIsValidAsync(updatingCategory);
 
-      if (existingCategory.ParentCategoryId.HasValue)
-        existingCategory = await CheckSubCategoryIsValidAsync(existingCategory, id);
+      if (updatingCategory.ParentCategoryId.HasValue)
+        updatingCategory = await CheckSubCategoryIsValidAsync(updatingCategory, id);
 
-      if (existingCategory.ParentCategoryId.HasValue)
-        await ChangingParentOfMainCategory(existingCategory);
+      var category = await _categoryRepository.UpdateAsync(updatingCategory);
 
-      var category = await _categoryRepository.UpdateAsync(existingCategory);
-
-      if (!existingCategory.ParentCategoryId.HasValue)
-        await UpdateSubCategoryByMainIsActiveAsync(existingCategory);
+      if (!updatingCategory.ParentCategoryId.HasValue)
+        if (updatingCategory.IsActive == false)
+          await UpdateSubCategoryByMainIsActiveAsync(updatingCategory);
 
       var categoryDto = _objectMapper.Map<Category, CategoryDto>(category);
       return categoryDto;
     }
 
-    private async Task ChangingParentOfMainCategory(Category category)
+    private async Task ChangingParentIdOfMainCategory(int id)
     {
-      if (await _categoryRepository.AnyAsync(c => c.ParentCategoryId == category.Id))
+      if (await _categoryRepository.AnyAsync(c => c.ParentCategoryId == id))
         throw new BusinessException(NewsManagementDomainErrorCodes.MainCategoryWithSubCannotBeChanged);
 
     }
