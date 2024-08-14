@@ -83,86 +83,89 @@ public class NewsManagementDbContext :
     builder.ConfigureTenantManagement();
     builder.ConfigureFileManagement();
 
-
+    #region Gallery, Video, News
     builder.Entity<Gallery>(b =>
     {
+
+
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Galleries", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
-
-
     });
     
     builder.Entity<Video>(b =>
     {
+
+
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Videos", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
-
-
     });
     
     builder.Entity<News>(b =>
     {
+
+
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Newses", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
-
-
     });
+    #endregion
     
-    builder.Entity<ListableContent>(b =>
-    {
-      b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContents", NewsManagementConsts.DbSchema);
-      b.ConfigureByConvention();
-
-
-    });
-    
+    #region ListableContent(Tag, City, Category)
     builder.Entity<ListableContentTag>(b =>
     {
+      b.HasKey(x => new { x.ListableContentId, x.TagId });
+      b.HasOne(x => x.ListableContent).WithMany(x => x.ListableContentTags).HasForeignKey(x => x.ListableContentId);
+      b.HasOne(x => x.Tag).WithMany(x => x.ListableContentTags).HasForeignKey(x => x.TagId);
+
       b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContentTags", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
-
-
     });
     
     builder.Entity<ListableContentCity>(b =>
     {
+      b.HasKey(x => new { x.ListableContentId, x.CityId });
+      b.HasOne(x => x.ListableContent).WithMany(x => x.ListableContentCities).HasForeignKey(x => x.ListableContentId);
+      b.HasOne(x => x.City).WithMany(x => x.ListableContentCities).HasForeignKey(x => x.CityId);
+
       b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContentCities", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
-
-
     });
-    
-    
+        
     builder.Entity<ListableContentCategory>(b =>
     {
+      b.HasKey(x => new { x.ListableContentId, x.CategoryId });
+      b.HasOne(x => x.ListableContent).WithMany(x => x.ListableContentCategories).HasForeignKey(x => x.ListableContentId);
+      b.HasOne(x => x.Category).WithMany(x => x.ListableContentCategories).HasForeignKey(x => x.CategoryId);
+
       b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContentCategories", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
-
-
     });
+    #endregion 
 
+    #region Tag, City, Category
     builder.Entity<Tag>(b =>
     {
+      b.HasMany(x => x.ListableContentTags).WithOne().HasForeignKey(x => x.TagId);
+
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Tags", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
-
-
     });
 
     builder.Entity<City>(b =>
     {
+      b.HasMany(x => x.ListableContentCities).WithOne().HasForeignKey(x => x.CityId);
+
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Cities", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
-
-
     });
         
     builder.Entity<Category>(b =>
     {
+      b.HasMany(x => x.ListableContentCategories).WithOne().HasForeignKey(x => x.CategoryId);
+
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Categories", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
-
     });
+    #endregion
 
 
   }
