@@ -6,7 +6,8 @@ namespace NewsManagement.EntityConsts.CategoryConsts
 {
   public enum CategoryType
   {
-    MainCategory,
-    SubCategory
+    News,
+    Video,
+    Gallery
   }
 }
