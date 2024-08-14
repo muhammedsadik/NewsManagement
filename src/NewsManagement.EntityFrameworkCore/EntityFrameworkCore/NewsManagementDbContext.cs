@@ -87,22 +87,16 @@ public class NewsManagementDbContext :
     //builder.Entity<Gallery>(b =>
     //{
 
-    //  b.ToTable(NewsManagementConsts.DbTablePrefix + "Galleries", NewsManagementConsts.DbSchema);
-    //  b.ConfigureByConvention();
     //});
     
     //builder.Entity<Video>(b =>
     //{
 
-    //  b.ToTable(NewsManagementConsts.DbTablePrefix + "Videos", NewsManagementConsts.DbSchema);
-    //  b.ConfigureByConvention();
     //});
     
     //builder.Entity<News>(b =>
     //{
 
-    //  b.ToTable(NewsManagementConsts.DbTablePrefix + "Newses", NewsManagementConsts.DbSchema);
-    //  b.ConfigureByConvention();
     //});
     #endregion
     
