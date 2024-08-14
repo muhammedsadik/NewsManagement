@@ -182,17 +182,20 @@ namespace NewsManagement.Entities.Categories
     {
       var category = await _categoryRepository.GetAsync(id);
 
+      if (category.IsActive == false)
+        throw new NotFoundException(typeof(Category), id.ToString());
+
       List<Category> listCategory = new();
 
       if (!category.ParentCategoryId.HasValue)
       {
-        listCategory.AddRange(await _categoryRepository.GetListAsync(c => c.ParentCategoryId == id));
+        listCategory.AddRange(await _categoryRepository.GetListAsync(c => c.ParentCategoryId == id && c.IsActive==true));
         listCategory.Add(category);
       }
 
       if (category.ParentCategoryId.HasValue)
       {
-        listCategory.AddRange(await _categoryRepository.GetListAsync(c => c.ParentCategoryId == category.ParentCategoryId));
+        listCategory.AddRange(await _categoryRepository.GetListAsync(c => c.ParentCategoryId == category.ParentCategoryId && c.IsActive == true));
         listCategory.Add(await _categoryRepository.GetAsync((int)category.ParentCategoryId));
       }
 
