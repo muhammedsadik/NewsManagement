@@ -188,7 +188,27 @@ namespace NewsManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppCategory", (string)null);
+                    b.ToTable("AppCategories", (string)null);
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.Categories.ListableContentCategory", b =>
+                {
+                    b.Property<int>("ListableContentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CategoryId1")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ListableContentId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("CategoryId1");
+
+                    b.ToTable("AppListableContentCategories", (string)null);
                 });
 
             modelBuilder.Entity("NewsManagement.Entities.Cities.City", b =>
@@ -252,7 +272,128 @@ namespace NewsManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppCity", (string)null);
+                    b.ToTable("AppCities", (string)null);
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.Cities.ListableContentCity", b =>
+                {
+                    b.Property<int>("ListableContentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CityId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CityId1")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ListableContentId", "CityId");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("CityId1");
+
+                    b.ToTable("AppListableContentCities", (string)null);
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.ListableContents.ListableContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExtraProperties")
+                        .HasColumnType("text")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<int>("ImageId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<DateTime>("PublishTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Spot")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("listableContentType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ListableContents");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("ListableContent");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.Tags.ListableContentTag", b =>
+                {
+                    b.Property<int>("ListableContentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TagId1")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ListableContentId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.HasIndex("TagId1");
+
+                    b.ToTable("AppListableContentTags", (string)null);
                 });
 
             modelBuilder.Entity("NewsManagement.Entities.Tags.Tag", b =>
@@ -313,7 +454,7 @@ namespace NewsManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AppTag", (string)null);
+                    b.ToTable("AppTags", (string)null);
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>
@@ -1968,6 +2109,105 @@ namespace NewsManagement.Migrations
                     b.ToTable("AbpTenantConnectionStrings", (string)null);
                 });
 
+            modelBuilder.Entity("NewsManagement.Entities.Galleries.Gallery", b =>
+                {
+                    b.HasBaseType("NewsManagement.Entities.ListableContents.ListableContent");
+
+                    b.HasDiscriminator().HasValue("Gallery");
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.Newses.News", b =>
+                {
+                    b.HasBaseType("NewsManagement.Entities.ListableContents.ListableContent");
+
+                    b.HasDiscriminator().HasValue("News");
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.Videos.Video", b =>
+                {
+                    b.HasBaseType("NewsManagement.Entities.ListableContents.ListableContent");
+
+                    b.Property<int>("VideoType")
+                        .HasColumnType("integer");
+
+                    b.HasDiscriminator().HasValue("Video");
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.Categories.ListableContentCategory", b =>
+                {
+                    b.HasOne("NewsManagement.Entities.Categories.Category", null)
+                        .WithMany("ListableContentCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NewsManagement.Entities.Categories.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NewsManagement.Entities.ListableContents.ListableContent", "ListableContent")
+                        .WithMany("ListableContentCategories")
+                        .HasForeignKey("ListableContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("ListableContent");
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.Cities.ListableContentCity", b =>
+                {
+                    b.HasOne("NewsManagement.Entities.Cities.City", null)
+                        .WithMany("ListableContentCities")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NewsManagement.Entities.Cities.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NewsManagement.Entities.ListableContents.ListableContent", "ListableContent")
+                        .WithMany("ListableContentCities")
+                        .HasForeignKey("ListableContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("ListableContent");
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.Tags.ListableContentTag", b =>
+                {
+                    b.HasOne("NewsManagement.Entities.ListableContents.ListableContent", "ListableContent")
+                        .WithMany("ListableContentTags")
+                        .HasForeignKey("ListableContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NewsManagement.Entities.Tags.Tag", null)
+                        .WithMany("ListableContentTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NewsManagement.Entities.Tags.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ListableContent");
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogAction", b =>
                 {
                     b.HasOne("Volo.Abp.AuditLogging.AuditLog", null)
@@ -2108,6 +2348,30 @@ namespace NewsManagement.Migrations
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.Categories.Category", b =>
+                {
+                    b.Navigation("ListableContentCategories");
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.Cities.City", b =>
+                {
+                    b.Navigation("ListableContentCities");
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.ListableContents.ListableContent", b =>
+                {
+                    b.Navigation("ListableContentCategories");
+
+                    b.Navigation("ListableContentCities");
+
+                    b.Navigation("ListableContentTags");
+                });
+
+            modelBuilder.Entity("NewsManagement.Entities.Tags.Tag", b =>
+                {
+                    b.Navigation("ListableContentTags");
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>

@@ -84,29 +84,26 @@ public class NewsManagementDbContext :
     builder.ConfigureFileManagement();
 
     #region Gallery, Video, News
-    builder.Entity<Gallery>(b =>
-    {
+    //builder.Entity<Gallery>(b =>
+    //{
 
-
-      b.ToTable(NewsManagementConsts.DbTablePrefix + "Galleries", NewsManagementConsts.DbSchema);
-      b.ConfigureByConvention();
-    });
+    //  b.ToTable(NewsManagementConsts.DbTablePrefix + "Galleries", NewsManagementConsts.DbSchema);
+    //  b.ConfigureByConvention();
+    //});
     
-    builder.Entity<Video>(b =>
-    {
+    //builder.Entity<Video>(b =>
+    //{
 
-
-      b.ToTable(NewsManagementConsts.DbTablePrefix + "Videos", NewsManagementConsts.DbSchema);
-      b.ConfigureByConvention();
-    });
+    //  b.ToTable(NewsManagementConsts.DbTablePrefix + "Videos", NewsManagementConsts.DbSchema);
+    //  b.ConfigureByConvention();
+    //});
     
-    builder.Entity<News>(b =>
-    {
+    //builder.Entity<News>(b =>
+    //{
 
-
-      b.ToTable(NewsManagementConsts.DbTablePrefix + "Newses", NewsManagementConsts.DbSchema);
-      b.ConfigureByConvention();
-    });
+    //  b.ToTable(NewsManagementConsts.DbTablePrefix + "Newses", NewsManagementConsts.DbSchema);
+    //  b.ConfigureByConvention();
+    //});
     #endregion
     
     #region ListableContent(Tag, City, Category)
