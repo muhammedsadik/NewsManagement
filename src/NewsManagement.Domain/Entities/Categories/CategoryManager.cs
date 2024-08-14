@@ -88,13 +88,37 @@ namespace NewsManagement.Entities.Categories
       if (!existingCategory.ParentCategoryId.HasValue)
         await CheckMainCategoryIsValidAsync(existingCategory);
 
+      if (!existingCategory.ParentCategoryId.HasValue)
+        await ChangingParentOfMainCategory(existingCategory);
+
       if (existingCategory.ParentCategoryId.HasValue)
         existingCategory = await CheckSubCategoryIsValidAsync(existingCategory, id);
 
       var category = await _categoryRepository.UpdateAsync(existingCategory);
 
+      if (!existingCategory.ParentCategoryId.HasValue)
+        await UpdateSubCategoryByMainIsActiveAsync(existingCategory);
+
       var categoryDto = _objectMapper.Map<Category, CategoryDto>(category);
       return categoryDto;
+    }
+
+    private async Task ChangingParentOfMainCategory(Category category)
+    {
+      if (await _categoryRepository.AnyAsync(c => c.ParentCategoryId == category.Id))
+        throw new BusinessException(NewsManagementDomainErrorCodes.MainCategoryWithSubCannotBeChanged);
+
+    }
+
+    private async Task UpdateSubCategoryByMainIsActiveAsync(Category category)
+    {
+      var subCategories = await _categoryRepository.GetListAsync(c => c.ParentCategoryId == category.Id);
+
+      foreach (var subCategory in subCategories)
+      {
+        subCategory.IsActive = category.IsActive;
+        await _categoryRepository.UpdateAsync(subCategory);
+      }
     }
 
     public async Task<PagedResultDto<CategoryDto>> GetListAsync(GetListPagedAndSortedDto input)

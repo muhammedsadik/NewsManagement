@@ -25,7 +25,8 @@
     "NewsManagement:500": "{0} = {1} Not Found.",
     "NewsManagement:501": "There is already {0} with the same name: {1}.",
     "NewsManagement:502": "Filter request limit exceeded.",
-    "NewsManagement:503": "A subcategory cannot have subcategories."
+    "NewsManagement:503": "A subcategory cannot have subcategories.",
+    "NewsManagement:504": "The main category cannot be changed with subcategories."
 
 
 
