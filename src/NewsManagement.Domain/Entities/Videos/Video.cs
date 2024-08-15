@@ -10,8 +10,8 @@ namespace NewsManagement.Entities.Videos
 {
   public class Video : ListableContent
   {
-
     public VideoType VideoType { get; set; }
+    public string? Url { get; set; }
 
 
     internal Video() { }

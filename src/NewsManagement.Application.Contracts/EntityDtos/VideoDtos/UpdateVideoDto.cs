@@ -9,6 +9,7 @@ namespace NewsManagement.EntityDtos.VideoDtos
   public class UpdateVideoDto : UpdateListableContentDto
   {
     public VideoType VideoType { get; set; }
+    public string? Url { get; set; }
 
   }
 }

@@ -9,5 +9,6 @@ namespace NewsManagement.EntityDtos.VideoDtos
   public class CreateVideoDto : CreateListableContentDto
   {
     public VideoType VideoType { get; set; }
+    public string? Url { get; set; }
   }
 }
