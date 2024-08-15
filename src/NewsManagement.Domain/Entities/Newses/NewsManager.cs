@@ -1,4 +1,4 @@
-﻿using NewsManagement.Entities.ListableContantBase;
+﻿using NewsManagement.Entities.ListableContentBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using Volo.Abp.ObjectMapping;
 
 namespace NewsManagement.Entities.Newses
 {
-  public class NewsManager : ListableContentBaseManager<News, int>
+  public class NewsManager : DomainService
   {
     private readonly INewsRepository _newsRepository;
     private readonly IObjectMapper _objectMapper;

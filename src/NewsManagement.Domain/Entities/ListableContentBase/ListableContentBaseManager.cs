@@ -9,8 +9,7 @@ using Volo.Abp.Domain.Services;
 
 namespace NewsManagement.Entities.ListableContentBase
 {
-  public abstract class ListableContentBaseManager<TEntity, TKey> : DomainService
-    where TEntity : class, IEntity, new()
+  public abstract class ListableContentBaseManager : DomainService
   {
 
 

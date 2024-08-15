@@ -1,4 +1,4 @@
-﻿using NewsManagement.Entities.ListableContents;
+﻿using NewsManagement.Entities.ListableContentBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;

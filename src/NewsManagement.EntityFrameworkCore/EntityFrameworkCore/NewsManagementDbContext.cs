@@ -20,7 +20,7 @@ using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Videos;
 using NewsManagement.Entities.Galleries;
 using NewsManagement.Entities.Newses;
-using NewsManagement.Entities.ListableContents;
+using NewsManagement.Entities.ListableContentBase;
 
 namespace NewsManagement.EntityFrameworkCore;
 
@@ -84,22 +84,29 @@ public class NewsManagementDbContext :
     builder.ConfigureFileManagement();
 
     #region Gallery, Video, News
-    //builder.Entity<Gallery>(b =>
-    //{
+    builder.Entity<Gallery>(b =>
+    {
 
-    //});
-    
-    //builder.Entity<Video>(b =>
-    //{
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "Galleries", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+    });
 
-    //});
-    
-    //builder.Entity<News>(b =>
-    //{
+    builder.Entity<Video>(b =>
+    {
 
-    //});
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "Videos", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+    });
+
+    builder.Entity<News>(b =>
+    {
+
+
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "Newses", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+    });
     #endregion
-    
+
     #region ListableContent(Tag, City, Category)
     builder.Entity<ListableContentTag>(b =>
     {

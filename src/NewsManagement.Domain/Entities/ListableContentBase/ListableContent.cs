@@ -17,11 +17,13 @@ namespace NewsManagement.Entities.ListableContentBase
     public string Spot { get; set; }
     public bool Status { get; set; }
     public DateTime PublishTime { get; set; }
-    public int ImageId { get; set; }//imageId =>al file da kaydet
-    public ListableContentType listableContentType { get; set; } //type => haber video galeri
+    public Guid ImageId { get; set; }//file da kaydet
+    public ListableContentType listableContentType { get; set; }
     public ICollection<ListableContentCategory> ListableContentCategories { get; set; }
     public ICollection<ListableContentCity> ListableContentCities { get; set; }
     public ICollection<ListableContentTag> ListableContentTags { get; set; }
+    //public ICollection<ListableContent> ListableContents { get; set; }
+
 
     internal ListableContent() { }
 
