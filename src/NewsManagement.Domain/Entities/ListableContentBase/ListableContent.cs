@@ -16,12 +16,12 @@ namespace NewsManagement.Entities.ListableContentBase
     public string Title { get; set; }
     public string Spot { get; set; }
     public bool Status { get; set; }
+    public Guid ImageId { get; set; }
     public DateTime PublishTime { get; set; }
-    public Guid ImageId { get; set; }//file da kaydet
     public ListableContentType listableContentType { get; set; }
-    public ICollection<ListableContentCategory> ListableContentCategories { get; set; }
-    public ICollection<ListableContentCity> ListableContentCities { get; set; }
     public ICollection<ListableContentTag> ListableContentTags { get; set; }
+    public ICollection<ListableContentCity> ListableContentCities { get; set; }
+    public ICollection<ListableContentCategory> ListableContentCategories { get; set; }
     //public ICollection<ListableContent> ListableContents { get; set; }
 
 
