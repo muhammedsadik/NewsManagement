@@ -16,10 +16,10 @@ namespace NewsManagement.EntityDtos.ListableContentDtos
     public bool Status { get; set; }
     public DateTime PublishTime { get; set; }
     public Guid ImageId { get; set; }
+    public int[]? TagId { get; set; }
+    public int[]? CityCode { get; set; }
     public ListableContentType listableContentType { get; set; }
-    public List<CreateCategoryDto> CreateCategoryDtos { get; set; }
-    public List<CreateCityDto> CreateCityDtos { get; set; }
-    public List<CreateTagDto> CreateTagDtos { get; set; }
+    public List<ListableContentCategoryDto>? ListableContentCategoryDtos { get; set; }
 
 
 

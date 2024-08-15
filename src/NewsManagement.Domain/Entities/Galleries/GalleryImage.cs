@@ -8,7 +8,7 @@ namespace NewsManagement.Entities.Galleries
 {
   public class GalleryImage
   {
-    public byte Picture { get; set; }
+    public Guid ImageId { get; set; }
     public string NewsContent { get; set; }
   }
 }

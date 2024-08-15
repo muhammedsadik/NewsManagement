@@ -7,7 +7,7 @@ namespace NewsManagement.EntityDtos.GalleryDtos
 {
   public class GalleryImageDto : IEntityDto
   {
-    public byte Picture { get; set; }
+    public Guid ImageId { get; set; }
     public string NewsContent { get; set; }
   }
 }
