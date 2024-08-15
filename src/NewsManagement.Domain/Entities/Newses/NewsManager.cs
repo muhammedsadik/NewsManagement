@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NewsManagement.Entities.ListableContentBase;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,8 @@ namespace NewsManagement.Entities.Newses
       _objectMapper = objectMapper;
       _newsRepository = newsRepository;
     }
+
+
 
 
   }

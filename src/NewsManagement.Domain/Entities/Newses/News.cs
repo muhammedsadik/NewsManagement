@@ -1,4 +1,4 @@
-﻿using NewsManagement.Entities.ListableContents;
+﻿using NewsManagement.Entities.ListableContentBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,7 @@ namespace NewsManagement.Entities.Newses
 {
   public class News : ListableContent
   {
+    public byte[] DetailPicture { get; set; }
 
     internal News() { }
   }

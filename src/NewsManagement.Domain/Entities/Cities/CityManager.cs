@@ -30,10 +30,13 @@ namespace NewsManagement.Entities.Cities
 
     public async Task<CityDto> CreateAsync(CreateCityDto createCityDto)
     {
-      var isExistCity = await _cityRepository.AnyAsync(c => c.CityName == createCityDto.CityName);
+      var isExistCity = await _cityRepository.AnyAsync(
+        c => c.CityName == createCityDto.CityName
+        || c.CityCode == createCityDto.CityCode
+      );
 
       if (isExistCity)
-        throw new AlreadyExistException(typeof(City), createCityDto.CityName);
+        throw new AlreadyExistException(typeof(City), createCityDto.CityCode.ToString());
 
       var createCity = _objectMapper.Map<CreateCityDto, City>(createCityDto);
 
@@ -48,9 +51,13 @@ namespace NewsManagement.Entities.Cities
     {
       var existingCity = await _cityRepository.GetAsync(id);
 
-      var isExistCity = await _cityRepository.AnyAsync(c => c.CityName == updateCityDto.CityName && c.Id != id);
+      var isExistCity = await _cityRepository.AnyAsync(c => 
+        (c.CityName == updateCityDto.CityName || c.CityCode == updateCityDto.CityCode) 
+        && c.Id != id
+      );
+      
       if (isExistCity)
-        throw new AlreadyExistException(typeof(City), updateCityDto.CityName);
+        throw new AlreadyExistException(typeof(City), updateCityDto.CityCode.ToString());
 
       _objectMapper.Map(updateCityDto, existingCity);
 
