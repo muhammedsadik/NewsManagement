@@ -16,6 +16,7 @@ namespace NewsManagement.Entities.Categories
     public bool IsActive { get; set; }
     public string ColorCode { get; set; }
     public int? ParentCategoryId { get; set; }
+    public bool IsPrimary { get; set; }
     public ICollection<ListableContentCategory> ListableContentCategories { get; set; }
 
     public Category()

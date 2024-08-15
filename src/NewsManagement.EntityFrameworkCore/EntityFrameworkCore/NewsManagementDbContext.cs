@@ -150,6 +150,8 @@ public class NewsManagementDbContext :
 
     builder.Entity<City>(b =>
     {
+      b.HasIndex(x => x.CityCode).IsUnique();
+
       b.HasMany(x => x.ListableContentCities).WithOne().HasForeignKey(x => x.CityId);
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Cities", NewsManagementConsts.DbSchema);
