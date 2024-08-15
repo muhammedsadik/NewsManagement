@@ -7,5 +7,6 @@ namespace NewsManagement.EntityDtos.GalleryDtos
 {
   public class UpdateGalleryDto : UpdateListableContentDto
   {
+    public List<GalleryImageDto> GalleryImage { get; set; }
   }
 }
