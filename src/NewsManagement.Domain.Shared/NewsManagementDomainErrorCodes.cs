@@ -9,8 +9,12 @@ public static class NewsManagementDomainErrorCodes
   public const string MainCategoryWithSubCannotBeChanged = "NewsManagement:504";
 
 
-  //Validation
 
 
+  #region ValidationErrorCodes
+  public const string NotInListableContentEnumType = "agency_transfercenter:v401";
+  public const string NotInVideoEnumType = "agency_transfercenter:v402";
 
+  
+  #endregion
 }
