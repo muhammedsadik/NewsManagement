@@ -34,7 +34,8 @@
 
     //ValidasyonHataları
     "agency_transfercenter:v401": "Enum türünde değil. Enum türü şunları içermelidir = { Haber için = 0 , Video için = 1 , Galeri için = 2 }.",
-    "agency_transfercenter:v402": "Enum türünde değil. Enum türü şunları içermelidir = { Fiziksel Video için = 0 , Link Video için = 1 }."
+    "agency_transfercenter:v402": "Enum türünde değil. Enum türü şunları içermelidir = { Fiziksel Video için = 0 , Link Video için = 1 }.",
+    "agency_transfercenter:v403": "Sadece bir kategori birincil kategori olabilir. Sizin seçiminiz = {0}"
 
 
   }
