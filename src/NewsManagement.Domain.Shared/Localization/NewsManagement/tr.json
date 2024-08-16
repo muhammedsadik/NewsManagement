@@ -29,11 +29,12 @@
     "NewsManagement:501": "{1} ile aynı isimli bir {0} önceden oluşturulmuş.",
     "NewsManagement:502": "Filitre istek sınırı aşıldı.",
     "NewsManagement:503": "Bir alt kategorinin alt kategorileri olamaz.",
-    "NewsManagement:504": "Ana kategori alt kategoriler ile birlikte değiştirilemez."
+    "NewsManagement:504": "Ana kategori alt kategoriler ile birlikte değiştirilemez.",
 
 
-
-
+    //ValidasyonHataları
+    "agency_transfercenter:v401": "Enum türünde değil. Enum türü şunları içermelidir = { Haber için = 0 , Video için = 1 , Galeri için = 2 }.",
+    "agency_transfercenter:v402": "Enum türünde değil. Enum türü şunları içermelidir = { Fiziksel Video için = 0 , Link Video için = 1 }."
 
 
   }
