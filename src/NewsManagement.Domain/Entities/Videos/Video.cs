@@ -1,4 +1,4 @@
-﻿using NewsManagement.Entities.ListableContentBase;
+﻿using NewsManagement.Entities.ListableContents;
 using NewsManagement.EntityConsts.VideoConsts;
 using System;
 using System.Collections.Generic;

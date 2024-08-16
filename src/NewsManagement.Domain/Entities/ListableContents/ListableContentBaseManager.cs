@@ -7,7 +7,7 @@ using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 
-namespace NewsManagement.Entities.ListableContentBase
+namespace NewsManagement.Entities.ListableContents
 {
   public abstract class ListableContentBaseManager : DomainService
   {

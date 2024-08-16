@@ -1,4 +1,5 @@
-﻿using NewsManagement.EntityConsts.CategoryConsts;
+﻿using NewsManagement.Entities.ListableContents;
+using NewsManagement.EntityConsts.CategoryConsts;
 using System;
 using System.Collections.Generic;
 using System.Linq;

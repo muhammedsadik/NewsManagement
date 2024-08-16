@@ -71,7 +71,7 @@ namespace NewsManagement.Entities.Categories
       var parentCategory = await _categoryRepository.GetAsync((int)category.ParentCategoryId);
 
       if (parentCategory.ParentCategoryId.HasValue)
-        throw new BusinessException(NewsManagementDomainErrorCodes.JustOneSubCategory);
+        throw new BusinessException(NewsManagementDomainErrorCodes.OnlyOneSubCategory);
 
       if (parentCategory.IsActive == false)
         category.IsActive = parentCategory.IsActive;
