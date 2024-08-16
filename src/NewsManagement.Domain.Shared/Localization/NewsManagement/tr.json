@@ -20,6 +20,26 @@
     "Permission:Categories.Edit": "Düzenleme",
     "Permission:Categories.Delete": "Silme",
 
+    "Permission:ListableContents": "Listelenebilir içerik",
+    "Permission:ListableContents.Create": "Oluşturma",
+    "Permission:ListableContents.Edit": "Düzenleme",
+    "Permission:ListableContents.Delete": "Silme",
+
+    "Permission:Newses": "Haber",
+    "Permission:Newses.Create": "Oluşturma",
+    "Permission:Newses.Edit": "Düzenleme",
+    "Permission:Newses.Delete": "Silme",
+
+    "Permission:Galleries": "Galeri",
+    "Permission:Galleries.Create": "Oluşturma",
+    "Permission:Galleries.Edit": "Düzenleme",
+    "Permission:Galleries.Delete": "Silme",
+
+    "Permission:Videos": "Video",
+    "Permission:Videos.Create": "Oluşturma",
+    "Permission:Videos.Edit": "Düzenleme",
+    "Permission:Videos.Delete": "Silme",
+
 
 
 

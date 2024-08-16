@@ -20,6 +20,26 @@
     "Permission:Categories.Edit": "Edit",
     "Permission:Categories.Delete": "Delete",
 
+    "Permission:ListableContents": "ListableContent",
+    "Permission:ListableContents.Create": "Create",
+    "Permission:ListableContents.Edit": "Edit",
+    "Permission:ListableContents.Delete": "Delete",
+
+    "Permission:Newses": "News",
+    "Permission:Newses.Create": "Create",
+    "Permission:Newses.Edit": "Edit",
+    "Permission:Newses.Delete": "Delete",
+
+    "Permission:Galleries": "Gallery",
+    "Permission:Galleries.Create": "Create",
+    "Permission:Galleries.Edit": "Edit",
+    "Permission:Galleries.Delete": "Delete",
+
+    "Permission:Videos": "Video",
+    "Permission:Videos.Create": "Create",
+    "Permission:Videos.Edit": "Edit",
+    "Permission:Videos.Delete": "Delete",
+
 
 
     "NewsManagement:500": "{0} = {1} Not Found.",
