@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NewsManagement.Entities.ListableContentBase
+namespace NewsManagement.Entities.ListableContents
 {
   public interface IListableContentBaseRepository
   {

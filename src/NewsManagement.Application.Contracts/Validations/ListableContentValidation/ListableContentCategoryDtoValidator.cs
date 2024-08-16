@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
-using NewsManagement.EntityDtos.CategoryDtos;
+using NewsManagement.EntityDtos.ListableContentDtos;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NewsManagement.Validations.CategoryValidation
+namespace NewsManagement.Validations.ListableContentValidation
 {
   public class ListableContentCategoryDtoValidator : AbstractValidator<ListableContentCategoryDto>
   {

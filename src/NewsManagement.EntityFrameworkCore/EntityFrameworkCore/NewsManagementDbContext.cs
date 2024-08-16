@@ -21,6 +21,7 @@ using NewsManagement.Entities.Videos;
 using NewsManagement.Entities.Galleries;
 using NewsManagement.Entities.Newses;
 using NewsManagement.Entities.ListableContentBase;
+using NewsManagement.Entities.ListableContents;
 
 namespace NewsManagement.EntityFrameworkCore;
 
