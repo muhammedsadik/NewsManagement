@@ -27,12 +27,12 @@ namespace NewsManagement.AppService.Galleries
 
     public override async Task<GalleryDto> CreateAsync(CreateGalleryDto createGalleryDto)
     {
-      return await base.CreateAsync(createGalleryDto);
+      return await _galleryManager.CreateAsync(createGalleryDto);
     }
 
     public async override Task<GalleryDto> UpdateAsync(int id, UpdateGalleryDto updateGalleryDto)
     {
-      return await base.UpdateAsync(id, updateGalleryDto);
+      return await _galleryManager.UpdateAsync(id, updateGalleryDto);
     }
 
     public async override Task<PagedResultDto<GalleryDto>> GetListAsync(GetListPagedAndSortedDto input)
