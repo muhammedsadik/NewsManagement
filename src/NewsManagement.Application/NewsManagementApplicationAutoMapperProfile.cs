@@ -1,10 +1,18 @@
 ﻿using AutoMapper;
 using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Cities;
+using NewsManagement.Entities.Galleries;
+using NewsManagement.Entities.ListableContents;
+using NewsManagement.Entities.Newses;
 using NewsManagement.Entities.Tags;
+using NewsManagement.Entities.Videos;
 using NewsManagement.EntityDtos.CategoryDtos;
 using NewsManagement.EntityDtos.CityDtos;
+using NewsManagement.EntityDtos.GalleryDtos;
+using NewsManagement.EntityDtos.ListableContentDtos;
+using NewsManagement.EntityDtos.NewsDtos;
 using NewsManagement.EntityDtos.TagDtos;
+using NewsManagement.EntityDtos.VideoDtos;
 
 namespace NewsManagement;
 
@@ -28,6 +36,30 @@ public class NewsManagementApplicationAutoMapperProfile : Profile
     CreateMap<Category, CategoryDto>().ReverseMap();
     CreateMap<UpdateCategoryDto, Category>().ReverseMap();
     CreateMap<CreateCategoryDto, Category>().ReverseMap();
+    #endregion
+    
+    #region News
+    CreateMap<News, NewsDto>().ReverseMap();
+    CreateMap<UpdateNewsDto, News>().ReverseMap();
+    CreateMap<CreateNewsDto, News>().ReverseMap();
+    #endregion
+    
+    #region Gallery
+    CreateMap<Gallery, GalleryDto>().ReverseMap();
+    CreateMap<UpdateGalleryDto, Gallery>().ReverseMap();
+    CreateMap<CreateGalleryDto, Gallery>().ReverseMap();
+    #endregion
+    
+    #region Video
+    CreateMap<Video, VideoDto>().ReverseMap();
+    CreateMap<UpdateVideoDto, Video>().ReverseMap();
+    CreateMap<CreateVideoDto, Video>().ReverseMap();
+    #endregion
+    
+    #region ListableContent
+    CreateMap<ListableContent, ListableContentDto>().ReverseMap();
+    CreateMap<UpdateListableContentDto, ListableContent>().ReverseMap();
+    CreateMap<CreateListableContentDto, ListableContent>().ReverseMap();
     #endregion
 
 

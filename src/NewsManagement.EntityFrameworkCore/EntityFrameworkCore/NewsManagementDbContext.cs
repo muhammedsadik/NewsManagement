@@ -20,8 +20,8 @@ using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Videos;
 using NewsManagement.Entities.Galleries;
 using NewsManagement.Entities.Newses;
-using NewsManagement.Entities.ListableContentBase;
 using NewsManagement.Entities.ListableContents;
+using NewsManagement.Entities.ListableContentRelations;
 
 namespace NewsManagement.EntityFrameworkCore;
 
@@ -35,15 +35,16 @@ public class NewsManagementDbContext :
 {
 
 
-  public DbSet<ListableContent> ListableContents { get; set; }
-  public DbSet<Gallery> Galleries { get; set; }
-  public DbSet<Video> Videos { get; set; }
-  public DbSet<News> Newses { get; set; }
   public DbSet<Tag> Tags { get; set; }
+  public DbSet<News> Newses { get; set; }
   public DbSet<City> Cities { get; set; }
+  public DbSet<Video> Videos { get; set; }
+  public DbSet<Gallery> Galleries { get; set; }
   public DbSet<Category> Categories { get; set; }
+  public DbSet<ListableContent> ListableContents { get; set; }
   public DbSet<ListableContentTag> ListableContentTags { get; set; }
   public DbSet<ListableContentCity> ListableContentCities { get; set; }
+  public DbSet<ListableContentRelation> ListableContentRelations { get; set; }
   public DbSet<ListableContentCategory> ListableContentCategories { get; set; }
 
 
@@ -87,6 +88,7 @@ public class NewsManagementDbContext :
     #region Gallery, Video, News
     builder.Entity<Gallery>(b =>
     {
+      b.OwnsOne(x => x.GalleryImage);
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Galleries", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
@@ -108,6 +110,28 @@ public class NewsManagementDbContext :
     });
     #endregion
 
+    #region ListableContent
+
+    builder.Entity<ListableContent>(b =>
+    {
+
+      //b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContents", NewsManagementConsts.DbSchema);
+      //b.ConfigureByConvention();
+    });
+
+    builder.Entity<ListableContentRelation>(b =>
+    {
+      b.HasKey(x => new { x.ListableContentId, x.RelatedListableContentId });
+
+      b.HasOne(x => x.ListableContent).WithMany(x => x.ListableContentRelations).HasForeignKey(x => x.ListableContentId);//.OnDelete(DeleteBehavior.Restrict);
+      b.HasOne(x => x.RelatedListableContent).WithMany().HasForeignKey(x => x.RelatedListableContentId);//.OnDelete(DeleteBehavior.Restrict);
+
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContentRelations", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+    });
+
+    #endregion
+
     #region ListableContent(Tag, City, Category)
     builder.Entity<ListableContentTag>(b =>
     {
@@ -118,7 +142,7 @@ public class NewsManagementDbContext :
       b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContentTags", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
     });
-    
+
     builder.Entity<ListableContentCity>(b =>
     {
       b.HasKey(x => new { x.ListableContentId, x.CityId });
@@ -128,7 +152,7 @@ public class NewsManagementDbContext :
       b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContentCities", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
     });
-        
+
     builder.Entity<ListableContentCategory>(b =>
     {
       b.HasKey(x => new { x.ListableContentId, x.CategoryId });
@@ -158,7 +182,7 @@ public class NewsManagementDbContext :
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Cities", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
     });
-        
+
     builder.Entity<Category>(b =>
     {
       b.HasMany(x => x.ListableContentCategories).WithOne().HasForeignKey(x => x.CategoryId);

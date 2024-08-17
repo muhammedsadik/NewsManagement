@@ -32,28 +32,28 @@ public class NewsManagementPermissionDefinitionProvider : PermissionDefinitionPr
     #endregion
 
     #region ListableContent
-    var listableContentsPermission = newsManagement.AddPermission(NewsManagementPermissions.Categories.Default, L("Permission:ListableContents"));
+    var listableContentsPermission = newsManagement.AddPermission(NewsManagementPermissions.ListableContents.Default, L("Permission:ListableContents"));
     listableContentsPermission.AddChild(NewsManagementPermissions.ListableContents.Create, L("Permission:ListableContents.Create"));
     listableContentsPermission.AddChild(NewsManagementPermissions.ListableContents.Edit, L("Permission:ListableContents.Edit"));
     listableContentsPermission.AddChild(NewsManagementPermissions.ListableContents.Delete, L("Permission:ListableContents.Delete"));
     #endregion
 
-    #region Video
-    var videosPermission = newsManagement.AddPermission(NewsManagementPermissions.Categories.Default, L("Permission:Videos"));
+    #region Video 
+    var videosPermission = newsManagement.AddPermission(NewsManagementPermissions.Videos.Default, L("Permission:Videos"));
     videosPermission.AddChild(NewsManagementPermissions.Videos.Create, L("Permission:Videos.Create"));
     videosPermission.AddChild(NewsManagementPermissions.Videos.Edit, L("Permission:Videos.Edit"));
     videosPermission.AddChild(NewsManagementPermissions.Videos.Delete, L("Permission:Videos.Delete"));
     #endregion
 
     #region News
-    var newsesPermission = newsManagement.AddPermission(NewsManagementPermissions.Categories.Default, L("Permission:Newses"));
-    newsesPermission.AddChild(NewsManagementPermissions.Categories.Create, L("Permission:Newses.Create"));
-    newsesPermission.AddChild(NewsManagementPermissions.Categories.Edit, L("Permission:Newses.Edit"));
-    newsesPermission.AddChild(NewsManagementPermissions.Categories.Delete, L("Permission:Newses.Delete"));
+    var newsesPermission = newsManagement.AddPermission(NewsManagementPermissions.Newses.Default, L("Permission:Newses"));
+    newsesPermission.AddChild(NewsManagementPermissions.Newses.Create, L("Permission:Newses.Create"));
+    newsesPermission.AddChild(NewsManagementPermissions.Newses.Edit, L("Permission:Newses.Edit"));
+    newsesPermission.AddChild(NewsManagementPermissions.Newses.Delete, L("Permission:Newses.Delete"));
     #endregion
 
     #region Gallery
-    var galleriesPermission = newsManagement.AddPermission(NewsManagementPermissions.Categories.Default, L("Permission:Galleries"));
+    var galleriesPermission = newsManagement.AddPermission(NewsManagementPermissions.Galleries.Default, L("Permission:Galleries"));
     galleriesPermission.AddChild(NewsManagementPermissions.Galleries.Create, L("Permission:Galleries.Create"));
     galleriesPermission.AddChild(NewsManagementPermissions.Galleries.Edit, L("Permission:Galleries.Edit"));
     galleriesPermission.AddChild(NewsManagementPermissions.Galleries.Delete, L("Permission:Galleries.Delete"));
