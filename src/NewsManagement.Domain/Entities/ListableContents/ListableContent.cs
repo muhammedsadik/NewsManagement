@@ -1,4 +1,5 @@
 ﻿using NewsManagement.Entities.Categories;
+using NewsManagement.Entities.ListableContentRelations;
 using NewsManagement.EntityConsts.ListableContentConsts;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace NewsManagement.Entities.ListableContents
     public Guid? TenantId { get; set; }
     public string Title { get; set; }
     public string Spot { get; set; }
-    public bool Status { get; set; }
+    public StatusType Status { get; set; }
     public Guid? ImageId { get; set; }
     public DateTime PublishTime { get; set; }
     public ListableContentType listableContentType { get; set; }
@@ -24,10 +25,12 @@ namespace NewsManagement.Entities.ListableContents
     public ICollection<ListableContentCategory> ListableContentCategories { get; set; }
 
 
-    //public ICollection<ListableContent> ListableContents { get; set; }
+    public ICollection<ListableContentRelation> ListableContentRelations { get; set; }
 
-
-    internal ListableContent() { }
+    public ListableContent()
+    {
+      ListableContentRelations = new List<ListableContentRelation>();
+    }
 
   }
 }

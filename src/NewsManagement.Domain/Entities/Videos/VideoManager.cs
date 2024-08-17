@@ -27,20 +27,20 @@ namespace NewsManagement.Entities.Videos
     }
 
 
-    public async Task<VideoDto> CreateAsync(CreateVideoDto createVideoDto)
-    {
+    //public async Task<VideoDto> CreateAsync(CreateVideoDto createVideoDto)
+    //{
       
-    }
+    //}
 
-    public async Task<VideoDto> UpdateAsync(int id, UpdateVideoDto updateVideoDto)
-    {
+    //public async Task<VideoDto> UpdateAsync(int id, UpdateVideoDto updateVideoDto)
+    //{
 
-    }
+    //}
 
-    public async Task<PagedResultDto<VideoDto>> GetListAsync(GetListPagedAndSortedDto input)
-    {
+    //public async Task<PagedResultDto<VideoDto>> GetListAsync(GetListPagedAndSortedDto input)
+    //{
 
-    }
+    //}
 
     public async Task DeleteAsync(int id)
     {

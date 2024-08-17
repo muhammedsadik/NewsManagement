@@ -12,10 +12,11 @@ namespace NewsManagement.EntityDtos.ListableContentDtos
   {
     public string Title { get; set; }
     public string Spot { get; set; }
-    public bool Status { get; set; }
+    public StatusType Status { get; set; }
     public Guid? ImageId { get; set; }
     public int[] TagId { get; set; }
     public int[]? CityCode { get; set; }
+    public int[]? RelatedListableContent { get; set; }
     public ListableContentType listableContentType { get; set; }
     public List<ListableContentCategoryDto> ListableContentCategoryDtos { get; set; }
   }

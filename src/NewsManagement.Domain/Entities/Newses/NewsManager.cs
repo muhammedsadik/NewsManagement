@@ -22,20 +22,20 @@ namespace NewsManagement.Entities.Newses
       _newsRepository = newsRepository;
     }
 
-    public async Task<NewsDto> CreateAsync(CreateNewsDto createNewsDto)
-    {
+    //public async Task<NewsDto> CreateAsync(CreateNewsDto createNewsDto)
+    //{
 
-    }
+    //}
 
-    public async Task<NewsDto> UpdateAsync(int id, UpdateNewsDto updateNewsDto)
-    {
+    //public async Task<NewsDto> UpdateAsync(int id, UpdateNewsDto updateNewsDto)
+    //{
 
-    }
+    //}
 
-    public async Task<PagedResultDto<NewsDto>> GetListAsync(GetListPagedAndSortedDto input)
-    {
+    //public async Task<PagedResultDto<NewsDto>> GetListAsync(GetListPagedAndSortedDto input)
+    //{
 
-    }
+    //}
 
     public async Task DeleteAsync(int id)
     {
