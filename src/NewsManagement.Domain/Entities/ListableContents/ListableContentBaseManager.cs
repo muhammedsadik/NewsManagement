@@ -1,5 +1,7 @@
-﻿using NewsManagement.Entities.Cities;
+﻿using NewsManagement.Entities.Categories;
+using NewsManagement.Entities.Cities;
 using NewsManagement.Entities.Exceptions;
+using NewsManagement.Entities.ListableContentRelations;
 using NewsManagement.Entities.Tags;
 using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.EntityDtos.ListableContentDtos;
@@ -28,6 +30,7 @@ namespace NewsManagement.Entities.ListableContents
     private readonly IRepository<TEntity, int> _repository;
     private readonly ITagRepository _tagRepository;
     private readonly ICityRepository _cityRepository;
+    private readonly ICategoryRepository _categoryRepository;
     private readonly IRepository<ListableContent, int> _listableContentRepository;
 
     protected ListableContentBaseManager(
@@ -35,7 +38,8 @@ namespace NewsManagement.Entities.ListableContents
       IObjectMapper objectMapper,
       ITagRepository tagRepository,
       ICityRepository cityRepository,
-      IRepository<ListableContent, int> listableContentRepository
+      IRepository<ListableContent, int> listableContentRepository,
+      ICategoryRepository categoryRepository
     )
     {
       _repository = repository;
@@ -43,22 +47,18 @@ namespace NewsManagement.Entities.ListableContents
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
       _listableContentRepository = listableContentRepository;
+      _categoryRepository = categoryRepository;
     }
 
 
 
 
-    public async Task<TEntityDto> CreateBaseAsync(TEntityCreateDto createDto)
+    public async Task CreateBaseAsync(TEntityCreateDto createDto)
     {
       var isExist = await _repository.AnyAsync(x => x.Title == createDto.Title);
       if (isExist)
         throw new AlreadyExistException(typeof(TEntityDto), createDto.Title);
-
-      if (createDto.Status == StatusType.Deleted || createDto.Status == StatusType.Rejected)//oluşturulan değer Silinmiş veya Reddedilmiş olamaz.
-        throw new BusinessException(NewsManagementDomainErrorCodes.WrongTypeSelectionInCreateStatus);// 📢 📩
-
-      await CheckStatusAndDateTimeAsync(createDto.Status, createDto.PublishTime);
-
+      
       await CheckTagByIdAsync(createDto.TagIds);
 
       if (createDto.CityIds != null)
@@ -67,67 +67,11 @@ namespace NewsManagement.Entities.ListableContents
       if (createDto.RelatedListableContentIds != null)
         await CheckListableContentByIdAsync(createDto.RelatedListableContentIds);
 
+      await CheckListableContentCategoryAsync(createDto.ListableContentCategoryDtos);
 
-
-
-      var creatingEntity = _objectMapper.Map<TEntityCreateDto, TEntity>(createDto);
-
-      var createdContent = await _repository.InsertAsync(creatingEntity);
-
-      var createdDto = _objectMapper.Map<TEntity, TEntityDto>(creatingEntity);
-
-      return createdDto;
     }
-
-
 
     #region Helper Method
-
-    public async Task CheckStatusAndDateTimeAsync(StatusType type, DateTime? dateTime)// await kullanmadık background Job da da kullanmazsak refactor edecez.
-    {
-      if (type == StatusType.Draft && !dateTime.HasValue)//eğer üzerinde çalışılıyor ise tarih olamaz
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📢 📩
-
-      if (type == StatusType.PendingReview && !dateTime.HasValue)//eğer onay bekliyor ise tarih olamaz
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📢 📩
-
-      if (type == StatusType.Archived && !dateTime.HasValue)//eğer Arşivlenmiş Eski haberler ise tarih olamaz.
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📢 📩
-
-      if (type == StatusType.Rejected && !dateTime.HasValue)//eğer Reddedilmiş ise tarih olamaz.
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📢 📩
-
-      if (type == StatusType.Deleted && !dateTime.HasValue)//eğer Silinmiş ise tarih olamaz
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📢 📩
-
-      if (!dateTime.HasValue)
-        dateTime = DateTime.Now;
-
-      if (type == StatusType.Published && dateTime.Value > DateTime.Now)//eğer yayında ise tarih ileri olamaz
-        throw new BusinessException(NewsManagementDomainErrorCodes.IfStatusPublishedDatetimeMustNowOrNull);// 📢 📩
-
-      if (type == StatusType.Scheduled && dateTime.Value <= DateTime.Now)//eğer planlanmış ise tarih geri olamaz
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📢 📩
-
-      if (type == StatusType.Scheduled && dateTime.Value > DateTime.Now)//eğer planlanmış ise tarihe göre işleme alınacak
-      {
-        //Burada background Job kullanılacak
-      }
-    }
-
-    public void CheckDuplicateInputs(string inputName, int[] inputId)
-    {
-      var duplicates = inputId.GroupBy(x => x)
-        .Where(u => u.Count() > 1).Select(u => u.Key).ToList();
-
-      if (duplicates.Count > 0)
-      {
-        var duplicateUnits = string.Join(", ", duplicates);
-        throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)// 📢 📩
-          .WithData("index", inputName)
-          .WithData("repeat", duplicateUnits);
-      }
-    }
 
     public async Task CheckTagByIdAsync(int[] tagIds)
     {
@@ -153,6 +97,20 @@ namespace NewsManagement.Entities.ListableContents
       }
     }
 
+    public void CheckDuplicateInputs(string inputName, int[] inputId)
+    {
+      var duplicates = inputId.GroupBy(x => x)
+        .Where(u => u.Count() > 1).Select(u => u.Key).ToList();
+
+      if (duplicates.Count > 0)
+      {
+        var duplicateUnits = string.Join(", ", duplicates);
+        throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)// 📩
+          .WithData("index", inputName)
+          .WithData("repeat", duplicateUnits);
+      }
+    }
+
     public async Task CheckListableContentByIdAsync(int[] RelatedListableContentIds)
     {
       CheckDuplicateInputs(nameof(RelatedListableContentIds), RelatedListableContentIds);
@@ -165,6 +123,54 @@ namespace NewsManagement.Entities.ListableContents
       }
     }
 
+    public async Task CheckStatusAndDateTimeAsync(StatusType type, DateTime? dateTime)
+    {
+      if (type == StatusType.Draft && !dateTime.HasValue)//eğer üzerinde çalışılıyor ise tarih olamaz
+        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+
+      if (type == StatusType.PendingReview && !dateTime.HasValue)//eğer onay bekliyor ise tarih olamaz
+        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+
+      if (type == StatusType.Archived && !dateTime.HasValue)//eğer Arşivlenmiş eski haberler ise tarih olamaz.
+        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+
+      if (type == StatusType.Rejected && !dateTime.HasValue)//eğer Reddedilmiş ise tarih olamaz.
+        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+
+      if (type == StatusType.Deleted && !dateTime.HasValue)//eğer Silinmiş ise tarih olamaz
+        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+
+      if (!dateTime.HasValue)
+        dateTime = DateTime.Now;
+
+      if (type == StatusType.Published && dateTime.Value > DateTime.Now)//eğer yayında ise tarih ileri olamaz.⚠yayına alınan içerik için zamanı yönet⚠ 
+        throw new BusinessException(NewsManagementDomainErrorCodes.IfStatusPublishedDatetimeMustNowOrNull);// 📩
+
+      if (type == StatusType.Scheduled && dateTime.Value <= DateTime.Now)//eğer planlanmış ise tarih geri olamaz
+        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+
+      if (type == StatusType.Scheduled && dateTime.Value > DateTime.Now)//eğer planlanmış ise tarihe göre işleme alınacak
+      {
+        //Burada background Job kullanılacak
+      }
+    }
+
+    public async Task CheckListableContentCategoryAsync(List<ListableContentCategoryDto> listableContentCategoryDto)
+    {
+      var categoryIds = listableContentCategoryDto.Select(x => x.CategoryId).ToArray();
+
+      CheckDuplicateInputs(nameof(categoryIds), categoryIds);
+
+      foreach (var categoryId in categoryIds)
+      {
+        var existTag = await _categoryRepository.AnyAsync(t => t.Id == categoryId);
+        if (!existTag)
+          throw new NotFoundException(typeof(ListableContentCategory), categoryId.ToString());// 📢 📩
+      }
+
+      if(listableContentCategoryDto.Count(x => x.IsPrimary) != 1)
+        throw new BusinessException();// validation da bu durum için error message yazdık  📢 📩
+    }
 
     #endregion
 

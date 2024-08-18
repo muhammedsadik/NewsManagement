@@ -1,5 +1,6 @@
 ﻿using NewsManagement.Entities.Cities;
 using NewsManagement.Entities.ListableContents;
+using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.EntityDtos.GalleryDtos;
 using NewsManagement.EntityDtos.PagedAndSortedDtos;
 using System;
@@ -28,7 +29,19 @@ namespace NewsManagement.Entities.Galleries
 
     public async Task<GalleryDto> CreateAsync(CreateGalleryDto createGalleryDto)
     {
+      await CreateBaseAsync(createGalleryDto);
 
+      var creatingGallery = _objectMapper.Map<CreateGalleryDto, Gallery>(createGalleryDto);
+
+      creatingGallery.PublishTime = DateTime.Now;
+      creatingGallery.Status = StatusType.PendingReview;
+      creatingGallery.listableContentType = ListableContentType.Gallery;
+
+      var agllery = await _galleryRepository.InsertAsync(creatingGallery);
+
+      var galleryDto = _objectMapper.Map<Gallery, GalleryDto>(agllery);
+
+      return galleryDto;
     }
 
     public async Task<GalleryDto> UpdateAsync(int id, UpdateGalleryDto updateGalleryDto)
