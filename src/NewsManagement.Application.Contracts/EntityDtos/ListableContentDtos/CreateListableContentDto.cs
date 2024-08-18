@@ -14,9 +14,9 @@ namespace NewsManagement.EntityDtos.ListableContentDtos
     public string Spot { get; set; }
     public StatusType Status { get; set; }
     public Guid? ImageId { get; set; }
-    public int[] TagId { get; set; }
-    public int[]? CityCode { get; set; }
-    public int[]? RelatedListableContent { get; set; }
+    public int[] TagIds { get; set; }
+    public int[]? CityIds { get; set; }
+    public int[]? RelatedListableContentIds { get; set; }
     public DateTime? PublishTime { get; set; }
     public ListableContentType listableContentType { get; set; }
     public List<ListableContentCategoryDto> ListableContentCategoryDtos { get; set; }
