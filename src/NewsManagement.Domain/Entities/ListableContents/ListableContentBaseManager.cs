@@ -27,39 +27,51 @@ namespace NewsManagement.Entities.ListableContents
     where TEntityUpdateDto : UpdateListableContentDto
   {
     private readonly IObjectMapper _objectMapper;
-    private readonly IRepository<TEntity, int> _repository;
     private readonly ITagRepository _tagRepository;
     private readonly ICityRepository _cityRepository;
+    private readonly IRepository<TEntity, int> _repository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IRepository<ListableContent, int> _listableContentRepository;
+    private readonly IRepository<ListableContentTag> _listableContentTagRepository;
+    private readonly IRepository<ListableContentCity> _listableContentCityRepository;
+    private readonly IRepository<ListableContentCategory> _listableContentCategoryRepository;
+    private readonly IRepository<ListableContentRelation> _listableContentRelationRepository;
 
     protected ListableContentBaseManager(
-      IRepository<TEntity, int> repository,
       IObjectMapper objectMapper,
       ITagRepository tagRepository,
       ICityRepository cityRepository,
+      IRepository<TEntity, int> repository,
+      ICategoryRepository categoryRepository,
       IRepository<ListableContent, int> listableContentRepository,
-      ICategoryRepository categoryRepository
+      IRepository<ListableContentTag> listableContentTagRepository,
+      IRepository<ListableContentCity> listableContentCityRepository,
+      IRepository<ListableContentCategory> listableContentCategoryRepository,
+      IRepository<ListableContentRelation> listableContentRelationRepository
     )
     {
       _repository = repository;
       _objectMapper = objectMapper;
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
-      _listableContentRepository = listableContentRepository;
       _categoryRepository = categoryRepository;
+      _listableContentRepository = listableContentRepository;
+      _listableContentTagRepository = listableContentTagRepository;
+      _listableContentCityRepository = listableContentCityRepository;
+      _listableContentCategoryRepository = listableContentCategoryRepository;
+      _listableContentRelationRepository = listableContentRelationRepository;
     }
 
 
 
 
-    public async Task CreateBaseAsync(TEntityCreateDto createDto)
+    public async Task CheckCreateInputBaseAsync(TEntityCreateDto createDto)
     {
       var isExist = await _repository.AnyAsync(x => x.Title == createDto.Title);
       if (isExist)
         throw new AlreadyExistException(typeof(TEntityDto), createDto.Title);
-      
-      await CheckTagByIdAsync(createDto.TagIds);
+
+      await CheckTagByIdAsync(createDto.TagIds);//bunu burada kontrol ettik ki business rul exception alınca ListableContent Insert edilmesin
 
       if (createDto.CityIds != null)
         await CheckCityByIdAsync(createDto.CityIds);
@@ -115,9 +127,9 @@ namespace NewsManagement.Entities.ListableContents
     {
       CheckDuplicateInputs(nameof(RelatedListableContentIds), RelatedListableContentIds);
 
-      foreach (var ListableContentId in RelatedListableContentIds)
+      foreach (var ListableContentId in RelatedListableContentIds)// 🔄 ◀ 
       {
-        var existListableContent = await _listableContentRepository.AnyAsync(l => l.Id == ListableContentId);
+        var existListableContent = await _listableContentRepository.AnyAsync(l => l.Id == ListableContentId);//bunun çalışma mantığını öğren ve ona göre sorgu yap
         if (!existListableContent)
           throw new NotFoundException(typeof(ListableContent), ListableContentId.ToString());
       }
@@ -163,18 +175,58 @@ namespace NewsManagement.Entities.ListableContents
 
       foreach (var categoryId in categoryIds)
       {
-        var existTag = await _categoryRepository.AnyAsync(t => t.Id == categoryId);
-        if (!existTag)
+        var existCategory = await _categoryRepository.AnyAsync(t => t.Id == categoryId);
+        if (!existCategory)
           throw new NotFoundException(typeof(ListableContentCategory), categoryId.ToString());// 📢 📩
       }
 
-      if(listableContentCategoryDto.Count(x => x.IsPrimary) != 1)
-        throw new BusinessException();// validation da bu durum için error message yazdık  📢 📩
+      if (listableContentCategoryDto.Count(x => x.IsPrimary) != 1)
+        throw new BusinessException();// validation da bu durum için error message yazdık aynısını burada uygula 📢 📩
     }
+
+
 
     #endregion
 
+    #region CreateListableContentSubs
 
+    public async Task CreateListableContentTagAsync(int[] tagIds, int listableContentId)// bunun kontrollerini önceden yap
+    {
+      foreach (var tagId in tagIds)
+      {
+        await _listableContentTagRepository.InsertAsync(new() { ListableContentId = listableContentId, TagId = tagId });
+      }
+    }
+
+    public async Task CreateListableContentCityAsync(int[] cityIds, int listableContentId)// bunun kontrollerini önceden yap
+    {
+      foreach (var cityId in cityIds)
+      {
+        await _listableContentCityRepository.InsertAsync(new() { ListableContentId = listableContentId, CityId = cityId });
+      }
+    }
+
+    public async Task CreateListableContentCategoryAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)// bunun kontrollerini önceden yap
+    {
+      foreach (var item in listableContentCategoryDto)
+      {
+        await _listableContentCategoryRepository.InsertAsync(new() 
+        { ListableContentId = listableContentId, CategoryId = item.CategoryId, IsPrimary = item.IsPrimary });
+      }
+    }
+
+    public async Task CreateListableContentRelationAsync(int[] RelatedListableContentIds, int listableContentId)//önce kontrolleri yap henüz yapmadın
+    {
+      foreach (var RelatedId in RelatedListableContentIds)
+      {
+        await _listableContentRelationRepository.InsertAsync(new()// _listableContentRelationRepository mi kullanılacak❔
+        {
+          ListableContentId = listableContentId, RelatedListableContentId = RelatedId
+        });
+      }
+    }
+
+    #endregion
 
 
     public async Task<TEntityDto> UpdateBaseAsync(int id, TEntityUpdateDto updateDto)

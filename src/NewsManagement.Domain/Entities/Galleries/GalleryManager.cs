@@ -29,7 +29,7 @@ namespace NewsManagement.Entities.Galleries
 
     public async Task<GalleryDto> CreateAsync(CreateGalleryDto createGalleryDto)
     {
-      await CreateBaseAsync(createGalleryDto);
+      await CheckCreateInputBaseAsync(createGalleryDto);
 
       var creatingGallery = _objectMapper.Map<CreateGalleryDto, Gallery>(createGalleryDto);
 
@@ -37,9 +37,19 @@ namespace NewsManagement.Entities.Galleries
       creatingGallery.Status = StatusType.PendingReview;
       creatingGallery.listableContentType = ListableContentType.Gallery;
 
-      var agllery = await _galleryRepository.InsertAsync(creatingGallery);
+      var gallery = await _galleryRepository.InsertAsync(creatingGallery);
 
-      var galleryDto = _objectMapper.Map<Gallery, GalleryDto>(agllery);
+      await CreateListableContentTagAsync(createGalleryDto.TagIds, gallery.Id);
+
+      if(createGalleryDto.CityIds != null)
+      await CreateListableContentCityAsync(createGalleryDto.CityIds, gallery.Id);
+
+      await CreateListableContentCategoryAsync(createGalleryDto.ListableContentCategoryDtos, gallery.Id);
+
+      if (createGalleryDto.RelatedListableContentIds != null)
+        await CreateListableContentRelationAsync(createGalleryDto.RelatedListableContentIds, gallery.Id);
+
+      var galleryDto = _objectMapper.Map<Gallery, GalleryDto>(gallery);
 
       return galleryDto;
     }
