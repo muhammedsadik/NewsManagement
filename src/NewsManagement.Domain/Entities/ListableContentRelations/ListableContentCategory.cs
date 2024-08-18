@@ -11,12 +11,11 @@ namespace NewsManagement.Entities.ListableContentRelations
 {
     public class ListableContentCategory : Entity
     {
-
+        public bool IsPrimary { get; set; }
         public int CategoryId { get; set; }
         public Category Category { get; set; }
         public int ListableContentId { get; set; }
         public ListableContent ListableContent { get; set; }
-        public bool IsPrimary { get; set; }
 
 
 
