@@ -7,8 +7,11 @@ public static class NewsManagementDomainErrorCodes
   public const string FilterLimitsError = "NewsManagement:502";
   public const string OnlyOneSubCategory = "NewsManagement:503";
   public const string MainCategoryWithSubCannotBeChanged = "NewsManagement:504";
+  public const string WrongTypeSelectionInCreateStatus = "NewsManagement:505";
+  public const string IfStatusPublishedDatetimeMustNowOrNull = "NewsManagement:506";
 
 
+  public const string RepeatedDataError = "agency_transfercenter:";// <= zamanı gelince kod ver
 
 
   #region ValidationErrorCodes

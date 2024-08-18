@@ -26,6 +26,30 @@ namespace NewsManagement.Entities.Galleries
     }
 
 
+    public async Task<GalleryDto> CreateAsync(CreateGalleryDto createGalleryDto)
+    {
+
+    }
+
+    public async Task<GalleryDto> UpdateAsync(int id, UpdateGalleryDto updateGalleryDto)
+    {
+
+    }
+
+    public async Task<PagedResultDto<GalleryDto>> GetListAsync(GetListPagedAndSortedDto input)
+    {
+
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+
+    }
+
+    public async Task DeleteHardAsync(int id)
+    {
+
+    }
 
 
   }
