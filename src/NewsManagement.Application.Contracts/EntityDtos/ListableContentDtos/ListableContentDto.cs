@@ -14,7 +14,7 @@ namespace NewsManagement.EntityDtos.ListableContentDtos
     public string Spot { get; set; }
     public StatusType Status { get; set; }
     public Guid? ImageId { get; set; }
-    public DateTime PublishTime { get; set; }
+    public DateTime? PublishTime { get; set; }
     public ListableContentType listableContentType { get; set; }
 
   }

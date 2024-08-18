@@ -37,18 +37,19 @@ namespace NewsManagement.AppService.Galleries
 
     public async override Task<PagedResultDto<GalleryDto>> GetListAsync(GetListPagedAndSortedDto input)
     {
-      throw new NotImplementedException();
+      return await _galleryManager.GetListAsync(input);
     }
 
     public override async Task DeleteAsync(int id)
     {
+      await _galleryManager.DeleteAsync(id);
 
       await base.DeleteAsync(id);
     }
 
-    public Task DeleteHardAsync(int id)
+    public async Task DeleteHardAsync(int id)
     {
-      throw new NotImplementedException();
+       await _galleryManager.DeleteHardAsync(id);
     }
   }
 }

@@ -5,6 +5,24 @@
     "Welcome": "Welcome",
     "LongWelcomeMessage": "Welcome to the NewsManagement application. This is a startup project based on the ABP framework.",
 
+
+    "NewsManagement:500": "{0} = {1} Not Found.",
+    "NewsManagement:501": "There is already {0} with the same name: {1}.",
+    "NewsManagement:502": "Filter request limit exceeded.",
+    "NewsManagement:503": "A subcategory cannot have subcategories.",
+    "NewsManagement:504": "The main category cannot be changed with subcategories.",
+    "NewsManagement:505": "Wrong status type selected during creation.",
+
+
+
+    //ValidationErrors
+    "agency_transfercenter:v401": "Not in enum type. Enum type must contain = { For News = 0 , For Video = 1 , For Gallery = 2 }.",
+    "agency_transfercenter:v402": "Not in enum type. Enum type must contain = { For Physical Video = 0 , For Link Video = 1 }.",
+    "agency_transfercenter:v403": "Only one category can be the primary category. Your choice = {0}",
+
+
+
+
     "Permission:Tags": "Tag",
     "Permission:Tags.Create": "Create",
     "Permission:Tags.Edit": "Edit",
@@ -38,23 +56,7 @@
     "Permission:Videos": "Video",
     "Permission:Videos.Create": "Create",
     "Permission:Videos.Edit": "Edit",
-    "Permission:Videos.Delete": "Delete",
-
-
-
-    "NewsManagement:500": "{0} = {1} Not Found.",
-    "NewsManagement:501": "There is already {0} with the same name: {1}.",
-    "NewsManagement:502": "Filter request limit exceeded.",
-    "NewsManagement:503": "A subcategory cannot have subcategories.",
-    "NewsManagement:504": "The main category cannot be changed with subcategories.",
-
-
-    //ValidationErrors
-    "agency_transfercenter:v401": "Not in enum type. Enum type must contain = { For News = 0 , For Video = 1 , For Gallery = 2 }.",
-    "agency_transfercenter:v402": "Not in enum type. Enum type must contain = { For Physical Video = 0 , For Link Video = 1 }.",
-    "agency_transfercenter:v403": "Only one category can be the primary category. Your choice = {0}"
-
-
+    "Permission:Videos.Delete": "Delete"
 
 
   }

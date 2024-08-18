@@ -17,6 +17,7 @@ namespace NewsManagement.EntityDtos.ListableContentDtos
     public int[] TagId { get; set; }
     public int[]? CityCode { get; set; }
     public int[]? RelatedListableContent { get; set; }
+    public DateTime? PublishTime { get; set; }
     public ListableContentType listableContentType { get; set; }
     public List<ListableContentCategoryDto> ListableContentCategoryDtos { get; set; }
   }
