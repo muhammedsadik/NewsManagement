@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NewsManagement.Entities.ListableContents;
 using NewsManagement.Entities.Videos;
 using NewsManagement.EntityFrameworkCore;
+using NewsManagement.EntityRepositories.ListableContents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,18 +14,11 @@ using Volo.Abp.EntityFrameworkCore;
 
 namespace NewsManagement.EntityRepositories.Videos
 {
-  public class EfCoreVideoRepository : EfCoreRepository<NewsManagementDbContext, Video, int>, IVideoRepository
+  public class EfCoreVideoRepository : ListableContentGenericRepository<Video>, IVideoRepository, IListableContentGenericRepository<Video>
   {
     public EfCoreVideoRepository(IDbContextProvider<NewsManagementDbContext> dbContextProvider) : base(dbContextProvider)
     {
     }
 
-    public async Task<List<Video>> GetListAsync(int skipCount, int maxResultCount, string sorting, string filter = null)
-    {
-      var dbSet = await GetDbSetAsync();
-
-      return await dbSet.WhereIf(!filter.IsNullOrWhiteSpace(), c => c.Title.Contains(filter))
-        .OrderBy(sorting).Skip(skipCount).Take(maxResultCount).ToListAsync();
-    }
   }
 }

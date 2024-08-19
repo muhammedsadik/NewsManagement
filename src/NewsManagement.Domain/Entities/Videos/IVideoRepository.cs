@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NewsManagement.Entities.ListableContents;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +8,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace NewsManagement.Entities.Videos
 {
-  public interface IVideoRepository : IRepository<Video, int>
+  public interface IVideoRepository :IListableContentGenericRepository<Video>
   {
-    Task<List<Video>> GetListAsync(int skipCount, int maxResultCount, string sorting, string filter = null);
   }
 }
