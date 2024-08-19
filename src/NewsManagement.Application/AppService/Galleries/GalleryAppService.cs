@@ -16,6 +16,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace NewsManagement.AppService.Galleries
 {
+  [Authorize(NewsManagementPermissions.Galleries.Default)]
   public class GalleryAppService : CrudAppService<Gallery, GalleryDto, int, GetListPagedAndSortedDto, CreateGalleryDto, UpdateGalleryDto>, IGalleryAppService
   {
     private readonly GalleryManager _galleryManager;
@@ -25,11 +26,13 @@ namespace NewsManagement.AppService.Galleries
       _galleryManager = galleryManager;
     }
 
+    [Authorize(NewsManagementPermissions.Galleries.Create)]
     public override async Task<GalleryDto> CreateAsync(CreateGalleryDto createGalleryDto)
     {
       return await _galleryManager.CreateAsync(createGalleryDto);
     }
 
+    [Authorize(NewsManagementPermissions.Galleries.Edit)]
     public async override Task<GalleryDto> UpdateAsync(int id, UpdateGalleryDto updateGalleryDto)
     {
       return await _galleryManager.UpdateAsync(id, updateGalleryDto);
@@ -40,6 +43,7 @@ namespace NewsManagement.AppService.Galleries
       return await _galleryManager.GetListAsync(input);
     }
 
+    [Authorize(NewsManagementPermissions.Galleries.Delete)]
     public override async Task DeleteAsync(int id)
     {
       await _galleryManager.DeleteAsync(id);
@@ -47,6 +51,7 @@ namespace NewsManagement.AppService.Galleries
       await base.DeleteAsync(id);
     }
 
+    [Authorize(NewsManagementPermissions.Galleries.Delete)]
     public async Task DeleteHardAsync(int id)
     {
        await _galleryManager.DeleteHardAsync(id);

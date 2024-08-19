@@ -97,7 +97,7 @@ namespace NewsManagement.Entities.Galleries
 
       //if(updateGalleryDto.listableContentType != ListableContentType.Gallery)
       //burada listableContentType kontrolü yap listableContentType değişebilir ona göre yönlendirme yap
-      //(burada UpdateGalleryDto dan geldiği için status değişemez olması gerekiyor ama ListableContent ten gelirse bunu ele almak gerekir.)
+      //(burada UpdateGalleryDto dan geldiği için status değişemez olması gerekiyor ama ListableContent ten gelirse(!) bunu ele almak gerekir.)
 
       //if(updateGalleryDto.GalleryImage != null)
       // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
