@@ -62,9 +62,6 @@ namespace NewsManagement.Entities.ListableContents
       _listableContentRelationRepository = listableContentRelationRepository;
     }
 
-
-
-
     public async Task CheckCreateInputBaseAsync(TEntityCreateDto createDto)
     {
       var isExist = await _repository.AnyAsync(x => x.Title == createDto.Title);
@@ -80,6 +77,26 @@ namespace NewsManagement.Entities.ListableContents
         await CheckListableContentByIdAsync(createDto.RelatedListableContentIds);
 
       await CheckListableContentCategoryAsync(createDto.ListableContentCategoryDtos);
+
+    }
+
+    public async Task CheckUpdateInputBaseAsync(int id, TEntityUpdateDto updateDto)
+    {
+      var isExist = await _repository.AnyAsync(x => x.Title == updateDto.Title && x.Id != id);
+      if (isExist)
+        throw new AlreadyExistException(typeof(TEntityDto), updateDto.Title);
+
+      await CheckTagByIdAsync(updateDto.TagIds);
+
+      if (updateDto.CityIds != null)
+        await CheckCityByIdAsync(updateDto.CityIds);
+
+      if (updateDto.RelatedListableContentIds != null)
+        await CheckListableContentByIdAsync(updateDto.RelatedListableContentIds);
+
+      await CheckListableContentCategoryAsync(updateDto.ListableContentCategoryDtos);
+
+      await CheckStatusAndDateTimeAsync(updateDto.Status, updateDto.PublishTime);
 
     }
 
@@ -138,7 +155,7 @@ namespace NewsManagement.Entities.ListableContents
     public async Task CheckStatusAndDateTimeAsync(StatusType type, DateTime? dateTime)
     {
       if (type == StatusType.Draft && !dateTime.HasValue)//eğer üzerinde çalışılıyor ise tarih olamaz
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩 
 
       if (type == StatusType.PendingReview && !dateTime.HasValue)//eğer onay bekliyor ise tarih olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
@@ -152,8 +169,11 @@ namespace NewsManagement.Entities.ListableContents
       if (type == StatusType.Deleted && !dateTime.HasValue)//eğer Silinmiş ise tarih olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
 
-      if (!dateTime.HasValue)
+      if (!dateTime.HasValue) // veri tabanına birşeyler kaydetmek gerekir.
         dateTime = DateTime.Now;
+
+      if (type == StatusType.Published && dateTime.Value < DateTime.Now.AddHours(-1))//eğer yayında ise tarih en fazla şimdi den 1 saat önce olabilir ⚠ 
+        throw new BusinessException(NewsManagementDomainErrorCodes.IfStatusPublishedDatetimeMustNowOrNull);// 📩 
 
       if (type == StatusType.Published && dateTime.Value > DateTime.Now)//eğer yayında ise tarih ileri olamaz.⚠yayına alınan içerik için zamanı yönet⚠ 
         throw new BusinessException(NewsManagementDomainErrorCodes.IfStatusPublishedDatetimeMustNowOrNull);// 📩
@@ -210,7 +230,7 @@ namespace NewsManagement.Entities.ListableContents
     {
       foreach (var item in listableContentCategoryDto)
       {
-        await _listableContentCategoryRepository.InsertAsync(new() 
+        await _listableContentCategoryRepository.InsertAsync(new()
         { ListableContentId = listableContentId, CategoryId = item.CategoryId, IsPrimary = item.IsPrimary });
       }
     }
@@ -221,30 +241,63 @@ namespace NewsManagement.Entities.ListableContents
       {
         await _listableContentRelationRepository.InsertAsync(new()// _listableContentRelationRepository mi kullanılacak❔
         {
-          ListableContentId = listableContentId, RelatedListableContentId = RelatedId
+          ListableContentId = listableContentId,
+          RelatedListableContentId = RelatedId
         });
       }
+    }
+
+    public async Task ReCreateListableContentTagAsync(int[] tagIds, int listableContentId)
+    {
+      var isExist = await _listableContentTagRepository.GetListAsync(x => x.ListableContentId == listableContentId);
+
+      if (isExist.Count() != 0)
+      {
+        await _listableContentTagRepository.DeleteManyAsync(isExist, autoSave:true);
+      }
+
+      await CreateListableContentTagAsync(tagIds, listableContentId);
+    }
+
+    public async Task ReCreateListableContentCityAsync(int[] cityIds, int listableContentId)
+    {
+      var isExist = await _listableContentCityRepository.GetListAsync(x => x.ListableContentId == listableContentId);
+
+      if (isExist.Count() != 0)
+      {
+        await _listableContentCityRepository.DeleteManyAsync(isExist, autoSave: true);
+      }
+
+      await CreateListableContentTagAsync(cityIds, listableContentId);
+    }
+        
+    public async Task ReCreateListableContentCategoryAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)
+    {
+      var isExist = await _listableContentCategoryRepository.GetListAsync(x => x.ListableContentId == listableContentId);
+
+      if (isExist.Count() != 0)
+      {
+        await _listableContentCategoryRepository.DeleteManyAsync(isExist, autoSave: true);
+      }
+
+      await CreateListableContentCategoryAsync(listableContentCategoryDto, listableContentId);
+    }
+    
+    public async Task ReCreateListableContentRelationAsync(int[] RelatedListableContentIds, int listableContentId)
+    {
+      var isExist = await _listableContentRelationRepository.GetListAsync(x => x.ListableContentId == listableContentId);
+
+      if (isExist.Count() != 0)
+      {
+        await _listableContentRelationRepository.DeleteManyAsync(isExist, autoSave: true);
+      }
+
+      await CreateListableContentRelationAsync(RelatedListableContentIds, listableContentId);
     }
 
     #endregion
 
 
-    public async Task<TEntityDto> UpdateBaseAsync(int id, TEntityUpdateDto updateDto)
-    {
-      var existingContent = await _repository.GetAsync(id);
-
-      var isExisting = await _repository.AnyAsync(x => x.Title == updateDto.Title && x.Id != id);
-      if (isExisting)
-        throw new AlreadyExistException(typeof(TEntity), updateDto.Title);
-
-      _objectMapper.Map(updateDto, existingContent);
-
-      var updatedContent = await _repository.UpdateAsync(existingContent);
-
-      var updatedDto = _objectMapper.Map<TEntity, TEntityDto>(updatedContent);
-
-      return updatedDto;
-    }
 
     public async Task<PagedResultDto<TEntityDto>> GetListBaseAsync(TPagedDto input)
     {
