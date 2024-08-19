@@ -1,6 +1,5 @@
 ﻿using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Cities;
-using NewsManagement.Entities.GenericRepository;
 using NewsManagement.Entities.ListableContentRelations;
 using NewsManagement.Entities.ListableContents;
 using NewsManagement.Entities.Tags;
@@ -13,7 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.Domain.Entities.Events.Distributed;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.ObjectMapping;
@@ -27,8 +25,7 @@ namespace NewsManagement.Entities.Galleries
     private readonly ITagRepository _tagRepository;
     private readonly ICityRepository _cityRepository;
     private readonly ICategoryRepository _categoryRepository;
-    private readonly IGenericRepository<Gallery> _genericRepository;
-    private readonly IRepository<ListableContent, int> _listableContentRepository;
+    private readonly IListableContentGenericRepository<Gallery> _genericRepository;
     private readonly IRepository<ListableContentTag> _listableContentTagRepository;
     private readonly IRepository<ListableContentCity> _listableContentCityRepository;
     private readonly IRepository<ListableContentCategory> _listableContentCategoryRepository;
@@ -40,15 +37,13 @@ namespace NewsManagement.Entities.Galleries
       IGalleryRepository galleryRepository,
       ICityRepository cityRepository,
       ICategoryRepository categoryRepository,
-      IGenericRepository<Gallery> genericRepository,
-      IRepository<ListableContent, int> listableContentRepository,
+      IListableContentGenericRepository<Gallery> genericRepository,
       IRepository<ListableContentTag> listableContentTagRepository,
       IRepository<ListableContentCity> listableContentCityRepository,
       IRepository<ListableContentCategory> listableContentCategoryRepository,
       IRepository<ListableContentRelation> listableContentRelationRepository
       )
-      : base(objectMapper, tagRepository, cityRepository, categoryRepository, genericRepository,
-          listableContentRepository, listableContentTagRepository, listableContentCityRepository, 
+      : base(objectMapper, tagRepository, cityRepository, categoryRepository, genericRepository, listableContentTagRepository, listableContentCityRepository, 
           listableContentCategoryRepository, listableContentRelationRepository)
     {
       _objectMapper = objectMapper;
@@ -57,7 +52,6 @@ namespace NewsManagement.Entities.Galleries
       _cityRepository = cityRepository;
       _categoryRepository = categoryRepository;
       _genericRepository = genericRepository;
-      _listableContentRepository = listableContentRepository;
       _listableContentTagRepository = listableContentTagRepository;
       _listableContentCityRepository = listableContentCityRepository;
       _listableContentCategoryRepository = listableContentCategoryRepository;

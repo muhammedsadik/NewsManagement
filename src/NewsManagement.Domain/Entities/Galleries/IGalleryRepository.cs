@@ -1,5 +1,4 @@
-﻿using NewsManagement.Entities.GenericRepository;
-using NewsManagement.Entities.ListableContents;
+﻿using NewsManagement.Entities.ListableContents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace NewsManagement.Entities.Galleries
 {
-  public interface IGalleryRepository : IGenericRepository<Gallery>
+  public interface IGalleryRepository : IListableContentGenericRepository<Gallery>
   {
   }
 }
