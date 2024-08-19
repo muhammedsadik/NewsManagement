@@ -80,15 +80,15 @@ namespace NewsManagement.Entities.Galleries
 
       var gallery = await _galleryRepository.InsertAsync(creatingGallery);
 
-      await CreateListableContentTagAsync(createGalleryDto.TagIds, gallery.Id);
+      await CreateListableContentTagBaseAsync(createGalleryDto.TagIds, gallery.Id);
 
       if (createGalleryDto.CityIds != null)
-        await CreateListableContentCityAsync(createGalleryDto.CityIds, gallery.Id);
+        await CreateListableContentCityBaseAsync(createGalleryDto.CityIds, gallery.Id);
 
-      await CreateListableContentCategoryAsync(createGalleryDto.ListableContentCategoryDtos, gallery.Id);
+      await CreateListableContentCategoryBaseAsync(createGalleryDto.ListableContentCategoryDtos, gallery.Id);
 
       if (createGalleryDto.RelatedListableContentIds != null)
-        await CreateListableContentRelationAsync(createGalleryDto.RelatedListableContentIds, gallery.Id);
+        await CreateListableContentRelationBaseAsync(createGalleryDto.RelatedListableContentIds, gallery.Id);
 
       var galleryDto = _objectMapper.Map<Gallery, GalleryDto>(gallery);
 
@@ -110,15 +110,15 @@ namespace NewsManagement.Entities.Galleries
 
       var gallery = await _galleryRepository.InsertAsync(updatingGallery);
 
-      await ReCreateListableContentTagAsync(updateGalleryDto.TagIds, gallery.Id);
+      await ReCreateListableContentTagBaseAsync(updateGalleryDto.TagIds, gallery.Id);
 
       if (updateGalleryDto.CityIds != null)
-        await ReCreateListableContentCityAsync(updateGalleryDto.CityIds, gallery.Id);
+        await ReCreateListableContentCityBaseAsync(updateGalleryDto.CityIds, gallery.Id);
 
-      await ReCreateListableContentCategoryAsync(updateGalleryDto.ListableContentCategoryDtos, gallery.Id);
+      await ReCreateListableContentCategoryBaseAsync(updateGalleryDto.ListableContentCategoryDtos, gallery.Id);
 
       if (updateGalleryDto.RelatedListableContentIds != null)
-        await ReCreateListableContentRelationAsync(updateGalleryDto.RelatedListableContentIds, gallery.Id);
+        await ReCreateListableContentRelationBaseAsync(updateGalleryDto.RelatedListableContentIds, gallery.Id);
 
       var galleryDto = _objectMapper.Map<Gallery, GalleryDto>(gallery);
 

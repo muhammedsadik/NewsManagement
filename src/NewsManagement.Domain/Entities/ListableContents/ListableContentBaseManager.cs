@@ -67,19 +67,19 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
     public async Task CheckCreateInputBaseAsync(TEntityCreateDto createDto)
     {
-      var isExist = await _repository.AnyAsync(x => x.Title == createDto.Title);
+      var isExist = await _genericRepository.AnyAsync(x => x.Title == createDto.Title);
       if (isExist)
         throw new AlreadyExistException(typeof(TEntityDto), createDto.Title);
 
-      await CheckTagByIdAsync(createDto.TagIds);//bunu burada kontrol ettik ki business rul exception alınca ListableContent Insert edilmesin
+      await CheckTagByIdBaseAsync(createDto.TagIds);//bunu burada kontrol ettik ki business rul exception alınca ListableContent Insert edilmesin
 
       if (createDto.CityIds != null)
-        await CheckCityByIdAsync(createDto.CityIds);
+        await CheckCityByIdBaseAsync(createDto.CityIds);
 
       if (createDto.RelatedListableContentIds != null)
-        await CheckListableContentByIdAsync(createDto.RelatedListableContentIds);
+        await CheckListableContentByIdBaseAsync(createDto.RelatedListableContentIds);
 
-      await CheckListableContentCategoryAsync(createDto.ListableContentCategoryDtos);
+      await CheckListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos);
 
     }
 
@@ -89,17 +89,17 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       if (isExist)
         throw new AlreadyExistException(typeof(TEntityDto), updateDto.Title);
 
-      await CheckTagByIdAsync(updateDto.TagIds);
+      await CheckTagByIdBaseAsync(updateDto.TagIds);
 
       if (updateDto.CityIds != null)
-        await CheckCityByIdAsync(updateDto.CityIds);
+        await CheckCityByIdBaseAsync(updateDto.CityIds);
 
       if (updateDto.RelatedListableContentIds != null)
-        await CheckListableContentByIdAsync(updateDto.RelatedListableContentIds);
+        await CheckListableContentByIdBaseAsync(updateDto.RelatedListableContentIds);
 
-      await CheckListableContentCategoryAsync(updateDto.ListableContentCategoryDtos);
+      await CheckListableContentCategoryBaseAsync(updateDto.ListableContentCategoryDtos);
 
-      await CheckStatusAndDateTimeAsync(updateDto.Status, updateDto.PublishTime);
+      await CheckStatusAndDateTimeBaseAsync(updateDto.Status, updateDto.PublishTime);
 
     }
 
@@ -141,9 +141,9 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
     #region Helper Method
 
-    public async Task CheckTagByIdAsync(int[] tagIds)
+    public async Task CheckTagByIdBaseAsync(int[] tagIds)
     {
-      CheckDuplicateInputs(nameof(tagIds), tagIds);
+      CheckDuplicateInputsBase(nameof(tagIds), tagIds);
 
       foreach (var tagId in tagIds)
       {
@@ -153,9 +153,9 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       }
     }
 
-    public async Task CheckCityByIdAsync(int[] cityIds)
+    public async Task CheckCityByIdBaseAsync(int[] cityIds)
     {
-      CheckDuplicateInputs(nameof(cityIds), cityIds);
+      CheckDuplicateInputsBase(nameof(cityIds), cityIds);
 
       foreach (var cityId in cityIds)
       {
@@ -165,7 +165,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       }
     }
 
-    public void CheckDuplicateInputs(string inputName, int[] inputId)
+    public void CheckDuplicateInputsBase(string inputName, int[] inputId)
     {
       var duplicates = inputId.GroupBy(x => x)
         .Where(u => u.Count() > 1).Select(u => u.Key).ToList();
@@ -179,9 +179,9 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       }
     }
 
-    public async Task CheckListableContentByIdAsync(int[] RelatedListableContentIds)
+    public async Task CheckListableContentByIdBaseAsync(int[] RelatedListableContentIds)
     {
-      CheckDuplicateInputs(nameof(RelatedListableContentIds), RelatedListableContentIds);
+      CheckDuplicateInputsBase(nameof(RelatedListableContentIds), RelatedListableContentIds);
 
       foreach (var ListableContentId in RelatedListableContentIds)// 🔄 ◀ 
       {
@@ -191,7 +191,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       }
     }
 
-    public async Task CheckStatusAndDateTimeAsync(StatusType type, DateTime? dateTime)
+    public async Task CheckStatusAndDateTimeBaseAsync(StatusType type, DateTime? dateTime)
     {
       if (type == StatusType.Draft && dateTime.HasValue)//eğer üzerinde çalışılıyor ise tarih olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩 
@@ -229,11 +229,11 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       }
     }
 
-    public async Task CheckListableContentCategoryAsync(List<ListableContentCategoryDto> listableContentCategoryDto)
+    public async Task CheckListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto)
     {
       var categoryIds = listableContentCategoryDto.Select(x => x.CategoryId).ToArray();
 
-      CheckDuplicateInputs(nameof(categoryIds), categoryIds);
+      CheckDuplicateInputsBase(nameof(categoryIds), categoryIds);
 
       foreach (var categoryId in categoryIds)
       {
@@ -252,7 +252,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
     #region CreateListableContentSubs
 
-    public async Task CreateListableContentTagAsync(int[] tagIds, int listableContentId)// bunun kontrollerini önceden yap
+    public async Task CreateListableContentTagBaseAsync(int[] tagIds, int listableContentId)// bunun kontrollerini önceden yap
     {
       foreach (var tagId in tagIds)
       {
@@ -260,7 +260,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       }
     }
 
-    public async Task CreateListableContentCityAsync(int[] cityIds, int listableContentId)// bunun kontrollerini önceden yap
+    public async Task CreateListableContentCityBaseAsync(int[] cityIds, int listableContentId)// bunun kontrollerini önceden yap
     {
       foreach (var cityId in cityIds)
       {
@@ -268,7 +268,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       }
     }
 
-    public async Task CreateListableContentCategoryAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)// bunun kontrollerini önceden yap
+    public async Task CreateListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)// bunun kontrollerini önceden yap
     {
       foreach (var item in listableContentCategoryDto)
       {
@@ -277,7 +277,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       }
     }
 
-    public async Task CreateListableContentRelationAsync(int[] RelatedListableContentIds, int listableContentId)//önce kontrolleri yap henüz yapmadın
+    public async Task CreateListableContentRelationBaseAsync(int[] RelatedListableContentIds, int listableContentId)//önce kontrolleri yap henüz yapmadın
     {
       foreach (var RelatedId in RelatedListableContentIds)
       {
@@ -289,7 +289,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       }
     }
 
-    public async Task ReCreateListableContentTagAsync(int[] tagIds, int listableContentId)
+    public async Task ReCreateListableContentTagBaseAsync(int[] tagIds, int listableContentId)
     {
       var isExist = await _listableContentTagRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
@@ -298,10 +298,10 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
         await _listableContentTagRepository.DeleteManyAsync(isExist, autoSave: true);
       }
 
-      await CreateListableContentTagAsync(tagIds, listableContentId);
+      await CreateListableContentTagBaseAsync(tagIds, listableContentId);
     }
 
-    public async Task ReCreateListableContentCityAsync(int[] cityIds, int listableContentId)
+    public async Task ReCreateListableContentCityBaseAsync(int[] cityIds, int listableContentId)
     {
       var isExist = await _listableContentCityRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
@@ -310,10 +310,10 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
         await _listableContentCityRepository.DeleteManyAsync(isExist, autoSave: true);
       }
 
-      await CreateListableContentTagAsync(cityIds, listableContentId);
+      await CreateListableContentTagBaseAsync(cityIds, listableContentId);
     }
 
-    public async Task ReCreateListableContentCategoryAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)
+    public async Task ReCreateListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)
     {
       var isExist = await _listableContentCategoryRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
@@ -322,10 +322,10 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
         await _listableContentCategoryRepository.DeleteManyAsync(isExist, autoSave: true);
       }
 
-      await CreateListableContentCategoryAsync(listableContentCategoryDto, listableContentId);
+      await CreateListableContentCategoryBaseAsync(listableContentCategoryDto, listableContentId);
     }
 
-    public async Task ReCreateListableContentRelationAsync(int[] RelatedListableContentIds, int listableContentId)
+    public async Task ReCreateListableContentRelationBaseAsync(int[] RelatedListableContentIds, int listableContentId)
     {
       var isExist = await _listableContentRelationRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
@@ -334,7 +334,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
         await _listableContentRelationRepository.DeleteManyAsync(isExist, autoSave: true);
       }
 
-      await CreateListableContentRelationAsync(RelatedListableContentIds, listableContentId);
+      await CreateListableContentRelationBaseAsync(RelatedListableContentIds, listableContentId);
     }
 
     #endregion
