@@ -8,7 +8,7 @@ namespace NewsManagement.EntityDtos.VideoDtos
 {
   public class CreateVideoDto : CreateListableContentDto
   {
-    public VideoType VideoType { get; set; }
+    public VideoType VideoType { get; set; }// bunun hakkında bilgi sahibi ol.
     public string? Url { get; set; }
   }
 }
