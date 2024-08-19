@@ -15,12 +15,12 @@ using NewsManagement.Entities.ListableContents;
 
 namespace NewsManagement.EntityRepositories.Galleries
 {
-    public class EfCoreGalleryRepository : ListableContentGenericRepository<Gallery> , IGalleryRepository, IListableContentGenericRepository<Gallery>
+  public class EfCoreGalleryRepository : ListableContentGenericRepository<Gallery>, IGalleryRepository, IListableContentGenericRepository<Gallery>
   {
     public EfCoreGalleryRepository(IDbContextProvider<NewsManagementDbContext> dbContextProvider) : base(dbContextProvider)
     {
     }
 
-    
+
   }
 }
