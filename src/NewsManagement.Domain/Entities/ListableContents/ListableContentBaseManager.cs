@@ -17,11 +17,13 @@ using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.ObjectMapping;
+using System.Linq.Dynamic.Core;
+using NewsManagement.Entities.GenericRepository;
 
 namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryleri düzenle ve mesajları 📩 özelleştir ⚠⚠
 {
   public abstract class ListableContentBaseManager<TEntity, TEntityDto, TPagedDto, TEntityCreateDto, TEntityUpdateDto> : DomainService
-    where TEntity : ListableContent
+    where TEntity : ListableContent, new()
     where TEntityDto : ListableContentDto
     where TEntityCreateDto : CreateListableContentDto
     where TEntityUpdateDto : UpdateListableContentDto
@@ -30,8 +32,8 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
     private readonly IObjectMapper _objectMapper;
     private readonly ITagRepository _tagRepository;
     private readonly ICityRepository _cityRepository;
-    private readonly IRepository<TEntity, int> _repository;
     private readonly ICategoryRepository _categoryRepository;
+    private readonly IGenericRepository<TEntity> _genericRepository;
     private readonly IRepository<ListableContent, int> _listableContentRepository;
     private readonly IRepository<ListableContentTag> _listableContentTagRepository;
     private readonly IRepository<ListableContentCity> _listableContentCityRepository;
@@ -42,8 +44,8 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       IObjectMapper objectMapper,
       ITagRepository tagRepository,
       ICityRepository cityRepository,
-      IRepository<TEntity, int> repository,
       ICategoryRepository categoryRepository,
+      IGenericRepository<TEntity> genericRepository,
       IRepository<ListableContent, int> listableContentRepository,
       IRepository<ListableContentTag> listableContentTagRepository,
       IRepository<ListableContentCity> listableContentCityRepository,
@@ -54,7 +56,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       _objectMapper = objectMapper;
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
-      _repository = repository;
+      _genericRepository = genericRepository;
       _categoryRepository = categoryRepository;
       _listableContentRepository = listableContentRepository;
       _listableContentTagRepository = listableContentTagRepository;
@@ -83,7 +85,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
     public async Task CheckUpdateInputBaseAsync(int id, TEntityUpdateDto updateDto)
     {
-      var isExist = await _repository.AnyAsync(x => x.Title == updateDto.Title && x.Id != id);
+      var isExist = await _genericRepository.AnyAsync(x => x.Title == updateDto.Title && x.Id != id);
       if (isExist)
         throw new AlreadyExistException(typeof(TEntityDto), updateDto.Title);
 
@@ -104,8 +106,8 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
     public async Task<PagedResultDto<TEntityDto>> GetListFilterBaseAsync(TPagedDto input)
     {
       var totalCount = input.Filter == null
-         ? await _repository.CountAsync()
-         : await _repository.CountAsync(c => c.Title.Contains(input.Filter));
+         ? await _genericRepository.CountAsync()
+         : await _genericRepository.CountAsync(c => c.Title.Contains(input.Filter));
 
       if (totalCount == 0)
         throw new NotFoundException(typeof(TEntity), input.Filter ?? string.Empty);
@@ -116,7 +118,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       if (input.Sorting.IsNullOrWhiteSpace())
         input.Sorting = nameof(ListableContent.Title);
 
-      var entityList = await _repository.GetListAsync(input.SkipCount, input.MaxResultCount, input.Sorting, input.Filter);//filter ile alakalı özel bir metod yazılacak
+      var entityList = await _genericRepository.GetListAsync(input.SkipCount, input.MaxResultCount, input.Sorting, input.Filter);//filter ile alakalı özel bir metod yazılacak
 
       var entityDtoList = _objectMapper.Map<List<TEntity>, List<TEntityDto>>(entityList);
 
@@ -125,16 +127,16 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
     public async Task CheckDeleteInputBaseAsync(int id)
     {
-      var isExist = await _repository.AnyAsync(t => t.Id == id);
+      var isExist = await _genericRepository.AnyAsync(t => t.Id == id);
       if (!isExist)
         throw new EntityNotFoundException(typeof(TEntity), id);
     }
 
     public async Task CheckDeleteHardInputBaseAsync(int id)
     {
-      var entity = await _repository.GetAsync(id);
+      var entity = await _genericRepository.GetAsync(id);
 
-      await _repository.HardDeleteAsync(entity);
+      await _genericRepository.HardDeleteAsync(entity);
     }
 
     #region Helper Method

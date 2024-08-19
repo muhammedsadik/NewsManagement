@@ -11,6 +11,6 @@ namespace NewsManagement.Entities.Newses
   {
     public Guid[]? DetailImageId { get; set; }
 
-    internal News() { }
+    public News() { }
   }
 }

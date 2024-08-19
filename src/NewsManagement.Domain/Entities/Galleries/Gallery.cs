@@ -11,6 +11,6 @@ namespace NewsManagement.Entities.Galleries
   {
     public List<GalleryImage> GalleryImage { get; set; }
 
-    internal Gallery() { }
+    public Gallery() { }
   }
 }

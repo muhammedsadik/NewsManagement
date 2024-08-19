@@ -32,5 +32,6 @@ namespace NewsManagement.Entities.ListableContents
       ListableContentRelations = new List<ListableContentRelation>();
     }
 
+
   }
 }

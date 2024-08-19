@@ -14,7 +14,7 @@ namespace NewsManagement.Entities.Videos
     public string? Url { get; set; }
 
 
-    internal Video() { }
+    public Video() { }
 
   }
 }
