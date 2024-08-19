@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NewsManagement.Entities.ListableContents;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +8,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace NewsManagement.Entities.Newses
 {
-  public interface INewsRepository : IRepository<News, int>
+  public interface INewsRepository :  IListableContentGenericRepository<News>
   {
-    Task<List<News>> GetListAsync(int skipCount, int maxResultCount, string sorting, string filter = null);
   }
 }
