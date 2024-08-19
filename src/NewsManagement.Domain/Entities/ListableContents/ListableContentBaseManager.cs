@@ -4,7 +4,6 @@ using NewsManagement.Entities.Exceptions;
 using NewsManagement.Entities.ListableContentRelations;
 using NewsManagement.Entities.Tags;
 using NewsManagement.EntityConsts.ListableContentConsts;
-using NewsManagement.EntityDtos.CityDtos;
 using NewsManagement.EntityDtos.ListableContentDtos;
 using NewsManagement.EntityDtos.PagedAndSortedDtos;
 using System;
@@ -52,10 +51,10 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       IRepository<ListableContentRelation> listableContentRelationRepository
     )
     {
-      _repository = repository;
       _objectMapper = objectMapper;
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
+      _repository = repository;
       _categoryRepository = categoryRepository;
       _listableContentRepository = listableContentRepository;
       _listableContentTagRepository = listableContentTagRepository;
@@ -102,7 +101,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
     }
 
-    public async Task<PagedResultDto<TEntityDto>> GetListBaseAsync(TPagedDto input)
+    public async Task<PagedResultDto<TEntityDto>> GetListFilterBaseAsync(TPagedDto input)
     {
       var totalCount = input.Filter == null
          ? await _repository.CountAsync()
@@ -160,7 +159,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       {
         var existCity = await _cityRepository.AnyAsync(c => c.Id == cityId);
         if (!existCity)
-          throw new NotFoundException(typeof(Tag), cityId.ToString());
+          throw new NotFoundException(typeof(City), cityId.ToString());
       }
     }
 
