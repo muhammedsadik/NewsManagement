@@ -9,5 +9,6 @@ namespace NewsManagement.Entities.Videos
 {
   public interface IVideoRepository : IRepository<Video, int>
   {
+    Task<List<Video>> GetListAsync(int skipCount, int maxResultCount, string sorting, string filter = null);
   }
 }

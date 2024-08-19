@@ -9,5 +9,6 @@ namespace NewsManagement.Entities.Galleries
 {
   public interface IGalleryRepository : IRepository<Gallery, int>
   {
+    Task<List<Gallery>> GetListAsync(int skipCount, int maxResultCount, string sorting, string filter = null);
   }
 }

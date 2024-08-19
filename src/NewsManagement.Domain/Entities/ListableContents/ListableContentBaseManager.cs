@@ -4,7 +4,9 @@ using NewsManagement.Entities.Exceptions;
 using NewsManagement.Entities.ListableContentRelations;
 using NewsManagement.Entities.Tags;
 using NewsManagement.EntityConsts.ListableContentConsts;
+using NewsManagement.EntityDtos.CityDtos;
 using NewsManagement.EntityDtos.ListableContentDtos;
+using NewsManagement.EntityDtos.PagedAndSortedDtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +26,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
     where TEntityDto : ListableContentDto
     where TEntityCreateDto : CreateListableContentDto
     where TEntityUpdateDto : UpdateListableContentDto
+    where TPagedDto : GetListPagedAndSortedDto
   {
     private readonly IObjectMapper _objectMapper;
     private readonly ITagRepository _tagRepository;
@@ -99,6 +102,42 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
     }
 
+    public async Task<PagedResultDto<TEntityDto>> GetListBaseAsync(TPagedDto input)
+    {
+      var totalCount = input.Filter == null
+         ? await _repository.CountAsync()
+         : await _repository.CountAsync(c => c.Title.Contains(input.Filter));
+
+      if (totalCount == 0)
+        throw new NotFoundException(typeof(TEntity), input.Filter ?? string.Empty);
+
+      if (input.SkipCount >= totalCount)
+        throw new BusinessException(NewsManagementDomainErrorCodes.FilterLimitsError);
+
+      if (input.Sorting.IsNullOrWhiteSpace())
+        input.Sorting = nameof(ListableContent.Title);
+
+      var entityList = await _repository.GetListAsync(input.SkipCount, input.MaxResultCount, input.Sorting, input.Filter);//filter ile alakalı özel bir metod yazılacak
+
+      var entityDtoList = _objectMapper.Map<List<TEntity>, List<TEntityDto>>(entityList);
+
+      return new PagedResultDto<TEntityDto>(totalCount, entityDtoList);
+    }
+
+    public async Task CheckDeleteInputBaseAsync(int id)
+    {
+      var isExist = await _repository.AnyAsync(t => t.Id == id);
+      if (!isExist)
+        throw new EntityNotFoundException(typeof(TEntity), id);
+    }
+
+    public async Task CheckDeleteHardInputBaseAsync(int id)
+    {
+      var entity = await _repository.GetAsync(id);
+
+      await _repository.HardDeleteAsync(entity);
+    }
+
     #region Helper Method
 
     public async Task CheckTagByIdAsync(int[] tagIds)
@@ -167,7 +206,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
       if (type == StatusType.Deleted && dateTime.HasValue)//eğer Silinmiş ise tarih olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
-      
+
       if (type == StatusType.Published && !dateTime.HasValue)//eğer yayında ise tarih olmalı
         throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
 
@@ -255,7 +294,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
       if (isExist.Count() != 0)
       {
-        await _listableContentTagRepository.DeleteManyAsync(isExist, autoSave:true);
+        await _listableContentTagRepository.DeleteManyAsync(isExist, autoSave: true);
       }
 
       await CreateListableContentTagAsync(tagIds, listableContentId);
@@ -272,7 +311,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
       await CreateListableContentTagAsync(cityIds, listableContentId);
     }
-        
+
     public async Task ReCreateListableContentCategoryAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)
     {
       var isExist = await _listableContentCategoryRepository.GetListAsync(x => x.ListableContentId == listableContentId);
@@ -284,7 +323,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
       await CreateListableContentCategoryAsync(listableContentCategoryDto, listableContentId);
     }
-    
+
     public async Task ReCreateListableContentRelationAsync(int[] RelatedListableContentIds, int listableContentId)
     {
       var isExist = await _listableContentRelationRepository.GetListAsync(x => x.ListableContentId == listableContentId);
@@ -299,23 +338,6 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
     #endregion
 
-
-    public async Task<PagedResultDto<TEntityDto>> GetListBaseAsync(TPagedDto input)
-    {
-      return new PagedResultDto<TEntityDto>();
-    }
-
-    public async Task DeleteBaseAsync(int id)
-    {
-      var isExist = await _repository.AnyAsync(t => t.Id == id);
-      if (!isExist)
-        throw new EntityNotFoundException(typeof(TEntity), id);
-    }
-
-    public async Task DeleteHardBaseAsync(int id)
-    {
-
-    }
 
 
 

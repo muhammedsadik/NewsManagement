@@ -9,5 +9,6 @@ namespace NewsManagement.Entities.Newses
 {
   public interface INewsRepository : IRepository<News, int>
   {
+    Task<List<News>> GetListAsync(int skipCount, int maxResultCount, string sorting, string filter = null);
   }
 }
