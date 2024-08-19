@@ -16,9 +16,8 @@ using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.ObjectMapping;
-using static NewsManagement.Permissions.NewsManagementPermissions;
 
-namespace NewsManagement.Entities.ListableContents
+namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryleri düzenle ve mesajları 📩 özelleştir ⚠⚠
 {
   public abstract class ListableContentBaseManager<TEntity, TEntityDto, TPagedDto, TEntityCreateDto, TEntityUpdateDto> : DomainService
     where TEntity : ListableContent
@@ -154,19 +153,22 @@ namespace NewsManagement.Entities.ListableContents
 
     public async Task CheckStatusAndDateTimeAsync(StatusType type, DateTime? dateTime)
     {
-      if (type == StatusType.Draft && !dateTime.HasValue)//eğer üzerinde çalışılıyor ise tarih olamaz
+      if (type == StatusType.Draft && dateTime.HasValue)//eğer üzerinde çalışılıyor ise tarih olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩 
 
-      if (type == StatusType.PendingReview && !dateTime.HasValue)//eğer onay bekliyor ise tarih olamaz
+      if (type == StatusType.PendingReview && dateTime.HasValue)//eğer onay bekliyor ise tarih olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
 
-      if (type == StatusType.Archived && !dateTime.HasValue)//eğer Arşivlenmiş eski haberler ise tarih olamaz.
+      if (type == StatusType.Archived && dateTime.HasValue)//eğer Arşivlenmiş eski haberler ise tarih olamaz.
         throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
 
-      if (type == StatusType.Rejected && !dateTime.HasValue)//eğer Reddedilmiş ise tarih olamaz.
+      if (type == StatusType.Rejected && dateTime.HasValue)//eğer Reddedilmiş ise tarih olamaz.
         throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
 
-      if (type == StatusType.Deleted && !dateTime.HasValue)//eğer Silinmiş ise tarih olamaz
+      if (type == StatusType.Deleted && dateTime.HasValue)//eğer Silinmiş ise tarih olamaz
+        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+      
+      if (type == StatusType.Published && !dateTime.HasValue)//eğer yayında ise tarih olmalı
         throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
 
       if (!dateTime.HasValue) // veri tabanına birşeyler kaydetmek gerekir.
@@ -296,7 +298,6 @@ namespace NewsManagement.Entities.ListableContents
     }
 
     #endregion
-
 
 
     public async Task<PagedResultDto<TEntityDto>> GetListBaseAsync(TPagedDto input)

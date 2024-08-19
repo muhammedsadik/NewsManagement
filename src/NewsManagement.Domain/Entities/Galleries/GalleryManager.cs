@@ -70,11 +70,21 @@ namespace NewsManagement.Entities.Galleries
       //if(updateGalleryDto.GalleryImage != null)
       // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
-
-      //Insert yapmadan önce duruma göre time ve status düzenle
       var gallery = await _galleryRepository.InsertAsync(updatingGallery);
 
+      await ReCreateListableContentTagAsync(updateGalleryDto.TagIds, gallery.Id);
 
+      if (updateGalleryDto.CityIds != null)
+        await ReCreateListableContentCityAsync(updateGalleryDto.CityIds, gallery.Id);
+
+      await ReCreateListableContentCategoryAsync(updateGalleryDto.ListableContentCategoryDtos, gallery.Id);
+
+      if (updateGalleryDto.RelatedListableContentIds != null)
+        await ReCreateListableContentRelationAsync(updateGalleryDto.RelatedListableContentIds, gallery.Id);
+
+      var galleryDto = _objectMapper.Map<Gallery, GalleryDto>(gallery);
+
+      return galleryDto;
     }
 
     public async Task<PagedResultDto<GalleryDto>> GetListAsync(GetListPagedAndSortedDto input)

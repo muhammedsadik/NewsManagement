@@ -7,6 +7,6 @@ namespace NewsManagement.EntityDtos.GalleryDtos
 {
   public class UpdateGalleryDto : UpdateListableContentDto
   {
-    public List<GalleryImageDto>? GalleryImage { get; set; }
+    public List<GalleryImageDto>? GalleryImage { get; set; }// validation ve managerde tekrar kontrol et ve bu zorunlu mu ❓
   }
 }
