@@ -1,5 +1,6 @@
 ﻿using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Cities;
+using NewsManagement.Entities.GenericRepository;
 using NewsManagement.Entities.ListableContentRelations;
 using NewsManagement.Entities.ListableContents;
 using NewsManagement.Entities.Tags;
@@ -26,6 +27,7 @@ namespace NewsManagement.Entities.Galleries
     private readonly ITagRepository _tagRepository;
     private readonly ICityRepository _cityRepository;
     private readonly ICategoryRepository _categoryRepository;
+    private readonly IGenericRepository<Gallery> _genericRepository;
     private readonly IRepository<ListableContent, int> _listableContentRepository;
     private readonly IRepository<ListableContentTag> _listableContentTagRepository;
     private readonly IRepository<ListableContentCity> _listableContentCityRepository;
@@ -38,13 +40,14 @@ namespace NewsManagement.Entities.Galleries
       IGalleryRepository galleryRepository,
       ICityRepository cityRepository,
       ICategoryRepository categoryRepository,
+      IGenericRepository<Gallery> genericRepository,
       IRepository<ListableContent, int> listableContentRepository,
       IRepository<ListableContentTag> listableContentTagRepository,
       IRepository<ListableContentCity> listableContentCityRepository,
       IRepository<ListableContentCategory> listableContentCategoryRepository,
       IRepository<ListableContentRelation> listableContentRelationRepository
       )
-      : base(objectMapper, tagRepository, cityRepository, galleryRepository, categoryRepository, 
+      : base(objectMapper, tagRepository, cityRepository, categoryRepository, genericRepository,
           listableContentRepository, listableContentTagRepository, listableContentCityRepository, 
           listableContentCategoryRepository, listableContentRelationRepository)
     {
@@ -53,6 +56,7 @@ namespace NewsManagement.Entities.Galleries
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
       _categoryRepository = categoryRepository;
+      _genericRepository = genericRepository;
       _listableContentRepository = listableContentRepository;
       _listableContentTagRepository = listableContentTagRepository;
       _listableContentCityRepository = listableContentCityRepository;
@@ -123,9 +127,7 @@ namespace NewsManagement.Entities.Galleries
 
     public async Task<PagedResultDto<GalleryDto>> GetListAsync(GetListPagedAndSortedDto input)
     {
-      var pagedGalleryDto = await GetListFilterBaseAsync(input);
-
-      return pagedGalleryDto;
+      return await GetListFilterBaseAsync(input);
     }
 
     public async Task DeleteAsync(int id)
