@@ -94,12 +94,12 @@ namespace NewsManagement.Entities.Galleries
 
     public async Task DeleteAsync(int id)
     {
-
+      await CheckDeleteInputBaseAsync(id);
     }
 
     public async Task DeleteHardAsync(int id)
     {
-
+      await CheckDeleteHardInputBaseAsync(id);
     }
 
 
