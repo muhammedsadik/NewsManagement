@@ -1,5 +1,4 @@
 ﻿using NewsManagement.Entities.Galleries;
-using NewsManagement.Entities.ListableContents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +7,9 @@ using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 
-namespace NewsManagement.Entities.GenericRepository
+namespace NewsManagement.Entities.ListableContents
 {
-  public interface IGenericRepository<T> : IRepository<T, int>
+  public interface IListableContentGenericRepository<T> : IRepository<T, int>
     where T : ListableContent, new()
   {
     Task<List<T>> GetListAsync(int skipCount, int maxResultCount, string sorting, string filter);

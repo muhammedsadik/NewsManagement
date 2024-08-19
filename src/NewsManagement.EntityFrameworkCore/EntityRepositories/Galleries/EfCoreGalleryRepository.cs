@@ -9,13 +9,13 @@ using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
-using NewsManagement.EntityRepositories.GenericRepository;
 using Polly;
-using NewsManagement.Entities.GenericRepository;
+using NewsManagement.EntityRepositories.ListableContents;
+using NewsManagement.Entities.ListableContents;
 
 namespace NewsManagement.EntityRepositories.Galleries
 {
-  public class EfCoreGalleryRepository : GenericRepository<Gallery> , IGalleryRepository, IGenericRepository<Gallery>
+    public class EfCoreGalleryRepository : ListableContentGenericRepository<Gallery> , IGalleryRepository, IListableContentGenericRepository<Gallery>
   {
     public EfCoreGalleryRepository(IDbContextProvider<NewsManagementDbContext> dbContextProvider) : base(dbContextProvider)
     {

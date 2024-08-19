@@ -18,7 +18,6 @@ using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.ObjectMapping;
 using System.Linq.Dynamic.Core;
-using NewsManagement.Entities.GenericRepository;
 
 namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryleri düzenle ve mesajları 📩 özelleştir ⚠⚠
 {
@@ -33,8 +32,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
     private readonly ITagRepository _tagRepository;
     private readonly ICityRepository _cityRepository;
     private readonly ICategoryRepository _categoryRepository;
-    private readonly IGenericRepository<TEntity> _genericRepository;
-    private readonly IRepository<ListableContent, int> _listableContentRepository;
+    private readonly IListableContentGenericRepository<TEntity> _genericRepository;
     private readonly IRepository<ListableContentTag> _listableContentTagRepository;
     private readonly IRepository<ListableContentCity> _listableContentCityRepository;
     private readonly IRepository<ListableContentCategory> _listableContentCategoryRepository;
@@ -45,8 +43,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       ITagRepository tagRepository,
       ICityRepository cityRepository,
       ICategoryRepository categoryRepository,
-      IGenericRepository<TEntity> genericRepository,
-      IRepository<ListableContent, int> listableContentRepository,
+      IListableContentGenericRepository<TEntity> genericRepository,
       IRepository<ListableContentTag> listableContentTagRepository,
       IRepository<ListableContentCity> listableContentCityRepository,
       IRepository<ListableContentCategory> listableContentCategoryRepository,
@@ -58,7 +55,6 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       _cityRepository = cityRepository;
       _genericRepository = genericRepository;
       _categoryRepository = categoryRepository;
-      _listableContentRepository = listableContentRepository;
       _listableContentTagRepository = listableContentTagRepository;
       _listableContentCityRepository = listableContentCityRepository;
       _listableContentCategoryRepository = listableContentCategoryRepository;
@@ -185,7 +181,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
 
       foreach (var ListableContentId in RelatedListableContentIds)// 🔄 ◀ 
       {
-        var existListableContent = await _listableContentRepository.AnyAsync(l => l.Id == ListableContentId);//bunun çalışma mantığını öğren ve ona göre sorgu yap
+        var existListableContent = await _genericRepository.AnyAsync(l => l.Id == ListableContentId);//bunun çalışma mantığını öğren ve ona göre sorgu yap
         if (!existListableContent)
           throw new NotFoundException(typeof(ListableContent), ListableContentId.ToString());
       }
