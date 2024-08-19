@@ -15,11 +15,11 @@ namespace NewsManagement.Entities.ListableContents
   {
     public string Spot { get; set; }
     public string Title { get; set; }
-    public Guid? ImageId { get; set; }// ❓ bunun kontrölünü yap var mı yok mu
+    public Guid? ImageId { get; set; }// ❓ kontrölünü yap var mı yok mu
     public Guid? TenantId { get; set; }
     public StatusType Status { get; set; }
     public DateTime PublishTime { get; set; }
-    public ListableContentType listableContentType { get; set; }// ❓ bunu ne için kullanacaz. ayrıca create için bunu kalrdırdık
+    public ListableContentType listableContentType { get; set; }// ❓ ne için kullanacaz. ayrıca create için kaldırdık
     public ICollection<ListableContentTag> ListableContentTags { get; set; }
     public ICollection<ListableContentCity>? ListableContentCities { get; set; }
     public ICollection<ListableContentCategory> ListableContentCategories { get; set; }

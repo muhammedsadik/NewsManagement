@@ -37,12 +37,15 @@ namespace NewsManagement.Entities.Galleries
       creatingGallery.Status = StatusType.PendingReview;
       creatingGallery.listableContentType = ListableContentType.Gallery;
 
+      //if(updateGalleryDto.GalleryImage != null)
+      // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
+
       var gallery = await _galleryRepository.InsertAsync(creatingGallery);
 
       await CreateListableContentTagAsync(createGalleryDto.TagIds, gallery.Id);
 
-      if(createGalleryDto.CityIds != null)
-      await CreateListableContentCityAsync(createGalleryDto.CityIds, gallery.Id);
+      if (createGalleryDto.CityIds != null)
+        await CreateListableContentCityAsync(createGalleryDto.CityIds, gallery.Id);
 
       await CreateListableContentCategoryAsync(createGalleryDto.ListableContentCategoryDtos, gallery.Id);
 
@@ -56,6 +59,21 @@ namespace NewsManagement.Entities.Galleries
 
     public async Task<GalleryDto> UpdateAsync(int id, UpdateGalleryDto updateGalleryDto)
     {
+      await CheckUpdateInputBaseAsync(id, updateGalleryDto);
+
+      var updatingGallery = _objectMapper.Map<UpdateGalleryDto, Gallery>(updateGalleryDto);
+
+      //if(updateGalleryDto.listableContentType != ListableContentType.Gallery)
+      //burada listableContentType kontrolü yap listableContentType değişebilir ona göre yönlendirme yap
+      //(burada UpdateGalleryDto dan geldiği için status değişemez olması gerekiyor ama ListableContent ten gelirse bunu ele almak gerekir.)
+
+      //if(updateGalleryDto.GalleryImage != null)
+      // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
+
+
+      //Insert yapmadan önce duruma göre time ve status düzenle
+      var gallery = await _galleryRepository.InsertAsync(updatingGallery);
+
 
     }
 
