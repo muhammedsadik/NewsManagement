@@ -20,10 +20,10 @@ namespace NewsManagement.Entities.Galleries
 {
   public class GalleryManager : ListableContentBaseManager<Gallery, GalleryDto, GetListPagedAndSortedDto, CreateGalleryDto, UpdateGalleryDto>
   {
-    private readonly IGalleryRepository _galleryRepository;
     private readonly IObjectMapper _objectMapper;
     private readonly ITagRepository _tagRepository;
     private readonly ICityRepository _cityRepository;
+    private readonly IGalleryRepository _galleryRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IListableContentGenericRepository<Gallery> _genericRepository;
     private readonly IRepository<ListableContentTag> _listableContentTagRepository;
@@ -34,24 +34,25 @@ namespace NewsManagement.Entities.Galleries
     public GalleryManager(
       IObjectMapper objectMapper,
       ITagRepository tagRepository,
-      IGalleryRepository galleryRepository,
       ICityRepository cityRepository,
+      IGalleryRepository galleryRepository,
       ICategoryRepository categoryRepository,
       IListableContentGenericRepository<Gallery> genericRepository,
       IRepository<ListableContentTag> listableContentTagRepository,
       IRepository<ListableContentCity> listableContentCityRepository,
       IRepository<ListableContentCategory> listableContentCategoryRepository,
       IRepository<ListableContentRelation> listableContentRelationRepository
-      )
-      : base(objectMapper, tagRepository, cityRepository, categoryRepository, genericRepository, listableContentTagRepository, listableContentCityRepository, 
-          listableContentCategoryRepository, listableContentRelationRepository)
+      ) : base(objectMapper, tagRepository, cityRepository, categoryRepository,
+          genericRepository, listableContentTagRepository, listableContentCityRepository,
+          listableContentCategoryRepository, listableContentRelationRepository
+          )
     {
       _objectMapper = objectMapper;
-      _galleryRepository = galleryRepository;
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
-      _categoryRepository = categoryRepository;
+      _galleryRepository = galleryRepository;
       _genericRepository = genericRepository;
+      _categoryRepository = categoryRepository;
       _listableContentTagRepository = listableContentTagRepository;
       _listableContentCityRepository = listableContentCityRepository;
       _listableContentCategoryRepository = listableContentCategoryRepository;

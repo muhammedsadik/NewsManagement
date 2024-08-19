@@ -1,7 +1,11 @@
-﻿using NewsManagement.Entities.Newses;
+﻿using Microsoft.AspNetCore.Authorization;
+using NewsManagement.Entities.Galleries;
+using NewsManagement.Entities.Newses;
+using NewsManagement.EntityDtos.GalleryDtos;
 using NewsManagement.EntityDtos.NewsDtos;
 using NewsManagement.EntityDtos.PagedAndSortedDtos;
 using NewsManagement.EntityDtos.VideoDtos;
+using NewsManagement.Permissions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +17,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace NewsManagement.AppService.Newses
 {
+  [Authorize(NewsManagementPermissions.Newses.Default)]
   public class NewsAppService : CrudAppService<News, NewsDto, int, GetListPagedAndSortedDto, CreateNewsDto, UpdateNewsDto>, INewsAppService
   {
     private readonly NewsManager _newsManager;
@@ -22,30 +27,35 @@ namespace NewsManagement.AppService.Newses
       _newsManager = newsManager;
     }
 
+    [Authorize(NewsManagementPermissions.Newses.Create)]
     public override async Task<NewsDto> CreateAsync(CreateNewsDto createNewsDto)
     {
-      return await base.CreateAsync(createNewsDto);
+      return await _newsManager.CreateAsync(createNewsDto);
     }
 
+    [Authorize(NewsManagementPermissions.Newses.Edit)]
     public async override Task<NewsDto> UpdateAsync(int id, UpdateNewsDto updateNewsDto)
     {
-      return await base.UpdateAsync(id, updateNewsDto);
+      return await _newsManager.UpdateAsync(id, updateNewsDto);
     }
 
     public async override Task<PagedResultDto<NewsDto>> GetListAsync(GetListPagedAndSortedDto input)
     {
-      throw new NotImplementedException();
+      return await _newsManager.GetListAsync(input);
     }
 
+    [Authorize(NewsManagementPermissions.Newses.Delete)]
     public override async Task DeleteAsync(int id)
     {
+      await _newsManager.DeleteAsync(id);
 
       await base.DeleteAsync(id);
     }
 
-    public Task DeleteHardAsync(int id)
+    [Authorize(NewsManagementPermissions.Newses.Delete)]
+    public async Task DeleteHardAsync(int id)
     {
-      throw new NotImplementedException();
+      await _newsManager.DeleteHardAsync(id);
     }
   }
 }
