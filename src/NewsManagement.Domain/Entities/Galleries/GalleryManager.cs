@@ -1,5 +1,8 @@
-﻿using NewsManagement.Entities.Cities;
+﻿using NewsManagement.Entities.Categories;
+using NewsManagement.Entities.Cities;
+using NewsManagement.Entities.ListableContentRelations;
 using NewsManagement.Entities.ListableContents;
+using NewsManagement.Entities.Tags;
 using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.EntityDtos.GalleryDtos;
 using NewsManagement.EntityDtos.PagedAndSortedDtos;
@@ -10,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Entities.Events.Distributed;
+using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.ObjectMapping;
 
@@ -19,11 +23,41 @@ namespace NewsManagement.Entities.Galleries
   {
     private readonly IGalleryRepository _galleryRepository;
     private readonly IObjectMapper _objectMapper;
+    private readonly ITagRepository _tagRepository;
+    private readonly ICityRepository _cityRepository;
+    private readonly ICategoryRepository _categoryRepository;
+    private readonly IRepository<ListableContent, int> _listableContentRepository;
+    private readonly IRepository<ListableContentTag> _listableContentTagRepository;
+    private readonly IRepository<ListableContentCity> _listableContentCityRepository;
+    private readonly IRepository<ListableContentCategory> _listableContentCategoryRepository;
+    private readonly IRepository<ListableContentRelation> _listableContentRelationRepository;
 
-    public GalleryManager(IObjectMapper objectMapper, IGalleryRepository galleryRepository) : base(galleryRepository, objectMapper)
+    public GalleryManager(
+      IObjectMapper objectMapper,
+      ITagRepository tagRepository,
+      IGalleryRepository galleryRepository,
+      ICityRepository cityRepository,
+      ICategoryRepository categoryRepository,
+      IRepository<ListableContent, int> listableContentRepository,
+      IRepository<ListableContentTag> listableContentTagRepository,
+      IRepository<ListableContentCity> listableContentCityRepository,
+      IRepository<ListableContentCategory> listableContentCategoryRepository,
+      IRepository<ListableContentRelation> listableContentRelationRepository
+      )
+      : base(objectMapper, tagRepository, cityRepository, galleryRepository, categoryRepository, 
+          listableContentRepository, listableContentTagRepository, listableContentCityRepository, 
+          listableContentCategoryRepository, listableContentRelationRepository)
     {
       _objectMapper = objectMapper;
       _galleryRepository = galleryRepository;
+      _tagRepository = tagRepository;
+      _cityRepository = cityRepository;
+      _categoryRepository = categoryRepository;
+      _listableContentRepository = listableContentRepository;
+      _listableContentTagRepository = listableContentTagRepository;
+      _listableContentCityRepository = listableContentCityRepository;
+      _listableContentCategoryRepository = listableContentCategoryRepository;
+      _listableContentRelationRepository = listableContentRelationRepository;
     }
 
 
@@ -89,7 +123,9 @@ namespace NewsManagement.Entities.Galleries
 
     public async Task<PagedResultDto<GalleryDto>> GetListAsync(GetListPagedAndSortedDto input)
     {
+      var pagedGalleryDto = await GetListFilterBaseAsync(input);
 
+      return pagedGalleryDto;
     }
 
     public async Task DeleteAsync(int id)
