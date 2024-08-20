@@ -19,7 +19,7 @@ using Volo.Abp.Domain.Services;
 using Volo.Abp.ObjectMapping;
 using System.Linq.Dynamic.Core;
 
-namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryleri düzenle ve mesajları 📩 özelleştir ⚠⚠
+namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 özelleştir ⚠⚠
 {
   public abstract class ListableContentBaseManager<TEntity, TEntityDto, TPagedDto, TEntityCreateDto, TEntityUpdateDto> : DomainService
     where TEntity : ListableContent, new()
@@ -114,7 +114,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       if (input.Sorting.IsNullOrWhiteSpace())
         input.Sorting = nameof(ListableContent.Title);
 
-      var entityList = await _genericRepository.GetListAsync(input.SkipCount, input.MaxResultCount, input.Sorting, input.Filter);//filter ile alakalı özel bir metod yazılacak
+      var entityList = await _genericRepository.GetListAsync(input.SkipCount, input.MaxResultCount, input.Sorting, input.Filter);
 
       var entityDtoList = _objectMapper.Map<List<TEntity>, List<TEntityDto>>(entityList);
 
@@ -169,43 +169,43 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ Burada Repositoryler
       if (duplicates.Count > 0)
       {
         var duplicateUnits = string.Join(", ", duplicates);
-        throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)// 📩
+        throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)// 📩 Bunun çalışmasını test et 
           .WithData("index", inputName)
           .WithData("repeat", duplicateUnits);
       }
     }
 
-    public async Task CheckListableContentByIdBaseAsync(int[] RelatedListableContentIds)
+    public async Task CheckListableContentByIdBaseAsync(int[] RelatedListableContentIds) // 🚧 🛠 🚩
     {
       CheckDuplicateInputsBase(nameof(RelatedListableContentIds), RelatedListableContentIds);
 
       foreach (var ListableContentId in RelatedListableContentIds)// 🔄 ◀ 
-      {
+      {                               // _ListableContentRepository vardı onu kaldırdık.
         var existListableContent = await _genericRepository.AnyAsync(l => l.Id == ListableContentId);//bunun çalışma mantığını öğren ve ona göre sorgu yap
         if (!existListableContent)
-          throw new NotFoundException(typeof(ListableContent), ListableContentId.ToString());
+          throw new NotFoundException(typeof(ListableContent), ListableContentId.ToString());// doğru typeof gönder
       }
     }
 
     public async Task CheckStatusAndDateTimeBaseAsync(StatusType type, DateTime? dateTime)
     {
       if (type == StatusType.Draft && dateTime.HasValue)//eğer üzerinde çalışılıyor ise tarih olamaz
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩 
+        throw new BusinessException(NewsManagementDomainErrorCodes.DraftStatusCannotHaveaPublishingTime);
 
       if (type == StatusType.PendingReview && dateTime.HasValue)//eğer onay bekliyor ise tarih olamaz
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+        throw new BusinessException(NewsManagementDomainErrorCodes.PendingReviewStatusCannotHaveaPublishingTime);
 
       if (type == StatusType.Archived && dateTime.HasValue)//eğer Arşivlenmiş eski haberler ise tarih olamaz.
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+        throw new BusinessException(NewsManagementDomainErrorCodes.ArchivedStatusCannotHaveaPublishingTime);
 
       if (type == StatusType.Rejected && dateTime.HasValue)//eğer Reddedilmiş ise tarih olamaz.
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+        throw new BusinessException(NewsManagementDomainErrorCodes.RejectedStatusCannotHaveaPublishingTime);
 
       if (type == StatusType.Deleted && dateTime.HasValue)//eğer Silinmiş ise tarih olamaz
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+        throw new BusinessException(NewsManagementDomainErrorCodes.DeletedStatusCannotHaveaPublishingTime);
 
       if (type == StatusType.Published && !dateTime.HasValue)//eğer yayında ise tarih olmalı
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+        throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusMustHavePublishingTime);// 📩
 
       if (!dateTime.HasValue) // veri tabanına birşeyler kaydetmek gerekir.
         dateTime = DateTime.Now;

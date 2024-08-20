@@ -31,13 +31,6 @@ public class NewsManagementPermissionDefinitionProvider : PermissionDefinitionPr
     categoriesPermission.AddChild(NewsManagementPermissions.Categories.Delete, L("Permission:Categories.Delete"));
     #endregion
 
-    #region ListableContent
-    var listableContentsPermission = newsManagement.AddPermission(NewsManagementPermissions.ListableContents.Default, L("Permission:ListableContents"));
-    listableContentsPermission.AddChild(NewsManagementPermissions.ListableContents.Create, L("Permission:ListableContents.Create"));
-    listableContentsPermission.AddChild(NewsManagementPermissions.ListableContents.Edit, L("Permission:ListableContents.Edit"));
-    listableContentsPermission.AddChild(NewsManagementPermissions.ListableContents.Delete, L("Permission:ListableContents.Delete"));
-    #endregion
-
     #region Video 
     var videosPermission = newsManagement.AddPermission(NewsManagementPermissions.Videos.Default, L("Permission:Videos"));
     videosPermission.AddChild(NewsManagementPermissions.Videos.Create, L("Permission:Videos.Create"));
@@ -59,6 +52,12 @@ public class NewsManagementPermissionDefinitionProvider : PermissionDefinitionPr
     galleriesPermission.AddChild(NewsManagementPermissions.Galleries.Delete, L("Permission:Galleries.Delete"));
     #endregion
     
+/*    #region ListableContent
+    var listableContentsPermission = newsManagement.AddPermission(NewsManagementPermissions.ListableContents.Default, L("Permission:ListableContents"));
+    listableContentsPermission.AddChild(NewsManagementPermissions.ListableContents.Create, L("Permission:ListableContents.Create"));
+    listableContentsPermission.AddChild(NewsManagementPermissions.ListableContents.Edit, L("Permission:ListableContents.Edit"));
+    listableContentsPermission.AddChild(NewsManagementPermissions.ListableContents.Delete, L("Permission:ListableContents.Delete"));
+    #endregion */
 
 
   }

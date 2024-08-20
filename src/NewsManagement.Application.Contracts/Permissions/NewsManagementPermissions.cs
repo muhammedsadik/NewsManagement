@@ -52,13 +52,15 @@ public static class NewsManagementPermissions
     public const string Delete = Default + ".Delete";
   }
   
-  public static class ListableContents
+
+
+  /*public static class ListableContents
   {
     public const string Default = GroupName + ".ListableContents";
     public const string Create = Default + ".Create";
     public const string Edit = Default + ".Edit";
     public const string Delete = Default + ".Delete";
-  }
+  }*/
 
 
 }

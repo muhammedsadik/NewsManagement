@@ -12,6 +12,13 @@
     "NewsManagement:503": "A subcategory cannot have subcategories.",
     "NewsManagement:504": "The main category cannot be changed with subcategories.",
     "NewsManagement:505": "Wrong status type selected during creation.",
+    "NewsManagement:506": "Repeated data error. Index : {index} , repeat : {repeat}",
+    "NewsManagement:507": "Draft status cannot have a publishing time.",
+    "NewsManagement:508": "Pending Review status cannot have a publishing time.",
+    "NewsManagement:509": "Archived status cannot have a publishing time.",
+    "NewsManagement:510": "Rejected status cannot have a publishing time.",
+    "NewsManagement:511": "Deleted status cannot have a publishing time.",
+    "NewsManagement:512": "Published status must have a publishing time.",
 
 
 
@@ -38,11 +45,6 @@
     "Permission:Categories.Edit": "Edit",
     "Permission:Categories.Delete": "Delete",
 
-    "Permission:ListableContents": "ListableContent",
-    "Permission:ListableContents.Create": "Create",
-    "Permission:ListableContents.Edit": "Edit",
-    "Permission:ListableContents.Delete": "Delete",
-
     "Permission:Newses": "News",
     "Permission:Newses.Create": "Create",
     "Permission:Newses.Edit": "Edit",
@@ -58,6 +60,11 @@
     "Permission:Videos.Edit": "Edit",
     "Permission:Videos.Delete": "Delete"
 
+
+    /*    "Permission:ListableContents": "ListableContent",
+    "Permission:ListableContents.Create": "Create",
+    "Permission:ListableContents.Edit": "Edit",
+    "Permission:ListableContents.Delete": "Delete",*/
 
   }
 }
