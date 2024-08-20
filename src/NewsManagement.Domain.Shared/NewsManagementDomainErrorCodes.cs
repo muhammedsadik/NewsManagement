@@ -22,14 +22,11 @@ public static class NewsManagementDomainErrorCodes
 
 
 
-
-
-
-
   #region ValidationErrorCodes
   public const string NotInListableContentEnumType = "agency_transfercenter:v401";
   public const string NotInVideoEnumType = "agency_transfercenter:v402";
   public const string OnlyOneCategoryIsActiveStatusTrue = "agency_transfercenter:v403";
+  public const string NotInStatusEnumType = "agency_transfercenter:v404";
 
   #endregion
 }

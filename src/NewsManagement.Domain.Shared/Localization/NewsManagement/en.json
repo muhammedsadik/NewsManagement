@@ -26,9 +26,10 @@
 
 
     //ValidationErrors
-    "agency_transfercenter:v401": "Not in enum type. Enum type must contain = { For News = 0 , For Video = 1 , For Gallery = 2 }.",
-    "agency_transfercenter:v402": "Not in enum type. Enum type must contain = { For Physical Video = 0 , For Link Video = 1 }.",
+    "agency_transfercenter:v401": "Not in ListableContent enum type. Enum type must contain = { News = 0 , Video = 1 , Gallery = 2 }.",
+    "agency_transfercenter:v402": "Not in Video enum type. Enum type must contain = { Physical Video = 0 , Link Video = 1 }.",
     "agency_transfercenter:v403": "Only one category can be the Primary Category. Your choice = {0}",
+    "agency_transfercenter:v404": "Not in Status enum type. Enum type must contain = { Draft = 0 , Pending Review = 1 , Archived = 2 , Published = 3 , Scheduled = 4 , Deleted = 5 , Rejected = 6 }.",
 
 
 

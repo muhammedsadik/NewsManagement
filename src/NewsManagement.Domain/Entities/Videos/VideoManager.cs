@@ -17,10 +17,7 @@ using NewsManagement.Entities.Cities;
 using NewsManagement.Entities.Tags;
 using NewsManagement.Entities.ListableContentRelations;
 using NewsManagement.Entities.ListableContents;
-using NewsManagement.Entities.Galleries;
 using NewsManagement.EntityConsts.ListableContentConsts;
-using NewsManagement.EntityDtos.GalleryDtos;
-using static NewsManagement.Permissions.NewsManagementPermissions;
 
 namespace NewsManagement.Entities.Videos
 {
@@ -76,8 +73,8 @@ namespace NewsManagement.Entities.Videos
       creatingVideo.Status = StatusType.PendingReview;
       creatingVideo.listableContentType = ListableContentType.Video;
 
-      //if(updateVideoDto.VideoType == VideoType.Link)
-      // ❓ VideoType (Physical, Link) kontrolünü yap ve => 📩
+      //if(createVideoDto.VideoType == VideoType.Link)
+      // ❓ VideoType (Physical, Link) kontrolünü yap ve 📩, ayrıca type göre iş kuralları varsa uygula
 
       var video = await _videoRepository.InsertAsync(creatingVideo);
 
