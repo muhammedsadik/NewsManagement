@@ -19,13 +19,16 @@
     "NewsManagement:510": "Rejected status cannot have a publishing time.",
     "NewsManagement:511": "Deleted status cannot have a publishing time.",
     "NewsManagement:512": "Published status must have a publishing time.",
+    "NewsManagement:513": "Published Status Datetime Error: Must be within the last hour.",
+    "NewsManagement:514": "Published Status Datetime Error: Must be now or null.",
+    "NewsManagement:515": "Scheduled Status Datetime Error: Must be in the future.",
 
 
 
     //ValidationErrors
     "agency_transfercenter:v401": "Not in enum type. Enum type must contain = { For News = 0 , For Video = 1 , For Gallery = 2 }.",
     "agency_transfercenter:v402": "Not in enum type. Enum type must contain = { For Physical Video = 0 , For Link Video = 1 }.",
-    "agency_transfercenter:v403": "Only one category can be the primary category. Your choice = {0}",
+    "agency_transfercenter:v403": "Only one category can be the Primary Category. Your choice = {0}",
 
 
 

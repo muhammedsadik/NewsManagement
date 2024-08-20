@@ -18,6 +18,7 @@ using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.ObjectMapping;
 using System.Linq.Dynamic.Core;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 özelleştir ⚠⚠
 {
@@ -205,19 +206,19 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
         throw new BusinessException(NewsManagementDomainErrorCodes.DeletedStatusCannotHaveaPublishingTime);
 
       if (type == StatusType.Published && !dateTime.HasValue)//eğer yayında ise tarih olmalı
-        throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusMustHavePublishingTime);// 📩
+        throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusMustHaveaPublishingTime);
 
       if (!dateTime.HasValue) // veri tabanına birşeyler kaydetmek gerekir.
         dateTime = DateTime.Now;
 
       if (type == StatusType.Published && dateTime.Value < DateTime.Now.AddHours(-1))//eğer yayında ise tarih en fazla şimdi den 1 saat önce olabilir ⚠ 
-        throw new BusinessException(NewsManagementDomainErrorCodes.IfStatusPublishedDatetimeMustNowOrNull);// 📩 
+        throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusDatetimeTimeoutError);
 
       if (type == StatusType.Published && dateTime.Value > DateTime.Now)//eğer yayında ise tarih ileri olamaz.⚠yayına alınan içerik için zamanı yönet⚠ 
-        throw new BusinessException(NewsManagementDomainErrorCodes.IfStatusPublishedDatetimeMustNowOrNull);// 📩
+        throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusDatetimeMustNowOrNull);
 
       if (type == StatusType.Scheduled && dateTime.Value <= DateTime.Now)//eğer planlanmış ise tarih geri olamaz
-        throw new BusinessException(NewsManagementDomainErrorCodes.NotInVideoEnumType);// 📩
+        throw new BusinessException(NewsManagementDomainErrorCodes.ScheduledStatusDatetimeMustBeInTheFuture);
 
       if (type == StatusType.Scheduled && dateTime.Value > DateTime.Now)//eğer planlanmış ise tarihe göre işleme alınacak
       {
@@ -235,11 +236,12 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       {
         var existCategory = await _categoryRepository.AnyAsync(t => t.Id == categoryId);
         if (!existCategory)
-          throw new NotFoundException(typeof(ListableContentCategory), categoryId.ToString());// 📢 📩
+          throw new NotFoundException(typeof(ListableContentCategory), categoryId.ToString());
       }
 
       if (listableContentCategoryDto.Count(x => x.IsPrimary) != 1)
-        throw new BusinessException();// validation da bu durum için error message yazdık aynısını burada uygula 📢 📩
+        throw new BusinessException(NewsManagementDomainErrorCodes.OnlyOneCategoryIsActiveStatusTrue)
+          .WithData("0", listableContentCategoryDto.Count(x => x.IsPrimary));
     }
 
 
