@@ -72,7 +72,7 @@ namespace NewsManagement.Entities.Newses
       creatingNews.Status = StatusType.PendingReview;
       creatingNews.listableContentType = ListableContentType.News;
 
-      //if(updateNewsDto.DetailImageId != null)
+      //if(createNewsDto.DetailImageId = null kontrolü)
       // ❓ DetailImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
       var news = await _newsRepository.InsertAsync(creatingNews);
@@ -102,7 +102,7 @@ namespace NewsManagement.Entities.Newses
       //burada listableContentType kontrolü yap listableContentType değişebilir ona göre yönlendirme yap
       //(burada UpdateNewsDto dan geldiği için status değişemez olması gerekiyor ama ListableContent ten gelirse(!) bunu ele almak gerekir.)
 
-      //if(updateNewsDto.DetailImageId != null)
+      //if(updateNewsDto.DetailImageId = null kontrolü)
       // ❓ DetailImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
       var news = await _newsRepository.InsertAsync(updatingNews);

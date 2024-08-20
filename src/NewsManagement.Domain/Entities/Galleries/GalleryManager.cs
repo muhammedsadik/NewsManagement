@@ -70,7 +70,7 @@ namespace NewsManagement.Entities.Galleries
       creatingGallery.Status = StatusType.PendingReview;
       creatingGallery.listableContentType = ListableContentType.Gallery;
 
-      //if(updateGalleryDto.GalleryImage != null)
+      //if(createGalleryDto.GalleryImage = null kontrolü)
       // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
       var gallery = await _galleryRepository.InsertAsync(creatingGallery);
@@ -100,7 +100,7 @@ namespace NewsManagement.Entities.Galleries
       //burada listableContentType kontrolü yap listableContentType değişebilir ona göre yönlendirme yap
       //(burada UpdateGalleryDto dan geldiği için status değişemez olması gerekiyor ama ListableContent ten gelirse(!) bunu ele almak gerekir.)
 
-      //if(updateGalleryDto.GalleryImage != null)
+      //if(updateGalleryDto.GalleryImage = null kontrolü)
       // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
       var gallery = await _galleryRepository.InsertAsync(updatingGallery);

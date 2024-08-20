@@ -1,5 +1,4 @@
-﻿using NewsManagement.Entities.Categories;
-using NewsManagement.Entities.ListableContentRelations;
+﻿using NewsManagement.Entities.ListableContentRelations;
 using NewsManagement.EntityConsts.ListableContentConsts;
 using System;
 using System.Collections.Generic;
@@ -13,8 +12,8 @@ namespace NewsManagement.Entities.ListableContents
 {
   public class ListableContent : FullAuditedAggregateRoot<int>, IMultiTenant
   {
-    public string Spot { get; set; }
     public string Title { get; set; }
+    public string Spot { get; set; }
     public Guid? ImageId { get; set; }// ❓ kontrölünü yap var mı yok mu
     public Guid? TenantId { get; set; }
     public StatusType Status { get; set; }

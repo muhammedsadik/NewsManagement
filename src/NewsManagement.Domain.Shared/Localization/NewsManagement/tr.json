@@ -4,7 +4,13 @@
     "Menu:Home": "Ana sayfa",
     "Welcome": "Hoşgeldiniz",
     "LongWelcomeMessage": "NewsManagement Uygulamasına hoşgeldiniz. Bu, ABP framework'ü üzerine bina edilmiş bir başlangıç projesidir.",
-
+    "Draft": "Taslak ",
+    "PendingReview": "İnceleme ",
+    "Archived": "Arşivlenmiş ",
+    "Published": "Yayınlanmış ", 
+    "Scheduled": "Planlanmış ",
+    "Deleted": "Silinmiş ",
+    "Rejected": "Reddedilmiş",
 
     "NewsManagement:500": "{0} = {1} Bulunamadı.",
     "NewsManagement:501": "{1} ile aynı isimli bir {0} önceden oluşturulmuş.",
@@ -28,9 +34,10 @@
 
 
     //ValidasyonHataları
-    "agency_transfercenter:v401": "Enum türünde değil. Enum türü şunları içermelidir = { Haber için = 0 , Video için = 1 , Galeri için = 2 }.",
-    "agency_transfercenter:v402": "Enum türünde değil. Enum türü şunları içermelidir = { Fiziksel Video için = 0 , Link Video için = 1 }.",
+    "agency_transfercenter:v401": "Listelenebilir Enum türünde değil. Enum türü şunları içermelidir = { Haber için = 0 , Video için = 1 , Galeri için = 2 }.",
+    "agency_transfercenter:v402": "Video Enum türünde değil. Enum türü şunları içermelidir = { Fiziksel Video için = 0 , Link Video için = 1 }.",
     "agency_transfercenter:v403": "Sadece bir kategori Birincil Kategori olabilir. Sizin seçiminiz = {0}",
+    "agency_transfercenter:v404": "Durum Enum türünde değil. Enum türü şunları içermelidir  = { Draft = 0 , Pending Review = 1 , Archived = 2 , Published = 3 , Scheduled = 4 , Deleted = 5 , Rejected = 6 }.",
 
 
 

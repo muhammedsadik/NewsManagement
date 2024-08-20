@@ -17,8 +17,6 @@ namespace NewsManagement.Validations.ListableContentValidation
       RuleFor(l => l.Spot).NotEmpty();
       RuleFor(l => l.TagIds).NotEmpty();
 
-      //RuleFor(l => l.listableContentType).NotEmpty().IsInEnum().WithMessage(localizer[NewsManagementDomainErrorCodes.NotInListableContentEnumType]);
-
       RuleFor(l => l.ListableContentCategoryDtos)
         .Must(cat => cat == null || cat.Count(c => c.IsPrimary) == 1)
         .WithMessage(x => string.Format(
@@ -26,6 +24,8 @@ namespace NewsManagement.Validations.ListableContentValidation
           x.ListableContentCategoryDtos?.Count(c => c.IsPrimary) ?? 0)
         );
 
+
+      //RuleFor(l => l.listableContentType).NotEmpty().IsInEnum().WithMessage(localizer[NewsManagementDomainErrorCodes.NotInListableContentEnumType]);
       //RuleFor(x => x.ListableContentCategoryDtos).ForEach(x => x.SetValidator(new ListableContentCategoryDtoValidator()));
     }
   }
