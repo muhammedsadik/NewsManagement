@@ -15,11 +15,13 @@ public static class NewsManagementDomainErrorCodes
   public const string RejectedStatusCannotHaveaPublishingTime = "agency_transfercenter:510";
   public const string DeletedStatusCannotHaveaPublishingTime = "agency_transfercenter:511";
   public const string PublishedStatusMustHaveaPublishingTime = "agency_transfercenter:512";
+  public const string PublishedStatusDatetimeTimeoutError = "agency_transfercenter:513";
+  public const string PublishedStatusDatetimeMustNowOrNull = "NewsManagement:514";
+  public const string ScheduledStatusDatetimeMustBeInTheFuture = "NewsManagement:515";
 
 
 
 
-  public const string IfStatusPublishedDatetimeMustNowOrNull = "NewsManagement:50";
 
 
 
