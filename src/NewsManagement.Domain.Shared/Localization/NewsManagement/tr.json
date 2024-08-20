@@ -12,6 +12,13 @@
     "NewsManagement:503": "Bir alt kategorinin alt kategorileri olamaz.",
     "NewsManagement:504": "Ana kategori alt kategoriler ile birlikte değiştirilemez.",
     "NewsManagement:505": "Oluşturma işleminde hatalı durum tipi seçildi.",
+    "NewsManagement:506": "Tekrarlanan veri hatası. İndeks : {index} , Tekrar : {repeat}",
+    "NewsManagement:507": "Taslak durumu için bir yayın zamanı olamaz.",
+    "NewsManagement:508": "Bekleyen İnceleme durumu için bir yayın zamanı olamaz.",
+    "NewsManagement:509": "Arşivlenmiş durumu için bir yayın zamanı olamaz.",
+    "NewsManagement:510": "Reddedilmiş durumu için bir yayın zamanı olamaz.",
+    "NewsManagement:511": "Silinmiş durumu için bir yayın zamanı olamaz.",
+    "NewsManagement:512": "Yayınlanmış durumun bir yayınlanma zamanı olmalıdır.",
 
 
 
@@ -40,11 +47,6 @@
     "Permission:Categories.Edit": "Düzenleme",
     "Permission:Categories.Delete": "Silme",
 
-    "Permission:ListableContents": "Listelenebilir içerik",
-    "Permission:ListableContents.Create": "Oluşturma",
-    "Permission:ListableContents.Edit": "Düzenleme",
-    "Permission:ListableContents.Delete": "Silme",
-
     "Permission:Newses": "Haber",
     "Permission:Newses.Create": "Oluşturma",
     "Permission:Newses.Edit": "Düzenleme",
@@ -60,6 +62,12 @@
     "Permission:Videos.Edit": "Düzenleme",
     "Permission:Videos.Delete": "Silme"
 
+
+
+    /*    "Permission:ListableContents": "Listelenebilir içerik",
+    "Permission:ListableContents.Create": "Oluşturma",
+    "Permission:ListableContents.Edit": "Düzenleme",
+    "Permission:ListableContents.Delete": "Silme", */
 
   }
 }

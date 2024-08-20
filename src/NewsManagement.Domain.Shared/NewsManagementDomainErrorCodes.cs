@@ -8,10 +8,20 @@ public static class NewsManagementDomainErrorCodes
   public const string OnlyOneSubCategory = "NewsManagement:503";
   public const string MainCategoryWithSubCannotBeChanged = "NewsManagement:504";
   public const string WrongTypeSelectionInCreateStatus = "NewsManagement:505";
-  public const string IfStatusPublishedDatetimeMustNowOrNull = "NewsManagement:506";
+  public const string RepeatedDataError = "agency_transfercenter:506";
+  public const string DraftStatusCannotHaveaPublishingTime = "agency_transfercenter:507";
+  public const string PendingReviewStatusCannotHaveaPublishingTime = "agency_transfercenter:508";
+  public const string ArchivedStatusCannotHaveaPublishingTime = "agency_transfercenter:509";
+  public const string RejectedStatusCannotHaveaPublishingTime = "agency_transfercenter:510";
+  public const string DeletedStatusCannotHaveaPublishingTime = "agency_transfercenter:511";
+  public const string PublishedStatusMustHaveaPublishingTime = "agency_transfercenter:512";
 
 
-  public const string RepeatedDataError = "agency_transfercenter:";// <= zamanı gelince kod ver
+
+
+  public const string IfStatusPublishedDatetimeMustNowOrNull = "NewsManagement:50";
+
+
 
 
   #region ValidationErrorCodes
