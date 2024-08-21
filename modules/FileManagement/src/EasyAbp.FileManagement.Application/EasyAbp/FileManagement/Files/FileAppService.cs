@@ -83,7 +83,7 @@ namespace EasyAbp.FileManagement.Files
         }
 
         [Authorize]
-        public virtual async Task<CreateFileOutput> CreateAsync(CreateFileInput input)
+        public virtual async Task<CreateFileOutput> CreateAsync(CreateFileInput input)//1
         {
             var configuration = _configurationProvider.Get(input.FileContainerName);
 
@@ -107,7 +107,7 @@ namespace EasyAbp.FileManagement.Files
         }
 
         [Authorize]
-        public virtual async Task<CreateFileOutput> CreateWithStreamAsync(CreateFileWithStreamInput input)
+        public virtual async Task<CreateFileOutput> CreateWithStreamAsync(CreateFileWithStreamInput input)//2
         {
             var configuration = _configurationProvider.Get(input.FileContainerName);
 
@@ -203,7 +203,7 @@ namespace EasyAbp.FileManagement.Files
             await _fileManager.DeleteAsync(file);
         }
 
-        public virtual async Task<CreateManyFileOutput> CreateManyAsync(CreateManyFileInput input)
+        public virtual async Task<CreateManyFileOutput> CreateManyAsync(CreateManyFileInput input)//3
         {
             var configuration = _configurationProvider.Get(input.FileInfos.First().FileContainerName);
 
@@ -545,7 +545,7 @@ namespace EasyAbp.FileManagement.Files
             return Guid.NewGuid().ToString("N") + Path.GetExtension(fileName);
         }
 
-        protected virtual async Task<bool> TrySaveBlobAsync(File file, byte[] fileContent,
+        protected virtual async Task<bool> TrySaveBlobAsync(File file, byte[] fileContent,//4 blob staring kayýt yeri : kullanýlacak.
             bool disableBlobReuse = false, bool allowBlobOverriding = false)
         {
             if (file.FileType is not FileType.RegularFile)

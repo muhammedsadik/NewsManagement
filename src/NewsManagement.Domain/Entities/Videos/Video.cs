@@ -12,7 +12,8 @@ namespace NewsManagement.Entities.Videos
   {
     public VideoType VideoType { get; set; }// bunun hakkında bilgi sahibi ol.
     public string? Url { get; set; }
-    //eğer url değilde fiziksel video ise onun property sini al ❓
+    public Guid? VideoId { get; set; }
+    
 
     public Video() { }
 
