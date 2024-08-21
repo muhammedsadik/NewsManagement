@@ -10,5 +10,6 @@ namespace NewsManagement.EntityDtos.VideoDtos
   {
     public VideoType VideoType { get; set; }
     public string? Url { get; set; }
+    public Guid? VideoId { get; set; }
   }
 }

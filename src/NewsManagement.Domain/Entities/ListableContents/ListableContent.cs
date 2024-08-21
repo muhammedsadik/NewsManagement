@@ -19,12 +19,12 @@ namespace NewsManagement.Entities.ListableContents
     public StatusType Status { get; set; }
     public DateTime PublishTime { get; set; }
     public ListableContentType listableContentType { get; set; }// ❓ ne için kullanacaz. ayrıca create için kaldırdık
-    public ICollection<ListableContentTag> ListableContentTags { get; set; }
-    public ICollection<ListableContentCity>? ListableContentCities { get; set; }
-    public ICollection<ListableContentCategory> ListableContentCategories { get; set; }
+    public List<ListableContentTag> ListableContentTags { get; set; }
+    public List<ListableContentCity>? ListableContentCities { get; set; }
+    public List<ListableContentCategory> ListableContentCategories { get; set; }
 
 
-    public ICollection<ListableContentRelation> ListableContentRelations { get; set; }// ❓ bunun kontrölü nasıl yapılacak
+    public List<ListableContentRelation> ListableContentRelations { get; set; }// ❓ bunun kontrölü nasıl yapılacak
 
     public ListableContent()
     {

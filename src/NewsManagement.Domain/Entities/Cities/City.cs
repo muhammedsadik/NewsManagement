@@ -14,7 +14,7 @@ namespace NewsManagement.Entities.Cities
     public Guid? TenantId { get; set; }
     public string CityName  { get; set; }
     public int CityCode { get; set; }
-    public ICollection<ListableContentCity> ListableContentCities { get; set; }
+    public List<ListableContentCity> ListableContentCities { get; set; }
 
     internal City()
     {

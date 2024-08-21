@@ -19,6 +19,7 @@ using Volo.Abp.Domain.Services;
 using Volo.Abp.ObjectMapping;
 using System.Linq.Dynamic.Core;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using EasyAbp.FileManagement.Files;
 
 namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 özelleştir ⚠⚠
 {
@@ -38,6 +39,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
     private readonly IRepository<ListableContentCity> _listableContentCityRepository;
     private readonly IRepository<ListableContentCategory> _listableContentCategoryRepository;
     private readonly IRepository<ListableContentRelation> _listableContentRelationRepository;
+    //private readonly FileAppService _fileAppService;
 
     protected ListableContentBaseManager(
       IObjectMapper objectMapper,
@@ -49,6 +51,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       IRepository<ListableContentCity> listableContentCityRepository,
       IRepository<ListableContentCategory> listableContentCategoryRepository,
       IRepository<ListableContentRelation> listableContentRelationRepository
+      //FileAppService fileAppService
     )
     {
       _objectMapper = objectMapper;
@@ -60,6 +63,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       _listableContentCityRepository = listableContentCityRepository;
       _listableContentCategoryRepository = listableContentCategoryRepository;
       _listableContentRelationRepository = listableContentRelationRepository;
+      //_fileAppService = fileAppService;
     }
 
     public async Task CheckCreateInputBaseAsync(TEntityCreateDto createDto)
@@ -67,6 +71,12 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       var isExist = await _genericRepository.AnyAsync(x => x.Title == createDto.Title);
       if (isExist)
         throw new AlreadyExistException(typeof(TEntityDto), createDto.Title);
+      
+      //var isExistImageId = await _fileAppService.GetAsync(createDto.ImageId);
+      //if (isExistImageId)
+      //  throw new AlreadyExistException(typeof(TEntityDto), createDto.Title);
+
+
 
       await CheckTagByIdBaseAsync(createDto.TagIds);//bunu burada kontrol ettik ki business rul exception alınca ListableContent Insert edilmesin
 
@@ -138,7 +148,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
 
     #region Helper Method
 
-    public async Task CheckTagByIdBaseAsync(int[] tagIds)
+    public async Task CheckTagByIdBaseAsync(List<int> tagIds)
     {
       CheckDuplicateInputsBase(nameof(tagIds), tagIds);
 
@@ -150,7 +160,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       }
     }
 
-    public async Task CheckCityByIdBaseAsync(int[] cityIds)
+    public async Task CheckCityByIdBaseAsync(List<int> cityIds)
     {
       CheckDuplicateInputsBase(nameof(cityIds), cityIds);
 
@@ -162,7 +172,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       }
     }
 
-    public void CheckDuplicateInputsBase(string inputName, int[] inputId)
+    public void CheckDuplicateInputsBase(string inputName, List<int> inputId)
     {
       var duplicates = inputId.GroupBy(x => x)
         .Where(u => u.Count() > 1).Select(u => u.Key).ToList();
@@ -176,7 +186,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       }
     }
 
-    public async Task CheckListableContentByIdBaseAsync(int[] RelatedListableContentIds) // 🚧 🛠 🚩
+    public async Task CheckListableContentByIdBaseAsync(List<int> RelatedListableContentIds) // 🚧 🛠 🚩
     {
       CheckDuplicateInputsBase(nameof(RelatedListableContentIds), RelatedListableContentIds);
 
@@ -228,7 +238,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
 
     public async Task CheckListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto)
     {
-      var categoryIds = listableContentCategoryDto.Select(x => x.CategoryId).ToArray();
+      var categoryIds = listableContentCategoryDto.Select(x => x.CategoryId).ToList();
 
       CheckDuplicateInputsBase(nameof(categoryIds), categoryIds);
 
@@ -250,7 +260,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
 
     #region CreateListableContentSubs
 
-    public async Task CreateListableContentTagBaseAsync(int[] tagIds, int listableContentId)// bunun kontrollerini önceden yap
+    public async Task CreateListableContentTagBaseAsync(List<int> tagIds, int listableContentId)// bunun kontrollerini önceden yap
     {
       foreach (var tagId in tagIds)
       {
@@ -258,7 +268,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       }
     }
 
-    public async Task CreateListableContentCityBaseAsync(int[] cityIds, int listableContentId)// bunun kontrollerini önceden yap
+    public async Task CreateListableContentCityBaseAsync(List<int> cityIds, int listableContentId)// bunun kontrollerini önceden yap
     {
       foreach (var cityId in cityIds)
       {
@@ -275,7 +285,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       }
     }
 
-    public async Task CreateListableContentRelationBaseAsync(int[] RelatedListableContentIds, int listableContentId)//önce kontrolleri yap henüz yapmadın
+    public async Task CreateListableContentRelationBaseAsync(List<int> RelatedListableContentIds, int listableContentId)//önce kontrolleri yap henüz yapmadın
     {
       foreach (var RelatedId in RelatedListableContentIds)
       {
@@ -287,7 +297,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       }
     }
 
-    public async Task ReCreateListableContentTagBaseAsync(int[] tagIds, int listableContentId)
+    public async Task ReCreateListableContentTagBaseAsync(List<int> tagIds, int listableContentId)
     {
       var isExist = await _listableContentTagRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
@@ -299,7 +309,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       await CreateListableContentTagBaseAsync(tagIds, listableContentId);
     }
 
-    public async Task ReCreateListableContentCityBaseAsync(int[] cityIds, int listableContentId)
+    public async Task ReCreateListableContentCityBaseAsync(List<int> cityIds, int listableContentId)
     {
       var isExist = await _listableContentCityRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
@@ -323,7 +333,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       await CreateListableContentCategoryBaseAsync(listableContentCategoryDto, listableContentId);
     }
 
-    public async Task ReCreateListableContentRelationBaseAsync(int[] RelatedListableContentIds, int listableContentId)
+    public async Task ReCreateListableContentRelationBaseAsync(List<int> RelatedListableContentIds, int listableContentId)
     {
       var isExist = await _listableContentRelationRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
