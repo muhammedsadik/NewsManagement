@@ -177,7 +177,7 @@ namespace NewsManagement.Entities.ListableContents
       if (duplicates.Count > 0)
       {
         var duplicateUnits = string.Join(", ", duplicates);
-        throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)// 📩 çalışmasını test et 
+        throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)// 📩 çalışmasını test etmek için vlidation kapat
           .WithData("index", inputName)
           .WithData("repeat", duplicateUnits);
       }
@@ -189,7 +189,7 @@ namespace NewsManagement.Entities.ListableContents
 
       foreach (var ListableContentId in RelatedListableContentIds)
       {
-        var existListableContent = await _genericRepository.AnyAsync(l => l.Id == ListableContentId);
+        var existListableContent = await _genericRepository.AnyAsync(l => l.Id == ListableContentId);// ⚠⚠burada Hata alıyoruz. sebebi diyelim  ListableContent gallery ile çekiyoruz ama verdiğimiz id News ile ilşkili bunu burada ele al. ⚠⚠  ❗❗❗    ⚠⚠    ❗❗❗     ⚠⚠
         if (!existListableContent)
           throw new NotFoundException(typeof(ListableContent), ListableContentId.ToString());
       }
