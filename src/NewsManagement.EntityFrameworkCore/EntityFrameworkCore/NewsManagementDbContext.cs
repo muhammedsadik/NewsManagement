@@ -88,6 +88,9 @@ public class NewsManagementDbContext :
     #region Gallery, Video, News
     builder.Entity<Gallery>(b =>
     {
+
+
+
       b.OwnsOne(x => x.GalleryImage);
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Galleries", NewsManagementConsts.DbSchema);
@@ -112,12 +115,11 @@ public class NewsManagementDbContext :
 
     #region ListableContent
 
-    builder.Entity<ListableContent>(b =>
-    {
+    //builder.Entity<ListableContent>(b =>
+    //{
 
-      //b.ToTable(NewsManagementConsts.DbTablePrefix + "ListableContents", NewsManagementConsts.DbSchema);
-      //b.ConfigureByConvention();
-    });
+      
+    //});
 
     builder.Entity<ListableContentRelation>(b =>
     {
@@ -167,7 +169,7 @@ public class NewsManagementDbContext :
     #region Tag, City, Category
     builder.Entity<Tag>(b =>
     {
-      b.HasMany(x => x.ListableContentTags).WithOne().HasForeignKey(x => x.TagId);
+      b.HasMany(x => x.ListableContentTags).WithOne(x => x.Tag).HasForeignKey(x => x.TagId).IsRequired();
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Tags", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
@@ -177,7 +179,7 @@ public class NewsManagementDbContext :
     {
       b.HasIndex(x => x.CityCode).IsUnique();
 
-      b.HasMany(x => x.ListableContentCities).WithOne().HasForeignKey(x => x.CityId);
+      b.HasMany(x => x.ListableContentCities).WithOne(x => x.City).HasForeignKey(x => x.CityId).IsRequired();
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Cities", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
@@ -185,7 +187,7 @@ public class NewsManagementDbContext :
 
     builder.Entity<Category>(b =>
     {
-      b.HasMany(x => x.ListableContentCategories).WithOne().HasForeignKey(x => x.CategoryId);
+      b.HasMany(x => x.ListableContentCategories).WithOne(x =>x.Category).HasForeignKey(x => x.CategoryId).IsRequired();
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Categories", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();

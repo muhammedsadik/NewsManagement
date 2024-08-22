@@ -10,7 +10,7 @@ using Volo.Abp.MultiTenancy;
 
 namespace NewsManagement.Entities.Categories
 {
-    public class Category : FullAuditedAggregateRoot<int>, IMultiTenant
+  public class Category : FullAuditedAggregateRoot<int>, IMultiTenant
   {
     public Guid? TenantId { get; set; }
     public string CategoryName { get; set; }

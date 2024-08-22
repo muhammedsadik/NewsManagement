@@ -7,7 +7,7 @@ namespace NewsManagement.EntityDtos.GalleryDtos
 {
   public class GalleryImageDto : IEntityDto
   {
-    public Guid ImageId { get; set; }// ❓ ImageId ye ait bir item varmı kontrolünü yap
+    public Guid ImageId { get; set; }
     public string NewsContent { get; set; }
   }
 }

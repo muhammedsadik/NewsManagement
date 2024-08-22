@@ -9,7 +9,7 @@ namespace NewsManagement.Entities.Newses
 {
   public class News : ListableContent
   {
-    public List<Guid>? DetailImageId { get; set; }
+    public List<Guid> DetailImageId { get; set; }
 
     public News() { }
   }

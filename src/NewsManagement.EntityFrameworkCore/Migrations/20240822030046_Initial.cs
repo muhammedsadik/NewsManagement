@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -482,8 +483,8 @@ namespace NewsManagement.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Spot = table.Column<string>(type: "text", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
+                    Spot = table.Column<string>(type: "text", nullable: false),
                     ImageId = table.Column<Guid>(type: "uuid", nullable: true),
                     TenantId = table.Column<Guid>(type: "uuid", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
@@ -820,8 +821,7 @@ namespace NewsManagement.Migrations
                 {
                     CategoryId = table.Column<int>(type: "integer", nullable: false),
                     ListableContentId = table.Column<int>(type: "integer", nullable: false),
-                    IsPrimary = table.Column<bool>(type: "boolean", nullable: false),
-                    CategoryId1 = table.Column<int>(type: "integer", nullable: false)
+                    IsPrimary = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -829,12 +829,6 @@ namespace NewsManagement.Migrations
                     table.ForeignKey(
                         name: "FK_AppListableContentCategories_AppCategories_CategoryId",
                         column: x => x.CategoryId,
-                        principalTable: "AppCategories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AppListableContentCategories_AppCategories_CategoryId1",
-                        column: x => x.CategoryId1,
                         principalTable: "AppCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -851,8 +845,7 @@ namespace NewsManagement.Migrations
                 columns: table => new
                 {
                     CityId = table.Column<int>(type: "integer", nullable: false),
-                    ListableContentId = table.Column<int>(type: "integer", nullable: false),
-                    CityId1 = table.Column<int>(type: "integer", nullable: false)
+                    ListableContentId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -860,12 +853,6 @@ namespace NewsManagement.Migrations
                     table.ForeignKey(
                         name: "FK_AppListableContentCities_AppCities_CityId",
                         column: x => x.CityId,
-                        principalTable: "AppCities",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AppListableContentCities_AppCities_CityId1",
-                        column: x => x.CityId1,
                         principalTable: "AppCities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -906,8 +893,7 @@ namespace NewsManagement.Migrations
                 columns: table => new
                 {
                     TagId = table.Column<int>(type: "integer", nullable: false),
-                    ListableContentId = table.Column<int>(type: "integer", nullable: false),
-                    TagId1 = table.Column<int>(type: "integer", nullable: false)
+                    ListableContentId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -915,12 +901,6 @@ namespace NewsManagement.Migrations
                     table.ForeignKey(
                         name: "FK_AppListableContentTags_AppTags_TagId",
                         column: x => x.TagId,
-                        principalTable: "AppTags",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AppListableContentTags_AppTags_TagId1",
-                        column: x => x.TagId1,
                         principalTable: "AppTags",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -937,7 +917,7 @@ namespace NewsManagement.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false),
-                    DetailImageId = table.Column<Guid[]>(type: "uuid[]", nullable: true)
+                    DetailImageId = table.Column<List<Guid>>(type: "uuid[]", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -956,7 +936,8 @@ namespace NewsManagement.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false),
                     VideoType = table.Column<int>(type: "integer", nullable: false),
-                    Url = table.Column<string>(type: "text", nullable: true)
+                    Url = table.Column<string>(type: "text", nullable: true),
+                    VideoId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1265,19 +1246,9 @@ namespace NewsManagement.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AppListableContentCategories_CategoryId1",
-                table: "AppListableContentCategories",
-                column: "CategoryId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AppListableContentCities_CityId",
                 table: "AppListableContentCities",
                 column: "CityId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AppListableContentCities_CityId1",
-                table: "AppListableContentCities",
-                column: "CityId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AppListableContentRelations_RelatedListableContentId",
@@ -1288,11 +1259,6 @@ namespace NewsManagement.Migrations
                 name: "IX_AppListableContentTags_TagId",
                 table: "AppListableContentTags",
                 column: "TagId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AppListableContentTags_TagId1",
-                table: "AppListableContentTags",
-                column: "TagId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EasyAbpFileManagementFiles_BlobName",

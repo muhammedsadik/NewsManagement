@@ -14,17 +14,17 @@ namespace NewsManagement.Entities.ListableContents
   {
     public string Title { get; set; }
     public string Spot { get; set; }
-    public Guid? ImageId { get; set; }// ❓ kontrölünü yap var mı yok mu
+    public Guid? ImageId { get; set; }
     public Guid? TenantId { get; set; }
     public StatusType Status { get; set; }
     public DateTime PublishTime { get; set; }
-    public ListableContentType listableContentType { get; set; }// ❓ ne için kullanacaz. ayrıca create için kaldırdık
+    public ListableContentType listableContentType { get; set; }
     public List<ListableContentTag> ListableContentTags { get; set; }
-    public List<ListableContentCity>? ListableContentCities { get; set; }
+    public List<ListableContentCity> ListableContentCities { get; set; }
     public List<ListableContentCategory> ListableContentCategories { get; set; }
 
 
-    public List<ListableContentRelation> ListableContentRelations { get; set; }// ❓ bunun kontrölü nasıl yapılacak
+    public List<ListableContentRelation> ListableContentRelations { get; set; }
 
     public ListableContent()
     {
