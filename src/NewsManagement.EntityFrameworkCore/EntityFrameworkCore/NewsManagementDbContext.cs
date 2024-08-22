@@ -169,7 +169,7 @@ public class NewsManagementDbContext :
     #region Tag, City, Category
     builder.Entity<Tag>(b =>
     {
-      b.HasMany(x => x.ListableContentTags).WithOne().HasForeignKey(x => x.TagId).IsRequired();
+      b.HasMany(x => x.ListableContentTags).WithOne(x => x.Tag).HasForeignKey(x => x.TagId).IsRequired();
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Tags", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
@@ -179,7 +179,7 @@ public class NewsManagementDbContext :
     {
       b.HasIndex(x => x.CityCode).IsUnique();
 
-      b.HasMany(x => x.ListableContentCities).WithOne().HasForeignKey(x => x.CityId).IsRequired();
+      b.HasMany(x => x.ListableContentCities).WithOne(x => x.City).HasForeignKey(x => x.CityId).IsRequired();
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Cities", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
@@ -187,7 +187,7 @@ public class NewsManagementDbContext :
 
     builder.Entity<Category>(b =>
     {
-      b.HasMany(x => x.ListableContentCategories).WithOne().HasForeignKey(x => x.CategoryId).IsRequired();
+      b.HasMany(x => x.ListableContentCategories).WithOne(x =>x.Category).HasForeignKey(x => x.CategoryId).IsRequired();
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Categories", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
