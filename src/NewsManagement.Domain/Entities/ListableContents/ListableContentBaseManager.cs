@@ -20,6 +20,9 @@ using Volo.Abp.ObjectMapping;
 using System.Linq.Dynamic.Core;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using EasyAbp.FileManagement.Files;
+using NewsManagement.Entities.Newses;
+using NewsManagement.Entities.Videos;
+using NewsManagement.Entities.Galleries;
 
 namespace NewsManagement.Entities.ListableContents
 {
@@ -32,7 +35,10 @@ namespace NewsManagement.Entities.ListableContents
   {
     private readonly IObjectMapper _objectMapper;
     private readonly ITagRepository _tagRepository;
-    private readonly ICityRepository _cityRepository;
+    private readonly ICityRepository _cityRepository; 
+    private readonly INewsRepository _newsRepository;
+    private readonly IVideoRepository _videoRepository;
+    private readonly IGalleryRepository _galleryRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IListableContentGenericRepository<TEntity> _genericRepository;
     private readonly IRepository<ListableContentTag> _listableContentTagRepository;
@@ -45,6 +51,9 @@ namespace NewsManagement.Entities.ListableContents
       IObjectMapper objectMapper,
       ITagRepository tagRepository,
       ICityRepository cityRepository,
+      INewsRepository newsRepository,
+      IVideoRepository videoRepository,
+      IGalleryRepository galleryRepository,
       ICategoryRepository categoryRepository,
       IListableContentGenericRepository<TEntity> genericRepository,
       IRepository<ListableContentTag> listableContentTagRepository,
@@ -57,6 +66,9 @@ namespace NewsManagement.Entities.ListableContents
       _objectMapper = objectMapper;
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
+      _newsRepository = newsRepository;
+      _videoRepository = videoRepository;
+      _galleryRepository = galleryRepository;
       _genericRepository = genericRepository;
       _categoryRepository = categoryRepository;
       _listableContentTagRepository = listableContentTagRepository;
@@ -177,7 +189,7 @@ namespace NewsManagement.Entities.ListableContents
       if (duplicates.Count > 0)
       {
         var duplicateUnits = string.Join(", ", duplicates);
-        throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)// 📩 çalışmasını test et 
+        throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)// 📩 çalışmasını test etmek için vlidation kapat
           .WithData("index", inputName)
           .WithData("repeat", duplicateUnits);
       }
@@ -189,8 +201,11 @@ namespace NewsManagement.Entities.ListableContents
 
       foreach (var ListableContentId in RelatedListableContentIds)
       {
-        var existListableContent = await _genericRepository.AnyAsync(l => l.Id == ListableContentId);
-        if (!existListableContent)
+        var galleryId = await _galleryRepository.AnyAsync(x => x.Id == ListableContentId);
+        var VideoId = await _videoRepository.AnyAsync(x => x.Id == ListableContentId);
+        var NewsId = await _newsRepository.AnyAsync(x => x.Id == ListableContentId);
+
+        if (galleryId || VideoId || NewsId)
           throw new NotFoundException(typeof(ListableContent), ListableContentId.ToString());
       }
     }

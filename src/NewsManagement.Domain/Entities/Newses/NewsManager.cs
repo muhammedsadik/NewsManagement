@@ -4,6 +4,7 @@ using NewsManagement.Entities.Galleries;
 using NewsManagement.Entities.ListableContentRelations;
 using NewsManagement.Entities.ListableContents;
 using NewsManagement.Entities.Tags;
+using NewsManagement.Entities.Videos;
 using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.EntityDtos.GalleryDtos;
 using NewsManagement.EntityDtos.NewsDtos;
@@ -26,6 +27,8 @@ namespace NewsManagement.Entities.Newses
     private readonly ITagRepository _tagRepository;
     private readonly ICityRepository _cityRepository;
     private readonly INewsRepository _newsRepository;
+    private readonly IVideoRepository _videoRepository;
+    private readonly IGalleryRepository _galleryRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IListableContentGenericRepository<News> _genericRepository;
     private readonly IRepository<ListableContentTag> _listableContentTagRepository;
@@ -39,21 +42,25 @@ namespace NewsManagement.Entities.Newses
       ITagRepository tagRepository,
       ICityRepository cityRepository,
       INewsRepository newsRepository,
+      IVideoRepository videoRepository,
+      IGalleryRepository galleryRepository,
       ICategoryRepository categoryRepository,
       IListableContentGenericRepository<News> genericRepository,
       IRepository<ListableContentTag> listableContentTagRepository,
       IRepository<ListableContentCity> listableContentCityRepository,
       IRepository<ListableContentCategory> listableContentCategoryRepository,
       IRepository<ListableContentRelation> listableContentRelationRepository
-      ) : base(objectMapper, tagRepository, cityRepository, categoryRepository,
-          genericRepository, listableContentTagRepository, listableContentCityRepository,
-          listableContentCategoryRepository, listableContentRelationRepository
+      ) : base(objectMapper, tagRepository, cityRepository, newsRepository,
+        videoRepository, galleryRepository, categoryRepository, genericRepository, listableContentTagRepository,
+        listableContentCityRepository, listableContentCategoryRepository, listableContentRelationRepository
           )
     {
       _objectMapper = objectMapper;
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
       _newsRepository = newsRepository;
+      _videoRepository = videoRepository;
+      _galleryRepository = galleryRepository;
       _genericRepository = genericRepository;
       _categoryRepository = categoryRepository;
       _listableContentTagRepository = listableContentTagRepository;
@@ -75,7 +82,7 @@ namespace NewsManagement.Entities.Newses
       // updateNewsDto.DetailImageId  kontrolü
       // ❓ DetailImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
-      var news = await _newsRepository.InsertAsync(creatingNews, autoSave:true);
+      var news = await _genericRepository.InsertAsync(creatingNews, autoSave:true);
 
       await CreateListableContentTagBaseAsync(createNewsDto.TagIds, news.Id);
 
@@ -104,7 +111,7 @@ namespace NewsManagement.Entities.Newses
       // updateNewsDto.DetailImageId  kontrolü
       // ❓ DetailImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
-      var news = await _newsRepository.InsertAsync(updatingNews);
+      var news = await _genericRepository.InsertAsync(updatingNews);
 
       await ReCreateListableContentTagBaseAsync(updateNewsDto.TagIds, news.Id);
 
