@@ -21,7 +21,7 @@ using System.Linq.Dynamic.Core;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using EasyAbp.FileManagement.Files;
 
-namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 özelleştir ⚠⚠
+namespace NewsManagement.Entities.ListableContents
 {
   public abstract class ListableContentBaseManager<TEntity, TEntityDto, TPagedDto, TEntityCreateDto, TEntityUpdateDto> : DomainService
     where TEntity : ListableContent, new()
@@ -51,7 +51,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       IRepository<ListableContentCity> listableContentCityRepository,
       IRepository<ListableContentCategory> listableContentCategoryRepository,
       IRepository<ListableContentRelation> listableContentRelationRepository
-      //FileAppService fileAppService
+    //FileAppService fileAppService
     )
     {
       _objectMapper = objectMapper;
@@ -71,22 +71,20 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       var isExist = await _genericRepository.AnyAsync(x => x.Title == createDto.Title);
       if (isExist)
         throw new AlreadyExistException(typeof(TEntityDto), createDto.Title);
-      
+
       //var isExistImageId = await _fileAppService.GetAsync(createDto.ImageId);
       //if (isExistImageId)
       //  throw new AlreadyExistException(typeof(TEntityDto), createDto.Title);
 
 
+      await CheckTagByIdBaseAsync(createDto.TagIds);
 
-      await CheckTagByIdBaseAsync(createDto.TagIds);//bunu burada kontrol ettik ki business rul exception alınca ListableContent Insert edilmesin
+      await CheckCityByIdBaseAsync(createDto.CityIds);
 
-      if (createDto.CityIds != null)
-        await CheckCityByIdBaseAsync(createDto.CityIds);
+      await CheckListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos);
 
       if (createDto.RelatedListableContentIds != null)
         await CheckListableContentByIdBaseAsync(createDto.RelatedListableContentIds);
-
-      await CheckListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos);
 
     }
 
@@ -98,15 +96,14 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
 
       await CheckTagByIdBaseAsync(updateDto.TagIds);
 
-      if (updateDto.CityIds != null)
-        await CheckCityByIdBaseAsync(updateDto.CityIds);
-
-      if (updateDto.RelatedListableContentIds != null)
-        await CheckListableContentByIdBaseAsync(updateDto.RelatedListableContentIds);
+      await CheckCityByIdBaseAsync(updateDto.CityIds);
 
       await CheckListableContentCategoryBaseAsync(updateDto.ListableContentCategoryDtos);
 
       await CheckStatusAndDateTimeBaseAsync(updateDto.Status, updateDto.PublishTime);
+
+      if (updateDto.RelatedListableContentIds != null)
+        await CheckListableContentByIdBaseAsync(updateDto.RelatedListableContentIds);
 
     }
 
@@ -180,21 +177,21 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       if (duplicates.Count > 0)
       {
         var duplicateUnits = string.Join(", ", duplicates);
-        throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)// 📩 Bunun çalışmasını test et 
+        throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)// 📩 çalışmasını test et 
           .WithData("index", inputName)
           .WithData("repeat", duplicateUnits);
       }
     }
 
-    public async Task CheckListableContentByIdBaseAsync(List<int> RelatedListableContentIds) // 🚧 🛠 🚩
+    public async Task CheckListableContentByIdBaseAsync(List<int> RelatedListableContentIds)
     {
       CheckDuplicateInputsBase(nameof(RelatedListableContentIds), RelatedListableContentIds);
 
-      foreach (var ListableContentId in RelatedListableContentIds)// 🔄 ◀ 
-      {                               // _ListableContentRepository vardı onu kaldırdık.
-        var existListableContent = await _genericRepository.AnyAsync(l => l.Id == ListableContentId);//bunun çalışma mantığını öğren ve ona göre sorgu yap
+      foreach (var ListableContentId in RelatedListableContentIds)
+      {
+        var existListableContent = await _genericRepository.AnyAsync(l => l.Id == ListableContentId);
         if (!existListableContent)
-          throw new NotFoundException(typeof(ListableContent), ListableContentId.ToString());// doğru typeof gönder
+          throw new NotFoundException(typeof(ListableContent), ListableContentId.ToString());
       }
     }
 
@@ -254,13 +251,11 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
           .WithData("0", listableContentCategoryDto.Count(x => x.IsPrimary));
     }
 
-
-
     #endregion
 
     #region CreateListableContentSubs
 
-    public async Task CreateListableContentTagBaseAsync(List<int> tagIds, int listableContentId)// bunun kontrollerini önceden yap
+    public async Task CreateListableContentTagBaseAsync(List<int> tagIds, int listableContentId)
     {
       foreach (var tagId in tagIds)
       {
@@ -268,7 +263,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       }
     }
 
-    public async Task CreateListableContentCityBaseAsync(List<int> cityIds, int listableContentId)// bunun kontrollerini önceden yap
+    public async Task CreateListableContentCityBaseAsync(List<int> cityIds, int listableContentId)
     {
       foreach (var cityId in cityIds)
       {
@@ -276,7 +271,7 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       }
     }
 
-    public async Task CreateListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)// bunun kontrollerini önceden yap
+    public async Task CreateListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)
     {
       foreach (var item in listableContentCategoryDto)
       {
@@ -285,11 +280,11 @@ namespace NewsManagement.Entities.ListableContents// ⚠⚠ mesajları 📩 öze
       }
     }
 
-    public async Task CreateListableContentRelationBaseAsync(List<int> RelatedListableContentIds, int listableContentId)//önce kontrolleri yap henüz yapmadın
+    public async Task CreateListableContentRelationBaseAsync(List<int> RelatedListableContentIds, int listableContentId)
     {
       foreach (var RelatedId in RelatedListableContentIds)
       {
-        await _listableContentRelationRepository.InsertAsync(new()// _listableContentRelationRepository mi kullanılacak❔
+        await _listableContentRelationRepository.InsertAsync(new()
         {
           ListableContentId = listableContentId,
           RelatedListableContentId = RelatedId

@@ -7,6 +7,6 @@ namespace NewsManagement.EntityDtos.NewsDtos
 {
   public class NewsDto : ListableContentDto
   {
-    public List<Guid>? DetailImageId { get; set; }
+    public List<Guid> DetailImageId { get; set; }
   }
 }

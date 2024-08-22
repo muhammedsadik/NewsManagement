@@ -15,6 +15,7 @@ namespace NewsManagement.Validations.NewsValidation
     {
       Include(new CreateListableContentDtoValidator(localizer));
 
+      RuleFor(n => n.DetailImageId).NotNull();
     }
   }
 }

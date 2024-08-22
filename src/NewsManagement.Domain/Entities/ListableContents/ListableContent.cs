@@ -20,7 +20,7 @@ namespace NewsManagement.Entities.ListableContents
     public DateTime PublishTime { get; set; }
     public ListableContentType listableContentType { get; set; }// ❓ ne için kullanacaz. ayrıca create için kaldırdık
     public List<ListableContentTag> ListableContentTags { get; set; }
-    public List<ListableContentCity>? ListableContentCities { get; set; }
+    public List<ListableContentCity> ListableContentCities { get; set; }
     public List<ListableContentCategory> ListableContentCategories { get; set; }
 
 

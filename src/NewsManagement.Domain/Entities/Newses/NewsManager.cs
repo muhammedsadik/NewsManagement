@@ -35,7 +35,7 @@ namespace NewsManagement.Entities.Newses
 
 
     public NewsManager(
-      IObjectMapper objectMapper, 
+      IObjectMapper objectMapper,
       ITagRepository tagRepository,
       ICityRepository cityRepository,
       INewsRepository newsRepository,
@@ -72,15 +72,14 @@ namespace NewsManagement.Entities.Newses
       creatingNews.Status = StatusType.PendingReview;
       creatingNews.listableContentType = ListableContentType.News;
 
-      //if(createNewsDto.DetailImageId = null kontrolü)
+      // updateNewsDto.DetailImageId  kontrolü
       // ❓ DetailImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
-      var news = await _newsRepository.InsertAsync(creatingNews);
+      var news = await _newsRepository.InsertAsync(creatingNews, autoSave:true);
 
       await CreateListableContentTagBaseAsync(createNewsDto.TagIds, news.Id);
 
-      if (createNewsDto.CityIds != null)
-        await CreateListableContentCityBaseAsync(createNewsDto.CityIds, news.Id);
+      await CreateListableContentCityBaseAsync(createNewsDto.CityIds, news.Id);
 
       await CreateListableContentCategoryBaseAsync(createNewsDto.ListableContentCategoryDtos, news.Id);
 
@@ -100,17 +99,16 @@ namespace NewsManagement.Entities.Newses
 
       //if(updateNewsDto.listableContentType != ListableContentType.News)
       //burada listableContentType kontrolü yap listableContentType değişebilir ona göre yönlendirme yap
-      //(burada UpdateNewsDto dan geldiği için status değişemez olması gerekiyor ama ListableContent ten gelirse(!) bunu ele almak gerekir.)
+      //(burada UpdateNewsDto dan geldiği için status değişemez olması gerekiyor ama gelirse(!) bunu ele almak gerekir.)
 
-      //if(updateNewsDto.DetailImageId = null kontrolü)
+      // updateNewsDto.DetailImageId  kontrolü
       // ❓ DetailImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
       var news = await _newsRepository.InsertAsync(updatingNews);
 
       await ReCreateListableContentTagBaseAsync(updateNewsDto.TagIds, news.Id);
 
-      if (updateNewsDto.CityIds != null)
-        await ReCreateListableContentCityBaseAsync(updateNewsDto.CityIds, news.Id);
+      await ReCreateListableContentCityBaseAsync(updateNewsDto.CityIds, news.Id);
 
       await ReCreateListableContentCategoryBaseAsync(updateNewsDto.ListableContentCategoryDtos, news.Id);
 

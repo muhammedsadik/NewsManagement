@@ -35,7 +35,7 @@ namespace NewsManagement.Entities.Videos
     private readonly IRepository<ListableContentRelation> _listableContentRelationRepository;
 
     public VideoManager(
-      IObjectMapper objectMapper, 
+      IObjectMapper objectMapper,
       ITagRepository tagRepository,
       ICityRepository cityRepository,
       IVideoRepository videoRepository,
@@ -46,7 +46,7 @@ namespace NewsManagement.Entities.Videos
       IRepository<ListableContentCategory> listableContentCategoryRepository,
       IRepository<ListableContentRelation> listableContentRelationRepository
       ) : base(objectMapper, tagRepository, cityRepository, categoryRepository,
-          genericRepository, listableContentTagRepository, listableContentCityRepository, 
+          genericRepository, listableContentTagRepository, listableContentCityRepository,
           listableContentCategoryRepository, listableContentRelationRepository
           )
     {
@@ -80,8 +80,7 @@ namespace NewsManagement.Entities.Videos
 
       await CreateListableContentTagBaseAsync(createVideoDto.TagIds, video.Id);
 
-      if (createVideoDto.CityIds != null)
-        await CreateListableContentCityBaseAsync(createVideoDto.CityIds, video.Id);
+      await CreateListableContentCityBaseAsync(createVideoDto.CityIds, video.Id);
 
       await CreateListableContentCategoryBaseAsync(createVideoDto.ListableContentCategoryDtos, video.Id);
 
@@ -110,8 +109,7 @@ namespace NewsManagement.Entities.Videos
 
       await ReCreateListableContentTagBaseAsync(updateVideoDto.TagIds, video.Id);
 
-      if (updateVideoDto.CityIds != null)
-        await ReCreateListableContentCityBaseAsync(updateVideoDto.CityIds, video.Id);
+      await ReCreateListableContentCityBaseAsync(updateVideoDto.CityIds, video.Id);
 
       await ReCreateListableContentCategoryBaseAsync(updateVideoDto.ListableContentCategoryDtos, video.Id);
 
