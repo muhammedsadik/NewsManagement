@@ -82,7 +82,7 @@ namespace NewsManagement.Entities.Galleries
       //updateGalleryDto.GalleryImage  kontrolü
       // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
-      var gallery = await _genericRepository.InsertAsync(creatingGallery);
+      var gallery = await _genericRepository.InsertAsync(creatingGallery, autoSave: true);
 
       await CreateListableContentTagBaseAsync(createGalleryDto.TagIds, gallery.Id);
 
@@ -112,7 +112,7 @@ namespace NewsManagement.Entities.Galleries
       //updateGalleryDto.GalleryImage  kontrolü
       // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
-      var gallery = await _genericRepository.InsertAsync(updatingGallery);
+      var gallery = await _genericRepository.UpdateAsync(updatingGallery, autoSave: true);
 
       await ReCreateListableContentTagBaseAsync(updateGalleryDto.TagIds, gallery.Id);
 

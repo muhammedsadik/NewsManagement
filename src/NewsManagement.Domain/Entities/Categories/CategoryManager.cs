@@ -40,7 +40,7 @@ namespace NewsManagement.Entities.Categories
       if (category.ParentCategoryId.HasValue)
         category = await CheckSubCategoryIsValidAsync(category);
 
-      var createdCategory = await _categoryRepository.InsertAsync(category);
+      var createdCategory = await _categoryRepository.InsertAsync(category, autoSave: true);
 
       var categoryDto = _objectMapper.Map<Category, CategoryDto>(createdCategory);
 
@@ -94,7 +94,7 @@ namespace NewsManagement.Entities.Categories
       if (updatingCategory.ParentCategoryId.HasValue)
         updatingCategory = await CheckSubCategoryIsValidAsync(updatingCategory, id);
 
-      var category = await _categoryRepository.UpdateAsync(updatingCategory);
+      var category = await _categoryRepository.UpdateAsync(updatingCategory, autoSave: true);
 
       if (!updatingCategory.ParentCategoryId.HasValue)
         if (updatingCategory.IsActive == false)
@@ -118,7 +118,7 @@ namespace NewsManagement.Entities.Categories
       foreach (var subCategory in subCategories)
       {
         subCategory.IsActive = category.IsActive;
-        await _categoryRepository.UpdateAsync(subCategory);
+        await _categoryRepository.UpdateAsync(subCategory, autoSave: true);
       }
     }
 

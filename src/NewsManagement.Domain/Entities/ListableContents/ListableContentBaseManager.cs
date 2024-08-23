@@ -82,7 +82,7 @@ namespace NewsManagement.Entities.ListableContents
     {
       var isExist = await _genericRepository.AnyAsync(x => x.Title == createDto.Title);
       if (isExist)
-        throw new AlreadyExistException(typeof(TEntityDto), createDto.Title);
+        throw new AlreadyExistException(typeof(TEntity), createDto.Title);
 
       //var isExistImageId = await _fileAppService.GetAsync(createDto.ImageId);
       //if (isExistImageId)
@@ -104,7 +104,7 @@ namespace NewsManagement.Entities.ListableContents
     {
       var isExist = await _genericRepository.AnyAsync(x => x.Title == updateDto.Title && x.Id != id);
       if (isExist)
-        throw new AlreadyExistException(typeof(TEntityDto), updateDto.Title);
+        throw new AlreadyExistException(typeof(TEntity), updateDto.Title);
 
       await CheckTagByIdBaseAsync(updateDto.TagIds);
 
@@ -265,7 +265,7 @@ namespace NewsManagement.Entities.ListableContents
         throw new BusinessException(NewsManagementDomainErrorCodes.OnlyOneCategoryIsActiveStatusTrue)
           .WithData("0", listableContentCategoryDto.Count(x => x.IsPrimary));
     }
-
+    
     #endregion
 
     #region CreateListableContentSubs
@@ -274,7 +274,7 @@ namespace NewsManagement.Entities.ListableContents
     {
       foreach (var tagId in tagIds)
       {
-        await _listableContentTagRepository.InsertAsync(new() { ListableContentId = listableContentId, TagId = tagId });
+        await _listableContentTagRepository.InsertAsync(new() { ListableContentId = listableContentId, TagId = tagId }, autoSave: true);
       }
     }
 
@@ -282,7 +282,7 @@ namespace NewsManagement.Entities.ListableContents
     {
       foreach (var cityId in cityIds)
       {
-        await _listableContentCityRepository.InsertAsync(new() { ListableContentId = listableContentId, CityId = cityId });
+        await _listableContentCityRepository.InsertAsync(new() { ListableContentId = listableContentId, CityId = cityId }, autoSave: true);
       }
     }
 
@@ -291,7 +291,7 @@ namespace NewsManagement.Entities.ListableContents
       foreach (var item in listableContentCategoryDto)
       {
         await _listableContentCategoryRepository.InsertAsync(new()
-        { ListableContentId = listableContentId, CategoryId = item.CategoryId, IsPrimary = item.IsPrimary });
+        { ListableContentId = listableContentId, CategoryId = item.CategoryId, IsPrimary = item.IsPrimary }, autoSave: true);
       }
     }
 
@@ -303,7 +303,7 @@ namespace NewsManagement.Entities.ListableContents
         {
           ListableContentId = listableContentId,
           RelatedListableContentId = RelatedId
-        });
+        }, autoSave: true);
       }
     }
 

@@ -82,7 +82,7 @@ namespace NewsManagement.Entities.Newses
       // updateNewsDto.DetailImageId  kontrolü
       // ❓ DetailImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
-      var news = await _genericRepository.InsertAsync(creatingNews, autoSave:true);
+      var news = await _genericRepository.InsertAsync(creatingNews, autoSave: true);
 
       await CreateListableContentTagBaseAsync(createNewsDto.TagIds, news.Id);
 
@@ -111,7 +111,7 @@ namespace NewsManagement.Entities.Newses
       // updateNewsDto.DetailImageId  kontrolü
       // ❓ DetailImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
-      var news = await _genericRepository.InsertAsync(updatingNews);
+      var news = await _genericRepository.UpdateAsync(updatingNews, autoSave: true);
 
       await ReCreateListableContentTagBaseAsync(updateNewsDto.TagIds, news.Id);
 
