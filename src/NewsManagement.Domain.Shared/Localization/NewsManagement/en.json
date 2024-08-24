@@ -7,12 +7,12 @@
 
 
     "NewsManagement:500": "{0} = {1} Not Found.",
-    "NewsManagement:501": "There is already {0} with the same name: {1}.",
+    "NewsManagement:501": "There is already {0} with the same name: {1}",
     "NewsManagement:502": "Filter request limit exceeded.",
     "NewsManagement:503": "A subcategory cannot have subcategories.",
     "NewsManagement:504": "The main category cannot be changed with subcategories.",
     "NewsManagement:505": "Wrong status type selected during creation.",
-    "NewsManagement:506": "Repeated data error. Index : {index} , repeat : {repeat}",
+    "NewsManagement:506": "Repeated data error. Index : {0} , Repeats : {1}",
     "NewsManagement:507": "Draft status cannot have a publishing time.",
     "NewsManagement:508": "Pending Review status cannot have a publishing time.",
     "NewsManagement:509": "Archived status cannot have a publishing time.",
@@ -22,14 +22,15 @@
     "NewsManagement:513": "Published Status Datetime Error: Must be within the last hour.",
     "NewsManagement:514": "Published Status Datetime Error: Must be now or null.",
     "NewsManagement:515": "Scheduled Status Datetime Error: Must be in the future.",
+    "NewsManagement:516": "A subcategory cannot be assigned without its parent. The missing = {0}",
 
 
 
     //ValidationErrors
-    "agency_transfercenter:v401": "Not in ListableContent enum type. Enum type must contain = { News = 0 , Video = 1 , Gallery = 2 }.",
-    "agency_transfercenter:v402": "Not in Video enum type. Enum type must contain = { Physical Video = 0 , Link Video = 1 }.",
-    "agency_transfercenter:v403": "Only one category can be the Primary Category. Your choice = {0}",
-    "agency_transfercenter:v404": "Not in Status enum type. Enum type must contain = { Draft = 0 , Pending Review = 1 , Archived = 2 , Published = 3 , Scheduled = 4 , Deleted = 5 , Rejected = 6 }.",
+    "NewsManagement:v401": "Not in ListableContent enum type. Enum type must contain = { News = 0 , Video = 1 , Gallery = 2 }.",
+    "NewsManagement:v402": "Not in Video enum type. Enum type must contain = { Physical Video = 0 , Link Video = 1 }.",
+    "NewsManagement:v403": "Only one category can be the Primary Category. Your choice = {0}",
+    "NewsManagement:v404": "Not in Status enum type. Enum type must contain = { Draft = 0 , Pending Review = 1 , Archived = 2 , Published = 3 , Scheduled = 4 , Deleted = 5 , Rejected = 6 }.",
 
 
 
