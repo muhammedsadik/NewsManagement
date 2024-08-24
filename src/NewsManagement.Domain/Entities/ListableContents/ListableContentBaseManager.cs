@@ -103,8 +103,8 @@ namespace NewsManagement.Entities.ListableContents
 
     public async Task<TEntity> CheckUpdateInputBaseAsync(int id, TEntityUpdateDto updateDto)
     {
-      var isExistId = await _genericRepository.AllAsync(x => x.Id == id);
-      if (isExistId)
+      var isExistId = await _genericRepository.AnyAsync(x => x.Id == id);
+      if (!isExistId)
         throw new NotFoundException(typeof(TEntity), id.ToString());
 
       var isExist = await _genericRepository.AnyAsync(x => x.Title == updateDto.Title && x.Id != id);
@@ -216,7 +216,7 @@ namespace NewsManagement.Entities.ListableContents
         var Video = await _videoRepository.AnyAsync(x => x.Id == ListableContentId);
         var News = await _newsRepository.AnyAsync(x => x.Id == ListableContentId);
 
-        if (gallery && Video && News)
+        if (!gallery && !Video && !News)
           throw new NotFoundException(typeof(ListableContent), ListableContentId.ToString());
       }
     }
@@ -267,15 +267,14 @@ namespace NewsManagement.Entities.ListableContents
 
       var categories = await _categoryRepository.GetListAsync(c => categoryIds.Contains(c.Id));
 
-      var missingCategoyIds = categoryIds.Except(categories.Select(c => c.Id)).ToList();
-      if (missingCategoyIds.Any())
-        throw new NotFoundException(typeof(ListableContentCategory), string.Join(", ", missingCategoyIds));
+      var isExistCategoyIds = categoryIds.Except(categories.Select(c => c.Id)).ToList();
+      if (isExistCategoyIds.Any())
+        throw new NotFoundException(typeof(ListableContentCategory), string.Join(", ", isExistCategoyIds));
 
       var parentCategoryIds = categories.Where(c => c.ParentCategoryId == null).Select(x => x.Id).ToList();
 
-      var subCategoryIds = categories.Where(c => c.ParentCategoryId != null).Select(x => x.ParentCategoryId).ToList();
+      var missingCategoryIds = categories.Where(c => !parentCategoryIds.Contains((int)c.Id)).Select(x => x.Id).ToList();
 
-      var missingCategoryIds = subCategoryIds.Where(subCategoryId => !parentCategoryIds.Contains((int)subCategoryId)).ToList();
       if (missingCategoryIds.Any())
         throw new BusinessException(NewsManagementDomainErrorCodes.WithoutParentCategory).WithData("categoryId", string.Join(", ", missingCategoryIds));
 
