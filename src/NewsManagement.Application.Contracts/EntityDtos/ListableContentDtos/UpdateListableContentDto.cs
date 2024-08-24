@@ -16,7 +16,6 @@ namespace NewsManagement.EntityDtos.ListableContentDtos
     public Guid? ImageId { get; set; }// ✔ Video olabilir genel sınıfta bulunbduğu için nullable
     public DateTime? PublishTime { get; set; }
     public StatusType Status { get; set; }
-    public ListableContentType ListableContentType { get; set; }// burada type değişirse ne olacak ⚠
     public List<ListableContentCategoryDto> ListableContentCategoryDtos { get; set; }
 
   }

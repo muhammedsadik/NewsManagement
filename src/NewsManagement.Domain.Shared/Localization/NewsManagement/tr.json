@@ -29,6 +29,7 @@
     "NewsManagement:514": "Yayınlanmış Durumu için Tarih/Saat Hatası: Şu anki zaman veya boş olmalı.",
     "NewsManagement:515": "Planlanmış Durumu için Tarih/Saat Hatası: Gelecekte olmalıdır.",
     "NewsManagement:516": "Alt kategori, üst kategori olmadan atanamaz. Atanamayan alt kategoriler = {categoryId}",
+    "NewsManagement:517": "İlgili içerik olarak kendi eklenemez",
 
 
 

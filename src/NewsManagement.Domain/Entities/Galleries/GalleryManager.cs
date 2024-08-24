@@ -104,9 +104,7 @@ namespace NewsManagement.Entities.Galleries
     {
       var updatingGallery = await CheckUpdateInputBaseAsync(id, updateGalleryDto);
 
-      //if(updateGalleryDto.listableContentType != ListableContentType.Gallery)
-      //burada listableContentType kontrolü yap listableContentType değişebilir ona göre yönlendirme yap
-      //(burada UpdateGalleryDto dan geldiği için status değişemez olması gerekiyor ama ListableContent ten gelirse(!) bunu ele almak gerekir.)
+      updatingGallery.listableContentType = ListableContentType.Gallery;
 
       //updateGalleryDto.GalleryImage  kontrolü
       // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩

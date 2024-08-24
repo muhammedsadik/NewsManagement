@@ -26,7 +26,6 @@ namespace NewsManagement.Validations.ListableContentValidation
         );
 
 
-      //RuleFor(l => l.listableContentType).NotEmpty().IsInEnum().WithMessage(localizer[NewsManagementDomainErrorCodes.NotInListableContentEnumType]);
       //RuleFor(x => x.ListableContentCategoryDtos).ForEach(x => x.SetValidator(new ListableContentCategoryDtoValidator()));
     }
   }

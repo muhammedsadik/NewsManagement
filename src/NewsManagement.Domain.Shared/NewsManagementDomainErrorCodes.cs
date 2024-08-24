@@ -19,6 +19,7 @@ public static class NewsManagementDomainErrorCodes
   public const string PublishedStatusDatetimeMustNowOrNull = "NewsManagement:514";
   public const string ScheduledStatusDatetimeMustBeInTheFuture = "NewsManagement:515";
   public const string WithoutParentCategory = "NewsManagement:516";
+  public const string CannotAddItself = "NewsManagement:517";
 
 
 

@@ -103,6 +103,10 @@ namespace NewsManagement.Entities.ListableContents
 
     public async Task<TEntity> CheckUpdateInputBaseAsync(int id, TEntityUpdateDto updateDto)
     {
+      var isExistId = await _genericRepository.AllAsync(x => x.Id == id);
+      if (isExistId)
+        throw new NotFoundException(typeof(TEntity), id.ToString());
+
       var isExist = await _genericRepository.AnyAsync(x => x.Title == updateDto.Title && x.Id != id);
       if (isExist)
         throw new AlreadyExistException(typeof(TEntity), updateDto.Title);
@@ -116,7 +120,13 @@ namespace NewsManagement.Entities.ListableContents
       await CheckStatusAndDateTimeBaseAsync(updateDto.Status, updateDto.PublishTime);
 
       if (updateDto.RelatedListableContentIds != null)
+      {
+        var listableContentSelfReference = updateDto.RelatedListableContentIds.Any(x => x == id);
+        if (listableContentSelfReference)
+          throw new BusinessException(NewsManagementDomainErrorCodes.CannotAddItself);
+
         await CheckListableContentByIdBaseAsync(updateDto.RelatedListableContentIds);
+      }
 
       return _objectMapper.Map(updateDto, await _genericRepository.GetAsync(id));
     }
@@ -270,7 +280,7 @@ namespace NewsManagement.Entities.ListableContents
         throw new BusinessException(NewsManagementDomainErrorCodes.WithoutParentCategory).WithData("categoryId", string.Join(", ", missingCategoryIds));
 
       if (listableContentCategoryDto.Count(x => x.IsPrimary) != 1)
-        throw new UserFriendlyException(NewsManagementDomainErrorCodes.OnlyOneCategoryIsActiveStatusTrue)
+        throw new BusinessException(NewsManagementDomainErrorCodes.OnlyOneCategoryIsActiveStatusTrue)
           .WithData("0", listableContentCategoryDto.Count(x => x.IsPrimary));
     }
 
