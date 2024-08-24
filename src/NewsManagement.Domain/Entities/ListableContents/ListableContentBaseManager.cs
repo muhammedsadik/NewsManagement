@@ -18,11 +18,11 @@ using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.ObjectMapping;
 using System.Linq.Dynamic.Core;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using EasyAbp.FileManagement.Files;
 using NewsManagement.Entities.Newses;
 using NewsManagement.Entities.Videos;
 using NewsManagement.Entities.Galleries;
+using NewsManagement.EntityDtos.GalleryDtos;
 
 namespace NewsManagement.Entities.ListableContents
 {
@@ -82,7 +82,7 @@ namespace NewsManagement.Entities.ListableContents
     {
       var isExist = await _genericRepository.AnyAsync(x => x.Title == createDto.Title);
       if (isExist)
-        throw new AlreadyExistException(typeof(TEntityDto), createDto.Title);
+        throw new AlreadyExistException(typeof(TEntity), createDto.Title);
 
       //var isExistImageId = await _fileAppService.GetAsync(createDto.ImageId);
       //if (isExistImageId)
@@ -100,11 +100,11 @@ namespace NewsManagement.Entities.ListableContents
 
     }
 
-    public async Task CheckUpdateInputBaseAsync(int id, TEntityUpdateDto updateDto)
+    public async Task<TEntity> CheckUpdateInputBaseAsync(int id, TEntityUpdateDto updateDto)
     {
       var isExist = await _genericRepository.AnyAsync(x => x.Title == updateDto.Title && x.Id != id);
       if (isExist)
-        throw new AlreadyExistException(typeof(TEntityDto), updateDto.Title);
+        throw new AlreadyExistException(typeof(TEntity), updateDto.Title);
 
       await CheckTagByIdBaseAsync(updateDto.TagIds);
 
@@ -117,6 +117,7 @@ namespace NewsManagement.Entities.ListableContents
       if (updateDto.RelatedListableContentIds != null)
         await CheckListableContentByIdBaseAsync(updateDto.RelatedListableContentIds);
 
+      return _objectMapper.Map(updateDto, await _genericRepository.GetAsync(id));
     }
 
     public async Task<PagedResultDto<TEntityDto>> GetListFilterBaseAsync(TPagedDto input)
@@ -189,9 +190,8 @@ namespace NewsManagement.Entities.ListableContents
       if (duplicates.Count > 0)
       {
         var duplicateUnits = string.Join(", ", duplicates);
-        throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)// 📩 çalışmasını test etmek için vlidation kapat
-          .WithData("index", inputName)
-          .WithData("repeat", duplicateUnits);
+        throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)
+          .WithData("0", inputName).WithData("1",string.Join(", ", duplicateUnits));
       }
     }
 
@@ -201,11 +201,11 @@ namespace NewsManagement.Entities.ListableContents
 
       foreach (var ListableContentId in RelatedListableContentIds)
       {
-        var galleryId = await _galleryRepository.AnyAsync(x => x.Id == ListableContentId);
-        var VideoId = await _videoRepository.AnyAsync(x => x.Id == ListableContentId);
-        var NewsId = await _newsRepository.AnyAsync(x => x.Id == ListableContentId);
+        var gallery = await _galleryRepository.AnyAsync(x => x.Id == ListableContentId);
+        var Video = await _videoRepository.AnyAsync(x => x.Id == ListableContentId);
+        var News = await _newsRepository.AnyAsync(x => x.Id == ListableContentId);
 
-        if (galleryId || VideoId || NewsId)
+        if (gallery && Video && News)
           throw new NotFoundException(typeof(ListableContent), ListableContentId.ToString());
       }
     }
@@ -254,18 +254,25 @@ namespace NewsManagement.Entities.ListableContents
 
       CheckDuplicateInputsBase(nameof(categoryIds), categoryIds);
 
-      foreach (var categoryId in categoryIds)
-      {
-        var existCategory = await _categoryRepository.AnyAsync(t => t.Id == categoryId);
-        if (!existCategory)
-          throw new NotFoundException(typeof(ListableContentCategory), categoryId.ToString());
-      }
+      var categories = await _categoryRepository.GetListAsync(c => categoryIds.Contains(c.Id));
+
+      var missingCategoyIds = categoryIds.Except(categories.Select(c => c.Id)).ToList();
+      if (missingCategoyIds.Any())
+        throw new NotFoundException(typeof(ListableContentCategory), string.Join(", ", missingCategoyIds));
+
+      var parentCategoryIds = categories.Where(c => c.ParentCategoryId == null).Select(x => x.Id).ToList();
+
+      var subCategoryIds = categories.Where(c => c.ParentCategoryId != null).Select(x => x.ParentCategoryId).ToList();
+
+      var missingCategoryIds = subCategoryIds.Where(subCategoryId => !parentCategoryIds.Contains((int)subCategoryId)).ToList();
+      if (missingCategoryIds.Any())
+        throw new BusinessException(NewsManagementDomainErrorCodes.WithoutParentCategory).WithData("0",string.Join(", ", missingCategoryIds));
 
       if (listableContentCategoryDto.Count(x => x.IsPrimary) != 1)
-        throw new BusinessException(NewsManagementDomainErrorCodes.OnlyOneCategoryIsActiveStatusTrue)
+        throw new UserFriendlyException(NewsManagementDomainErrorCodes.OnlyOneCategoryIsActiveStatusTrue)
           .WithData("0", listableContentCategoryDto.Count(x => x.IsPrimary));
     }
-
+    
     #endregion
 
     #region CreateListableContentSubs
@@ -274,7 +281,7 @@ namespace NewsManagement.Entities.ListableContents
     {
       foreach (var tagId in tagIds)
       {
-        await _listableContentTagRepository.InsertAsync(new() { ListableContentId = listableContentId, TagId = tagId });
+        await _listableContentTagRepository.InsertAsync(new() { ListableContentId = listableContentId, TagId = tagId }, autoSave: true);
       }
     }
 
@@ -282,7 +289,7 @@ namespace NewsManagement.Entities.ListableContents
     {
       foreach (var cityId in cityIds)
       {
-        await _listableContentCityRepository.InsertAsync(new() { ListableContentId = listableContentId, CityId = cityId });
+        await _listableContentCityRepository.InsertAsync(new() { ListableContentId = listableContentId, CityId = cityId }, autoSave: true);
       }
     }
 
@@ -291,7 +298,7 @@ namespace NewsManagement.Entities.ListableContents
       foreach (var item in listableContentCategoryDto)
       {
         await _listableContentCategoryRepository.InsertAsync(new()
-        { ListableContentId = listableContentId, CategoryId = item.CategoryId, IsPrimary = item.IsPrimary });
+        { ListableContentId = listableContentId, CategoryId = item.CategoryId, IsPrimary = item.IsPrimary }, autoSave: true);
       }
     }
 
@@ -303,7 +310,7 @@ namespace NewsManagement.Entities.ListableContents
         {
           ListableContentId = listableContentId,
           RelatedListableContentId = RelatedId
-        });
+        }, autoSave: true);
       }
     }
 
@@ -312,9 +319,8 @@ namespace NewsManagement.Entities.ListableContents
       var isExist = await _listableContentTagRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
       if (isExist.Count() != 0)
-      {
         await _listableContentTagRepository.DeleteManyAsync(isExist, autoSave: true);
-      }
+
 
       await CreateListableContentTagBaseAsync(tagIds, listableContentId);
     }
@@ -323,10 +329,9 @@ namespace NewsManagement.Entities.ListableContents
     {
       var isExist = await _listableContentCityRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
-      if (isExist.Count() != 0)
-      {
+      if (isExist.Count() != 0)   
         await _listableContentCityRepository.DeleteManyAsync(isExist, autoSave: true);
-      }
+      
 
       await CreateListableContentTagBaseAsync(cityIds, listableContentId);
     }
@@ -336,9 +341,8 @@ namespace NewsManagement.Entities.ListableContents
       var isExist = await _listableContentCategoryRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
       if (isExist.Count() != 0)
-      {
         await _listableContentCategoryRepository.DeleteManyAsync(isExist, autoSave: true);
-      }
+
 
       await CreateListableContentCategoryBaseAsync(listableContentCategoryDto, listableContentId);
     }
@@ -348,9 +352,8 @@ namespace NewsManagement.Entities.ListableContents
       var isExist = await _listableContentRelationRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
       if (isExist.Count() != 0)
-      {
         await _listableContentRelationRepository.DeleteManyAsync(isExist, autoSave: true);
-      }
+   
 
       await CreateListableContentRelationBaseAsync(RelatedListableContentIds, listableContentId);
     }

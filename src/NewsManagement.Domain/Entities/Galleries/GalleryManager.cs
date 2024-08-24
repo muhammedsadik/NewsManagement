@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
@@ -70,7 +71,7 @@ namespace NewsManagement.Entities.Galleries
 
 
     public async Task<GalleryDto> CreateAsync(CreateGalleryDto createGalleryDto)
-    {
+    {      
       await CheckCreateInputBaseAsync(createGalleryDto);
 
       var creatingGallery = _objectMapper.Map<CreateGalleryDto, Gallery>(createGalleryDto);
@@ -82,7 +83,7 @@ namespace NewsManagement.Entities.Galleries
       //updateGalleryDto.GalleryImage  kontrolü
       // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
-      var gallery = await _genericRepository.InsertAsync(creatingGallery);
+      var gallery = await _genericRepository.InsertAsync(creatingGallery, autoSave: true);
 
       await CreateListableContentTagBaseAsync(createGalleryDto.TagIds, gallery.Id);
 
@@ -101,9 +102,7 @@ namespace NewsManagement.Entities.Galleries
 
     public async Task<GalleryDto> UpdateAsync(int id, UpdateGalleryDto updateGalleryDto)
     {
-      await CheckUpdateInputBaseAsync(id, updateGalleryDto);
-
-      var updatingGallery = _objectMapper.Map<UpdateGalleryDto, Gallery>(updateGalleryDto);
+      var updatingGallery = await CheckUpdateInputBaseAsync(id, updateGalleryDto);
 
       //if(updateGalleryDto.listableContentType != ListableContentType.Gallery)
       //burada listableContentType kontrolü yap listableContentType değişebilir ona göre yönlendirme yap
@@ -112,16 +111,16 @@ namespace NewsManagement.Entities.Galleries
       //updateGalleryDto.GalleryImage  kontrolü
       // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
-      var gallery = await _genericRepository.InsertAsync(updatingGallery);
+      var gallery = await _genericRepository.UpdateAsync(updatingGallery, autoSave: true);
 
-      await ReCreateListableContentTagBaseAsync(updateGalleryDto.TagIds, gallery.Id);
+      await ReCreateListableContentTagBaseAsync(updateGalleryDto.TagIds, id);
 
-      await ReCreateListableContentCityBaseAsync(updateGalleryDto.CityIds, gallery.Id);
+      await ReCreateListableContentCityBaseAsync(updateGalleryDto.CityIds, id);
 
-      await ReCreateListableContentCategoryBaseAsync(updateGalleryDto.ListableContentCategoryDtos, gallery.Id);
+      await ReCreateListableContentCategoryBaseAsync(updateGalleryDto.ListableContentCategoryDtos, id);
 
       if (updateGalleryDto.RelatedListableContentIds != null)
-        await ReCreateListableContentRelationBaseAsync(updateGalleryDto.RelatedListableContentIds, gallery.Id);
+        await ReCreateListableContentRelationBaseAsync(updateGalleryDto.RelatedListableContentIds, id);
 
       var galleryDto = _objectMapper.Map<Gallery, GalleryDto>(gallery);
 

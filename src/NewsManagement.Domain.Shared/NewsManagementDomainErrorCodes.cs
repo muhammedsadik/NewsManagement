@@ -8,25 +8,26 @@ public static class NewsManagementDomainErrorCodes
   public const string OnlyOneSubCategory = "NewsManagement:503";
   public const string MainCategoryWithSubCannotBeChanged = "NewsManagement:504";
   public const string WrongTypeSelectionInCreateStatus = "NewsManagement:505";
-  public const string RepeatedDataError = "agency_transfercenter:506";
-  public const string DraftStatusCannotHaveaPublishingTime = "agency_transfercenter:507";
-  public const string PendingReviewStatusCannotHaveaPublishingTime = "agency_transfercenter:508";
-  public const string ArchivedStatusCannotHaveaPublishingTime = "agency_transfercenter:509";
-  public const string RejectedStatusCannotHaveaPublishingTime = "agency_transfercenter:510";
-  public const string DeletedStatusCannotHaveaPublishingTime = "agency_transfercenter:511";
-  public const string PublishedStatusMustHaveaPublishingTime = "agency_transfercenter:512";
-  public const string PublishedStatusDatetimeTimeoutError = "agency_transfercenter:513";
+  public const string RepeatedDataError = "NewsManagement:506";
+  public const string DraftStatusCannotHaveaPublishingTime = "NewsManagement:507";
+  public const string PendingReviewStatusCannotHaveaPublishingTime = "NewsManagement:508";
+  public const string ArchivedStatusCannotHaveaPublishingTime = "NewsManagement:509";
+  public const string RejectedStatusCannotHaveaPublishingTime = "NewsManagement:510";
+  public const string DeletedStatusCannotHaveaPublishingTime = "NewsManagement:511";
+  public const string PublishedStatusMustHaveaPublishingTime = "NewsManagement:512";
+  public const string PublishedStatusDatetimeTimeoutError = "NewsManagement:513";
   public const string PublishedStatusDatetimeMustNowOrNull = "NewsManagement:514";
   public const string ScheduledStatusDatetimeMustBeInTheFuture = "NewsManagement:515";
+  public const string WithoutParentCategory = "NewsManagement:516";
 
 
 
 
   #region ValidationErrorCodes
-  public const string NotInListableContentEnumType = "agency_transfercenter:v401";
-  public const string NotInVideoEnumType = "agency_transfercenter:v402";
-  public const string OnlyOneCategoryIsActiveStatusTrue = "agency_transfercenter:v403";
-  public const string NotInStatusEnumType = "agency_transfercenter:v404";
+  public const string NotInListableContentEnumType = "NewsManagement:v401";
+  public const string NotInVideoEnumType = "NewsManagement:v402";
+  public const string OnlyOneCategoryIsActiveStatusTrue = "NewsManagement:v403";
+  public const string NotInStatusEnumType = "NewsManagement:v404";
 
   #endregion
 }

@@ -30,17 +30,22 @@ namespace NewsManagement.Entities.Cities
 
     public async Task<CityDto> CreateAsync(CreateCityDto createCityDto)
     {
-      var isExistCity = await _cityRepository.AnyAsync(
-        c => c.CityName == createCityDto.CityName
-        || c.CityCode == createCityDto.CityCode
+      var isExistCityName = await _cityRepository.AnyAsync(c =>
+         c.CityName == createCityDto.CityName
       );
+      if (isExistCityName)
+        throw new AlreadyExistException(typeof(City), createCityDto.CityName.ToString());
 
-      if (isExistCity)
+
+      var isExistCityCode = await _cityRepository.AnyAsync(c =>
+        c.CityCode == createCityDto.CityCode
+      );
+      if (isExistCityCode)
         throw new AlreadyExistException(typeof(City), createCityDto.CityCode.ToString());
 
       var createCity = _objectMapper.Map<CreateCityDto, City>(createCityDto);
 
-      var city = await _cityRepository.InsertAsync(createCity);
+      var city = await _cityRepository.InsertAsync(createCity, autoSave:true);
 
       var cityDto = _objectMapper.Map<City, CityDto>(city);
 
@@ -51,17 +56,23 @@ namespace NewsManagement.Entities.Cities
     {
       var existingCity = await _cityRepository.GetAsync(id);
 
-      var isExistCity = await _cityRepository.AnyAsync(c => 
-        (c.CityName == updateCityDto.CityName || c.CityCode == updateCityDto.CityCode) 
-        && c.Id != id
+      var isExistCityName = await _cityRepository.AnyAsync(c =>
+         c.CityName == updateCityDto.CityName && c.Id != id
       );
-      
-      if (isExistCity)
+      if (isExistCityName)
+        throw new AlreadyExistException(typeof(City), updateCityDto.CityName.ToString());
+
+
+      var isExistCityCode = await _cityRepository.AnyAsync(c =>
+        c.CityCode == updateCityDto.CityCode && c.Id != id
+      );
+      if (isExistCityCode)
         throw new AlreadyExistException(typeof(City), updateCityDto.CityCode.ToString());
+
 
       _objectMapper.Map(updateCityDto, existingCity);
 
-      var city = await _cityRepository.UpdateAsync(existingCity);
+      var city = await _cityRepository.UpdateAsync(existingCity, autoSave: true);
 
       var cityDto = _objectMapper.Map<City, CityDto>(city);
 

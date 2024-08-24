@@ -84,7 +84,7 @@ namespace NewsManagement.Entities.Videos
       //if(createVideoDto.VideoType == VideoType.Link)
       // ❓ VideoType (Physical, Link) kontrolünü yap ve 📩, ayrıca type göre iş kuralları varsa uygula
 
-      var video = await _genericRepository.InsertAsync(creatingVideo);
+      var video = await _genericRepository.InsertAsync(creatingVideo, autoSave: true);
 
       await CreateListableContentTagBaseAsync(createVideoDto.TagIds, video.Id);
 
@@ -113,7 +113,7 @@ namespace NewsManagement.Entities.Videos
       //if(updateVideoDto.VideoType == VideoType.Physical) burada type değişmiş olabilir. ❗❗❗
       // ❓  VideoType (Physical, Link) kontrolünü yap ve => 📩
 
-      var video = await _genericRepository.InsertAsync(updatingVideo);
+      var video = await _genericRepository.UpdateAsync(updatingVideo, autoSave: true);
 
       await ReCreateListableContentTagBaseAsync(updateVideoDto.TagIds, video.Id);
 

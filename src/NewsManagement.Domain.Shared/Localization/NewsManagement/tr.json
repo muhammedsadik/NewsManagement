@@ -7,7 +7,7 @@
     "Draft": "Taslak ",
     "PendingReview": "İnceleme ",
     "Archived": "Arşivlenmiş ",
-    "Published": "Yayınlanmış ", 
+    "Published": "Yayınlanmış ",
     "Scheduled": "Planlanmış ",
     "Deleted": "Silinmiş ",
     "Rejected": "Reddedilmiş",
@@ -18,7 +18,7 @@
     "NewsManagement:503": "Bir alt kategorinin alt kategorileri olamaz.",
     "NewsManagement:504": "Ana kategori alt kategoriler ile birlikte değiştirilemez.",
     "NewsManagement:505": "Oluşturma işleminde hatalı durum tipi seçildi.",
-    "NewsManagement:506": "Tekrarlanan veri hatası. İndeks : {index} , Tekrar : {repeat}",
+    "NewsManagement:506": "Tekrarlanan veri hatası. İndeks : {0} , Tekrarlanan : {1}",
     "NewsManagement:507": "Taslak durumu için bir yayın zamanı olamaz.",
     "NewsManagement:508": "Bekleyen İnceleme durumu için bir yayın zamanı olamaz.",
     "NewsManagement:509": "Arşivlenmiş durumu için bir yayın zamanı olamaz.",
@@ -28,16 +28,17 @@
     "NewsManagement:513": "Yayınlanmış Durumu için Tarih/Saat Hatası: En fazla bir saat önce olabilir.",
     "NewsManagement:514": "Yayınlanmış Durumu için Tarih/Saat Hatası: Şu anki zaman veya boş olmalı.",
     "NewsManagement:515": "Planlanmış Durumu için Tarih/Saat Hatası: Gelecekte olmalıdır.",
+    "NewsManagement:516": "Alt kategor, üst kategori olmadan atanamaz. Eksik olanlar = {0}",
 
 
 
 
 
     //ValidasyonHataları
-    "agency_transfercenter:v401": "Listelenebilir Enum türünde değil. Enum türü şunları içermelidir = { Haber için = 0 , Video için = 1 , Galeri için = 2 }.",
-    "agency_transfercenter:v402": "Video Enum türünde değil. Enum türü şunları içermelidir = { Fiziksel Video için = 0 , Link Video için = 1 }.",
-    "agency_transfercenter:v403": "Sadece bir kategori Birincil Kategori olabilir. Sizin seçiminiz = {0}",
-    "agency_transfercenter:v404": "Durum Enum türünde değil. Enum türü şunları içermelidir  = { Draft = 0 , Pending Review = 1 , Archived = 2 , Published = 3 , Scheduled = 4 , Deleted = 5 , Rejected = 6 }.",
+    "NewsManagement:v401": "Listelenebilir Enum türünde değil. Enum türü şunları içermelidir = { Haber için = 0 , Video için = 1 , Galeri için = 2 }.",
+    "NewsManagement:v402": "Video Enum türünde değil. Enum türü şunları içermelidir = { Fiziksel Video için = 0 , Link Video için = 1 }.",
+    "NewsManagement:v403": "Sadece bir kategori Birincil Kategori olabilir. Sizin seçiminiz = {0}",
+    "NewsManagement:v404": "Durum Enum türünde değil. Enum türü şunları içermelidir  = { Draft = 0 , Pending Review = 1 , Archived = 2 , Published = 3 , Scheduled = 4 , Deleted = 5 , Rejected = 6 }.",
 
 
 
