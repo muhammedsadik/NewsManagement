@@ -24,28 +24,29 @@ namespace NewsManagement.AppService.Videos
 
     public override async Task<VideoDto> CreateAsync(CreateVideoDto createVideoDto)
     {
-      return await base.CreateAsync(createVideoDto);
+      return await _videoManager.CreateAsync(createVideoDto);
     }
 
     public async override Task<VideoDto> UpdateAsync(int id, UpdateVideoDto updateVideoDto)
     {
-      return await base.UpdateAsync(id, updateVideoDto);
+      return await _videoManager.UpdateAsync(id, updateVideoDto);
     }
 
     public async override Task<PagedResultDto<VideoDto>> GetListAsync(GetListPagedAndSortedDto input)
     {
-      throw new NotImplementedException();
+     return await _videoManager.GetListAsync(input);
     }
 
     public override async Task DeleteAsync(int id)
     {
+      await _videoManager.DeleteAsync(id);
 
       await base.DeleteAsync(id);
     }
 
-    public Task DeleteHardAsync(int id)
+    public async Task DeleteHardAsync(int id)
     {
-      throw new NotImplementedException();
+      await _videoManager.DeleteHardAsync(id);
     }
   }
 }
