@@ -23,6 +23,7 @@ using NewsManagement.Entities.Newses;
 using NewsManagement.Entities.Videos;
 using NewsManagement.Entities.Galleries;
 using NewsManagement.EntityDtos.GalleryDtos;
+using static NewsManagement.Permissions.NewsManagementPermissions;
 
 namespace NewsManagement.Entities.ListableContents
 {
@@ -35,7 +36,7 @@ namespace NewsManagement.Entities.ListableContents
   {
     private readonly IObjectMapper _objectMapper;
     private readonly ITagRepository _tagRepository;
-    private readonly ICityRepository _cityRepository; 
+    private readonly ICityRepository _cityRepository;
     private readonly INewsRepository _newsRepository;
     private readonly IVideoRepository _videoRepository;
     private readonly IGalleryRepository _galleryRepository;
@@ -191,7 +192,7 @@ namespace NewsManagement.Entities.ListableContents
       {
         var duplicateUnits = string.Join(", ", duplicates);
         throw new BusinessException(NewsManagementDomainErrorCodes.RepeatedDataError)
-          .WithData("0", inputName).WithData("1",string.Join(", ", duplicateUnits));
+          .WithData("0", inputName).WithData("1", string.Join(", ", duplicateUnits));
       }
     }
 
@@ -266,52 +267,68 @@ namespace NewsManagement.Entities.ListableContents
 
       var missingCategoryIds = subCategoryIds.Where(subCategoryId => !parentCategoryIds.Contains((int)subCategoryId)).ToList();
       if (missingCategoryIds.Any())
-        throw new BusinessException(NewsManagementDomainErrorCodes.WithoutParentCategory).WithData("0",string.Join(", ", missingCategoryIds));
+        throw new BusinessException(NewsManagementDomainErrorCodes.WithoutParentCategory).WithData("categoryId", string.Join(", ", missingCategoryIds));
 
       if (listableContentCategoryDto.Count(x => x.IsPrimary) != 1)
         throw new UserFriendlyException(NewsManagementDomainErrorCodes.OnlyOneCategoryIsActiveStatusTrue)
           .WithData("0", listableContentCategoryDto.Count(x => x.IsPrimary));
     }
-    
+
     #endregion
 
     #region CreateListableContentSubs
 
     public async Task CreateListableContentTagBaseAsync(List<int> tagIds, int listableContentId)
     {
+      List<ListableContentTag> listableContentTags = new();
       foreach (var tagId in tagIds)
       {
-        await _listableContentTagRepository.InsertAsync(new() { ListableContentId = listableContentId, TagId = tagId }, autoSave: true);
+        var tag = new ListableContentTag { TagId = tagId, ListableContentId = listableContentId };
+        listableContentTags.Add(tag);
       }
+
+      await _listableContentTagRepository.InsertManyAsync(listableContentTags, autoSave: true);
     }
 
     public async Task CreateListableContentCityBaseAsync(List<int> cityIds, int listableContentId)
     {
+      List<ListableContentCity> listableContentCitis = new();
       foreach (var cityId in cityIds)
       {
-        await _listableContentCityRepository.InsertAsync(new() { ListableContentId = listableContentId, CityId = cityId }, autoSave: true);
+        var city = new ListableContentCity { CityId = cityId, ListableContentId = listableContentId };
+        listableContentCitis.Add(city);
       }
+
+      await _listableContentCityRepository.InsertManyAsync(listableContentCitis, autoSave: true);
     }
 
     public async Task CreateListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)
     {
+      List<ListableContentCategory> listableContentCategories = new();
       foreach (var item in listableContentCategoryDto)
       {
-        await _listableContentCategoryRepository.InsertAsync(new()
-        { ListableContentId = listableContentId, CategoryId = item.CategoryId, IsPrimary = item.IsPrimary }, autoSave: true);
+        var category = new ListableContentCategory { ListableContentId = listableContentId, CategoryId = item.CategoryId, IsPrimary = item.IsPrimary };
+        listableContentCategories.Add(category);
       }
+
+      await _listableContentCategoryRepository.InsertManyAsync(listableContentCategories, autoSave: true);
     }
 
     public async Task CreateListableContentRelationBaseAsync(List<int> RelatedListableContentIds, int listableContentId)
     {
+      List<ListableContentRelation> listableContentRelations = new();
       foreach (var RelatedId in RelatedListableContentIds)
       {
-        await _listableContentRelationRepository.InsertAsync(new()
+        var listableContentRelation = new ListableContentRelation
         {
           ListableContentId = listableContentId,
           RelatedListableContentId = RelatedId
-        }, autoSave: true);
+        };
+
+        listableContentRelations.Add(listableContentRelation);
       }
+
+      await _listableContentRelationRepository.InsertManyAsync(listableContentRelations, autoSave: true);
     }
 
     public async Task ReCreateListableContentTagBaseAsync(List<int> tagIds, int listableContentId)
@@ -329,11 +346,11 @@ namespace NewsManagement.Entities.ListableContents
     {
       var isExist = await _listableContentCityRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
-      if (isExist.Count() != 0)   
+      if (isExist.Count() != 0)
         await _listableContentCityRepository.DeleteManyAsync(isExist, autoSave: true);
-      
 
-      await CreateListableContentTagBaseAsync(cityIds, listableContentId);
+
+      await CreateListableContentCityBaseAsync(cityIds, listableContentId);
     }
 
     public async Task ReCreateListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)
@@ -353,7 +370,7 @@ namespace NewsManagement.Entities.ListableContents
 
       if (isExist.Count() != 0)
         await _listableContentRelationRepository.DeleteManyAsync(isExist, autoSave: true);
-   
+
 
       await CreateListableContentRelationBaseAsync(RelatedListableContentIds, listableContentId);
     }

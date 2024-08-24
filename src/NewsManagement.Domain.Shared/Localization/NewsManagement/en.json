@@ -22,7 +22,7 @@
     "NewsManagement:513": "Published Status Datetime Error: Must be within the last hour.",
     "NewsManagement:514": "Published Status Datetime Error: Must be now or null.",
     "NewsManagement:515": "Scheduled Status Datetime Error: Must be in the future.",
-    "NewsManagement:516": "A subcategory cannot be assigned without its parent. The missing = {0}",
+    "NewsManagement:516": "A subcategory cannot be assigned without its parent. Assigned subcategories= {categoryId}",
 
 
 
