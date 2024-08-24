@@ -273,7 +273,11 @@ namespace NewsManagement.Entities.ListableContents
 
       var parentCategoryIds = categories.Where(c => c.ParentCategoryId == null).Select(x => x.Id).ToList();
 
-      var missingCategoryIds = categories.Where(c => !parentCategoryIds.Contains((int)c.Id)).Select(x => x.Id).ToList();
+      var missingCategoryIds = categories.Where(c => c.ParentCategoryId != null && !parentCategoryIds.Contains(c.ParentCategoryId.Value)).Select(x => x.Id).ToList();
+
+      var categoriesWithNoParent = categories.Where(c => c.ParentCategoryId != null && !parentCategoryIds.Contains(c.ParentCategoryId.Value))
+    .Select(c => c.Id)
+    .ToList();
 
       if (missingCategoryIds.Any())
         throw new BusinessException(NewsManagementDomainErrorCodes.WithoutParentCategory).WithData("categoryId", string.Join(", ", missingCategoryIds));
