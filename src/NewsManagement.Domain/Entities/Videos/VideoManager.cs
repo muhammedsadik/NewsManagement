@@ -102,14 +102,10 @@ namespace NewsManagement.Entities.Videos
 
     public async Task<VideoDto> UpdateAsync(int id, UpdateVideoDto updateVideoDto)
     {
-      await CheckUpdateInputBaseAsync(id, updateVideoDto);
+      var updatingVideo = await CheckUpdateInputBaseAsync(id, updateVideoDto);
 
-      var updatingVideo = _objectMapper.Map<UpdateVideoDto, Video>(updateVideoDto);
-
-      //if(updateVideoDto.listableContentType != ListableContentType.Video)
-      //burada listableContentType kontrolü yap listableContentType değişebilir ona göre yönlendirme yap
-      //(burada UpdateVideoDto dan geldiği için status değişemez olması gerekiyor ama ListableContent ten gelirse(!) bunu ele almak gerekir.)
-
+      updatingVideo.listableContentType = ListableContentType.Video;
+     
       //if(updateVideoDto.VideoType == VideoType.Physical) burada type değişmiş olabilir. ❗❗❗
       // ❓  VideoType (Physical, Link) kontrolünü yap ve => 📩
 

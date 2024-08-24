@@ -15,7 +15,7 @@ namespace NewsManagement.Validations.VideoValidation
     {
       Include(new UpdateListableContentDtoValidator(localizer)); 
       
-      RuleFor(v => v.VideoType).NotEmpty().IsInEnum().WithMessage(localizer[NewsManagementDomainErrorCodes.NotInVideoEnumType]);
+      RuleFor(v => v.VideoType).IsInEnum().WithMessage(localizer[NewsManagementDomainErrorCodes.NotInVideoEnumType]);
     }
   }
 }

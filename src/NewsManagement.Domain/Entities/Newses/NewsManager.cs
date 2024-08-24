@@ -100,14 +100,10 @@ namespace NewsManagement.Entities.Newses
 
     public async Task<NewsDto> UpdateAsync(int id, UpdateNewsDto updateNewsDto)
     {
-      await CheckUpdateInputBaseAsync(id, updateNewsDto);
+      var updatingNews = await CheckUpdateInputBaseAsync(id, updateNewsDto);
 
-      var updatingNews = _objectMapper.Map<UpdateNewsDto, News>(updateNewsDto);
-
-      //if(updateNewsDto.listableContentType != ListableContentType.News)
-      //burada listableContentType kontrolü yap listableContentType değişebilir ona göre yönlendirme yap
-      //(burada UpdateNewsDto dan geldiği için status değişemez olması gerekiyor ama gelirse(!) bunu ele almak gerekir.)
-
+      updatingNews.listableContentType = ListableContentType.News;
+     
       // updateNewsDto.DetailImageId  kontrolü
       // ❓ DetailImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
