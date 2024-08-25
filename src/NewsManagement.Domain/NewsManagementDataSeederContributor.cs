@@ -30,6 +30,7 @@ namespace NewsManagement
     private readonly IdentityRoleManager _identityRoleManager;
     private readonly IPermissionManager _permissionManager;
     private readonly ITenantManager _tenantManager;
+    private readonly ITenantRepository _tenantRepository;
 
     public NewsManagementDataSeederContributor(
       IGuidGenerator guidGenerator,
@@ -41,7 +42,8 @@ namespace NewsManagement
       IdentityRoleManager identityRoleManager,
       IdentityUserManager identityUserManager,
       IPermissionManager permissionManager,
-      ITenantManager tenantManager
+      ITenantManager tenantManager,
+      ITenantRepository tenantRepository
       )
     {
       _guidGenerator = guidGenerator;
@@ -54,6 +56,7 @@ namespace NewsManagement
       _identityUserManager = identityUserManager;
       _permissionManager = permissionManager;
       _tenantManager = tenantManager;
+      _tenantRepository = tenantRepository;
     }
 
     public async Task SeedAsync(DataSeedContext context)
@@ -69,7 +72,13 @@ namespace NewsManagement
 
     private async Task SeedTenantAsync()
     {
+      var isStaffTenantExist = await _tenantRepository.FindByNameAsync("Staff");
+      if (isStaffTenantExist != null)
+        return;
+
       await _tenantManager.CreateAsync("Staff");
+
+
     }
 
     #endregion

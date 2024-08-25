@@ -104,7 +104,7 @@ namespace NewsManagement.Entities.Galleries
     {
       var updatingGallery = await CheckUpdateInputBaseAsync(id, updateGalleryDto);
 
-      updatingGallery.listableContentType = ListableContentType.Gallery;
+      updatingGallery.listableContentType = ListableContentType.Gallery;// ❓
 
       //updateGalleryDto.GalleryImage  kontrolü
       // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩

@@ -6,6 +6,7 @@ namespace EasyAbp.FileManagement.Files.Dtos
 {
     public class GetFileListInput : PagedAndSortedResultRequestDto
     {
+    //Filter
         public Guid? ParentId { get; set; }
         
         [Required]
