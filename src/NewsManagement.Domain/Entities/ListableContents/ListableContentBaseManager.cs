@@ -23,10 +23,11 @@ using NewsManagement.Entities.Newses;
 using NewsManagement.Entities.Videos;
 using NewsManagement.Entities.Galleries;
 using NewsManagement.EntityDtos.GalleryDtos;
-using static NewsManagement.Permissions.NewsManagementPermissions;
+
 
 namespace NewsManagement.Entities.ListableContents
 {
+  
   public abstract class ListableContentBaseManager<TEntity, TEntityDto, TPagedDto, TEntityCreateDto, TEntityUpdateDto> : DomainService
     where TEntity : ListableContent, new()
     where TEntityDto : ListableContentDto
@@ -244,7 +245,7 @@ namespace NewsManagement.Entities.ListableContents
       if (!dateTime.HasValue) // veri tabanına birşeyler kaydetmek gerekir.
         dateTime = DateTime.Now;
 
-      if (type == StatusType.Published && dateTime.Value < DateTime.Now.AddHours(-1))//eğer yayında ise tarih en fazla şimdi den 1 saat önce olabilir ⚠ 
+      if (type == StatusType.Published && dateTime.Value < DateTime.Now)//eğer yayında ise tarih en fazla şimdi den 1 saat önce olabilir ⚠ 
         throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusDatetimeTimeoutError);
 
       if (type == StatusType.Published && dateTime.Value > DateTime.Now)//eğer yayında ise tarih ileri olamaz.⚠yayına alınan içerik için zamanı yönet⚠ 
@@ -255,7 +256,7 @@ namespace NewsManagement.Entities.ListableContents
 
       if (type == StatusType.Scheduled && dateTime.Value > DateTime.Now)//eğer planlanmış ise tarihe göre işleme alınacak
       {
-        //Burada background Job kullanılacak
+        //Burada background Job kullanılacak 
       }
     }
 
@@ -353,6 +354,25 @@ namespace NewsManagement.Entities.ListableContents
 
 
       await CreateListableContentTagBaseAsync(tagIds, listableContentId);
+    }
+
+    public async Task CreateCrossEntity(int listableContentId, List<int> tagIds, List<int> cityIds, List<ListableContentCategoryDto> listableContentCategoryDto, List<int> RelatedListableContentIds)
+    {
+      await DeleteCrossEntity(listableContentId);
+
+      await CreateListableContentTagBaseAsync(tagIds, listableContentId);
+      await CreateListableContentCityBaseAsync(cityIds, listableContentId);
+      await CreateListableContentCategoryBaseAsync(listableContentCategoryDto, listableContentId);
+      await CreateListableContentRelationBaseAsync(RelatedListableContentIds, listableContentId);
+
+    }
+
+    public async Task DeleteCrossEntity(int listableContentId)
+    {
+      await _listableContentCategoryRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
+      await _listableContentCityRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
+      await _listableContentTagRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
+      await _listableContentRelationRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
     }
 
     public async Task ReCreateListableContentCityBaseAsync(List<int> cityIds, int listableContentId)

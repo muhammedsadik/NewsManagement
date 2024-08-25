@@ -44,7 +44,7 @@ namespace EasyAbp.FileManagement.Files
 
             return await MapToGetOutputDtoAsync(file);
         }
-
+//Getlistfilterasync
         public override async Task<PagedResultDto<FileInfoDto>> GetListAsync(GetFileListInput input)
         {
             await AuthorizationService.CheckAsync(new FileOperationInfoModel
