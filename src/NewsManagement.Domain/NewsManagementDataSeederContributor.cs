@@ -14,6 +14,7 @@ using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Guids;
 using Volo.Abp.Identity;
 using Volo.Abp.PermissionManagement;
+using Volo.Abp.TenantManagement;
 
 namespace NewsManagement
 {
@@ -28,6 +29,7 @@ namespace NewsManagement
     private readonly IdentityUserManager _identityUserManager;
     private readonly IdentityRoleManager _identityRoleManager;
     private readonly IPermissionManager _permissionManager;
+    private readonly ITenantManager _tenantManager;
 
     public NewsManagementDataSeederContributor(
       IGuidGenerator guidGenerator,
@@ -38,7 +40,8 @@ namespace NewsManagement
       IRepository<IdentityRole, Guid> roleRepository,
       IdentityRoleManager identityRoleManager,
       IdentityUserManager identityUserManager,
-      IPermissionManager permissionManager
+      IPermissionManager permissionManager,
+      ITenantManager tenantManager
       )
     {
       _guidGenerator = guidGenerator;
@@ -50,16 +53,26 @@ namespace NewsManagement
       _identityRoleManager = identityRoleManager;
       _identityUserManager = identityUserManager;
       _permissionManager = permissionManager;
+      _tenantManager = tenantManager;
     }
 
     public async Task SeedAsync(DataSeedContext context)
     {
       await SeedRoleAsync();
+      await SeedUserAsync();
       await SeedTagAsync();
       await SeedCityAsync();
       await SeedCategoryAsync();
     }
 
+    #region Tenant
+
+    private async Task SeedTenantAsync()
+    {
+      await _tenantManager.CreateAsync("Staff");
+    }
+
+    #endregion
 
     #region Role
 
@@ -79,27 +92,27 @@ namespace NewsManagement
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Tags.Create, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Tags.Edit, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Tags.Delete, true);
-        
+
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Cities.Default, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Cities.Create, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Cities.Edit, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Cities.Delete, true);
-        
+
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Categories.Default, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Categories.Create, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Categories.Edit, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Categories.Delete, true);
-        
+
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Videos.Default, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Videos.Create, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Videos.Edit, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Videos.Delete, true);
-        
+
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Galleries.Default, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Galleries.Create, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Galleries.Edit, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Galleries.Delete, true);
-        
+
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Newses.Default, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Newses.Create, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Editor, NewsManagementPermissions.Newses.Edit, true);
@@ -119,22 +132,63 @@ namespace NewsManagement
 
         await _permissionManager.SetForRoleAsync(RoleConst.Reporter, NewsManagementPermissions.Videos.Default, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Reporter, NewsManagementPermissions.Videos.Create, true);
-                                                           
+
         await _permissionManager.SetForRoleAsync(RoleConst.Reporter, NewsManagementPermissions.Galleries.Default, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Reporter, NewsManagementPermissions.Galleries.Create, true);
-                                                          
+
         await _permissionManager.SetForRoleAsync(RoleConst.Reporter, NewsManagementPermissions.Newses.Default, true);
         await _permissionManager.SetForRoleAsync(RoleConst.Reporter, NewsManagementPermissions.Newses.Create, true);
 
       }
 
+    }
 
+    #endregion
 
+    #region User
 
+    private async Task SeedUserAsync()
+    {
+      if (!await _userRepository.AnyAsync(x => x.UserName == "Ahmet"))
+      {
+        var userAhmet = new IdentityUser
+          (
+            _guidGenerator.Create(),
+            "Ahmet",
+            "ahmet@gmail.com"
+          );
 
+        await _identityUserManager.CreateAsync(userAhmet, "1q2w3E*");
+        await _identityUserManager.SetRolesAsync(
+          userAhmet, new List<string> { RoleConst.Editor }
+        );
+      }
 
+      if (!await _userRepository.AnyAsync(x => x.UserName == "Halil"))
+      {
+        var userHalil = new IdentityUser
+          (
+            _guidGenerator.Create(),
+            "Halil",
+            "halil@gmail.com"
+          );
 
+        await _identityUserManager.CreateAsync(userHalil, "1q2w3E*");
+        await _identityUserManager.SetRolesAsync(userHalil, new List<string> { RoleConst.Reporter });
+      }
 
+      if (!await _userRepository.AnyAsync(x => x.UserName == "Murat"))
+      {
+        var userMurat = new IdentityUser
+          (
+            _guidGenerator.Create(),
+            "Murat",
+            "murat@gmail.com"
+          );
+
+        await _identityUserManager.CreateAsync(userMurat, "1q2w3E*");
+        await _identityUserManager.SetRolesAsync(userMurat, new List<string> { RoleConst.Reporter });
+      }
 
     }
 

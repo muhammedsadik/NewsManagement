@@ -13,9 +13,9 @@ public class NewsManagementPermissionDefinitionProvider : PermissionDefinitionPr
 
     #region Tag
     var tagsPermission = newsManagement.AddPermission(NewsManagementPermissions.Tags.Default, L("Permission:Tags"), multiTenancySide: MultiTenancySides.Host);
-    tagsPermission.AddChild(NewsManagementPermissions.Tags.Create, L("Permission:Tags.Create"));// Main permissiona verdim tenant ile giriş yapınca nasıl davaranacağını görmek için.
-    tagsPermission.AddChild(NewsManagementPermissions.Tags.Edit, L("Permission:Tags.Edit"));
-    tagsPermission.AddChild(NewsManagementPermissions.Tags.Delete, L("Permission:Tags.Delete"));
+    tagsPermission.AddChild(NewsManagementPermissions.Tags.Create, L("Permission:Tags.Create"), multiTenancySide: MultiTenancySides.Host);    
+    tagsPermission.AddChild(NewsManagementPermissions.Tags.Edit, L("Permission:Tags.Edit"), multiTenancySide: MultiTenancySides.Host);
+    tagsPermission.AddChild(NewsManagementPermissions.Tags.Delete, L("Permission:Tags.Delete"), multiTenancySide: MultiTenancySides.Host);
     #endregion
 
     #region City
@@ -34,21 +34,21 @@ public class NewsManagementPermissionDefinitionProvider : PermissionDefinitionPr
 
     #region Video 
     var videosPermission = newsManagement.AddPermission(NewsManagementPermissions.Videos.Default, L("Permission:Videos"));
-    videosPermission.AddChild(NewsManagementPermissions.Videos.Create, L("Permission:Videos.Create"), multiTenancySide: MultiTenancySides.Host);
+    videosPermission.AddChild(NewsManagementPermissions.Videos.Create, L("Permission:Videos.Create"));
     videosPermission.AddChild(NewsManagementPermissions.Videos.Edit, L("Permission:Videos.Edit"), multiTenancySide: MultiTenancySides.Host);
     videosPermission.AddChild(NewsManagementPermissions.Videos.Delete, L("Permission:Videos.Delete"), multiTenancySide: MultiTenancySides.Host);
     #endregion
 
     #region News
     var newsesPermission = newsManagement.AddPermission(NewsManagementPermissions.Newses.Default, L("Permission:Newses"));
-    newsesPermission.AddChild(NewsManagementPermissions.Newses.Create, L("Permission:Newses.Create"), multiTenancySide: MultiTenancySides.Host);
+    newsesPermission.AddChild(NewsManagementPermissions.Newses.Create, L("Permission:Newses.Create"));
     newsesPermission.AddChild(NewsManagementPermissions.Newses.Edit, L("Permission:Newses.Edit"), multiTenancySide: MultiTenancySides.Host);
     newsesPermission.AddChild(NewsManagementPermissions.Newses.Delete, L("Permission:Newses.Delete"), multiTenancySide: MultiTenancySides.Host);
     #endregion
 
     #region Gallery
     var galleriesPermission = newsManagement.AddPermission(NewsManagementPermissions.Galleries.Default, L("Permission:Galleries"));
-    galleriesPermission.AddChild(NewsManagementPermissions.Galleries.Create, L("Permission:Galleries.Create"), multiTenancySide: MultiTenancySides.Host);
+    galleriesPermission.AddChild(NewsManagementPermissions.Galleries.Create, L("Permission:Galleries.Create"));
     galleriesPermission.AddChild(NewsManagementPermissions.Galleries.Edit, L("Permission:Galleries.Edit"), multiTenancySide: MultiTenancySides.Host);
     galleriesPermission.AddChild(NewsManagementPermissions.Galleries.Delete, L("Permission:Galleries.Delete"), multiTenancySide: MultiTenancySides.Host);
     #endregion
