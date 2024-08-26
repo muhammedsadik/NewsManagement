@@ -20,6 +20,7 @@ using NewsManagement.Entities.ListableContents;
 using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.Entities.Galleries;
 using NewsManagement.Entities.Newses;
+using NewsManagement.EntityDtos.GalleryDtos;
 
 namespace NewsManagement.Entities.Videos
 {
@@ -86,14 +87,7 @@ namespace NewsManagement.Entities.Videos
 
       var video = await _genericRepository.InsertAsync(creatingVideo, autoSave: true);
 
-      await CreateListableContentTagBaseAsync(createVideoDto.TagIds, video.Id);
-
-      await CreateListableContentCityBaseAsync(createVideoDto.CityIds, video.Id);
-
-      await CreateListableContentCategoryBaseAsync(createVideoDto.ListableContentCategoryDtos, video.Id);
-
-      if (createVideoDto.RelatedListableContentIds != null)
-        await CreateListableContentRelationBaseAsync(createVideoDto.RelatedListableContentIds, video.Id);
+      await CreateCrossEntity(createVideoDto, video.Id);
 
       var videoDto = _objectMapper.Map<Video, VideoDto>(video);
 
@@ -111,14 +105,7 @@ namespace NewsManagement.Entities.Videos
 
       var video = await _genericRepository.UpdateAsync(updatingVideo, autoSave: true);
 
-      await ReCreateListableContentTagBaseAsync(updateVideoDto.TagIds, video.Id);
-
-      await ReCreateListableContentCityBaseAsync(updateVideoDto.CityIds, video.Id);
-
-      await ReCreateListableContentCategoryBaseAsync(updateVideoDto.ListableContentCategoryDtos, video.Id);
-
-      if (updateVideoDto.RelatedListableContentIds != null)
-        await ReCreateListableContentRelationBaseAsync(updateVideoDto.RelatedListableContentIds, video.Id);
+      await ReCreateCrossEntity(updateVideoDto, video.Id);
 
       var videoDto = _objectMapper.Map<Video, VideoDto>(video);
 

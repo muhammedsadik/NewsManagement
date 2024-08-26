@@ -84,14 +84,7 @@ namespace NewsManagement.Entities.Newses
 
       var news = await _genericRepository.InsertAsync(creatingNews, autoSave: true);
 
-      await CreateListableContentTagBaseAsync(createNewsDto.TagIds, news.Id);
-
-      await CreateListableContentCityBaseAsync(createNewsDto.CityIds, news.Id);
-
-      await CreateListableContentCategoryBaseAsync(createNewsDto.ListableContentCategoryDtos, news.Id);
-
-      if (createNewsDto.RelatedListableContentIds != null)
-        await CreateListableContentRelationBaseAsync(createNewsDto.RelatedListableContentIds, news.Id);
+      await CreateCrossEntity(createNewsDto, news.Id);
 
       var newsDto = _objectMapper.Map<News, NewsDto>(news);
 
@@ -109,14 +102,7 @@ namespace NewsManagement.Entities.Newses
 
       var news = await _genericRepository.UpdateAsync(updatingNews, autoSave: true);
 
-      await ReCreateListableContentTagBaseAsync(updateNewsDto.TagIds, news.Id);
-
-      await ReCreateListableContentCityBaseAsync(updateNewsDto.CityIds, news.Id);
-
-      await ReCreateListableContentCategoryBaseAsync(updateNewsDto.ListableContentCategoryDtos, news.Id);
-
-      if (updateNewsDto.RelatedListableContentIds != null)
-        await ReCreateListableContentRelationBaseAsync(updateNewsDto.RelatedListableContentIds, news.Id);
+      await ReCreateCrossEntity(updateNewsDto, news.Id);
 
       var newsDto = _objectMapper.Map<News, NewsDto>(news);
 
