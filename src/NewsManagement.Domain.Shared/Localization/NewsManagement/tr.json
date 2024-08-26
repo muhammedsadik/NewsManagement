@@ -25,7 +25,7 @@
     "NewsManagement:510": "Reddedilmiş durumu için bir yayın zamanı olamaz.",
     "NewsManagement:511": "Silinmiş durumu için bir yayın zamanı olamaz.",
     "NewsManagement:512": "Yayınlanmış durumu için bir yayınlanma zamanı olmalıdır.",
-    "NewsManagement:513": "Yayınlanmış Durumu için Tarih/Saat Hatası: En fazla bir saat önce olabilir.",
+    "NewsManagement:513": "Yayınlanmış Durumu için Tarih/Saat Hatası: Tarih şimdi olmalıdır.",
     "NewsManagement:514": "Yayınlanmış Durumu için Tarih/Saat Hatası: Şu anki zaman veya boş olmalı.",
     "NewsManagement:515": "Planlanmış Durumu için Tarih/Saat Hatası: Gelecekte olmalıdır.",
     "NewsManagement:516": "Alt kategori, üst kategori olmadan atanamaz. Atanamayan alt kategoriler = {categoryId}",

@@ -18,7 +18,6 @@ namespace NewsManagement.Validations.ListableContentValidation
       RuleFor(l => l.TagIds).NotEmpty();
       RuleFor(l => l.CityIds).NotEmpty();
       RuleFor(l => l.RelatedListableContentIds).NotEmpty();
-
       RuleFor(l => l.Status).IsInEnum().WithMessage(localizer[NewsManagementDomainErrorCodes.NotInStatusEnumType]);
 
       RuleFor(l => l.ListableContentCategoryDtos)
