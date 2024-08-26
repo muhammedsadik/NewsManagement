@@ -85,15 +85,7 @@ namespace NewsManagement.Entities.Galleries
 
       var gallery = await _genericRepository.InsertAsync(creatingGallery, autoSave: true);
 
-      await CreateListableContentTagBaseAsync(createGalleryDto.TagIds, gallery.Id);
-
-      await CreateListableContentCityBaseAsync(createGalleryDto.CityIds, gallery.Id);
-
-      await CreateListableContentCategoryBaseAsync(createGalleryDto.ListableContentCategoryDtos, gallery.Id);
-
-      if (createGalleryDto.RelatedListableContentIds != null)
-        await CreateListableContentRelationBaseAsync(createGalleryDto.RelatedListableContentIds, gallery.Id);
-
+      await CreateCrossEntity(createGalleryDto, gallery.Id);
 
       var galleryDto = _objectMapper.Map<Gallery, GalleryDto>(gallery);
 
@@ -104,21 +96,14 @@ namespace NewsManagement.Entities.Galleries
     {
       var updatingGallery = await CheckUpdateInputBaseAsync(id, updateGalleryDto);
 
-      updatingGallery.listableContentType = ListableContentType.Gallery;// ❓
+      updatingGallery.listableContentType = ListableContentType.Gallery;// ❓ ❓
 
       //updateGalleryDto.GalleryImage  kontrolü
       // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
 
       var gallery = await _genericRepository.UpdateAsync(updatingGallery, autoSave: true);
 
-      await ReCreateListableContentTagBaseAsync(updateGalleryDto.TagIds, id);
-
-      await ReCreateListableContentCityBaseAsync(updateGalleryDto.CityIds, id);
-
-      await ReCreateListableContentCategoryBaseAsync(updateGalleryDto.ListableContentCategoryDtos, id);
-
-      if (updateGalleryDto.RelatedListableContentIds != null)
-        await ReCreateListableContentRelationBaseAsync(updateGalleryDto.RelatedListableContentIds, id);
+      await ReCreateCrossEntity(updateGalleryDto, gallery.Id);
 
       var galleryDto = _objectMapper.Map<Gallery, GalleryDto>(gallery);
 

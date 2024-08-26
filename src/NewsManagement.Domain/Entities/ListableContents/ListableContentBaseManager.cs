@@ -27,7 +27,7 @@ using NewsManagement.EntityDtos.GalleryDtos;
 
 namespace NewsManagement.Entities.ListableContents
 {
-  
+
   public abstract class ListableContentBaseManager<TEntity, TEntityDto, TPagedDto, TEntityCreateDto, TEntityUpdateDto> : DomainService
     where TEntity : ListableContent, new()
     where TEntityDto : ListableContentDto
@@ -92,13 +92,12 @@ namespace NewsManagement.Entities.ListableContents
 
 
       await CheckTagByIdBaseAsync(createDto.TagIds);
-
       await CheckCityByIdBaseAsync(createDto.CityIds);
-
-      await CheckListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos);
 
       if (createDto.RelatedListableContentIds != null)
         await CheckListableContentByIdBaseAsync(createDto.RelatedListableContentIds);
+
+      await CheckListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos);
 
     }
 
@@ -113,21 +112,15 @@ namespace NewsManagement.Entities.ListableContents
         throw new AlreadyExistException(typeof(TEntity), updateDto.Title);
 
       await CheckTagByIdBaseAsync(updateDto.TagIds);
-
       await CheckCityByIdBaseAsync(updateDto.CityIds);
+      CheckStatusAndDateTimeBaseAsync(updateDto.Status, updateDto.PublishTime);
 
+      var listableContentSelfReference = updateDto.RelatedListableContentIds.Any(x => x == id);
+      if (listableContentSelfReference)
+        throw new BusinessException(NewsManagementDomainErrorCodes.CannotAddItself);
+
+      await CheckListableContentByIdBaseAsync(updateDto.RelatedListableContentIds);
       await CheckListableContentCategoryBaseAsync(updateDto.ListableContentCategoryDtos);
-
-      await CheckStatusAndDateTimeBaseAsync(updateDto.Status, updateDto.PublishTime);
-
-      if (updateDto.RelatedListableContentIds != null)
-      {
-        var listableContentSelfReference = updateDto.RelatedListableContentIds.Any(x => x == id);
-        if (listableContentSelfReference)
-          throw new BusinessException(NewsManagementDomainErrorCodes.CannotAddItself);
-
-        await CheckListableContentByIdBaseAsync(updateDto.RelatedListableContentIds);
-      }
 
       return _objectMapper.Map(updateDto, await _genericRepository.GetAsync(id));
     }
@@ -168,6 +161,7 @@ namespace NewsManagement.Entities.ListableContents
       await _genericRepository.HardDeleteAsync(entity);
     }
 
+
     #region Helper Method
 
     public async Task CheckTagByIdBaseAsync(List<int> tagIds)
@@ -207,6 +201,7 @@ namespace NewsManagement.Entities.ListableContents
       }
     }
 
+
     public async Task CheckListableContentByIdBaseAsync(List<int> RelatedListableContentIds)
     {
       CheckDuplicateInputsBase(nameof(RelatedListableContentIds), RelatedListableContentIds);
@@ -222,7 +217,7 @@ namespace NewsManagement.Entities.ListableContents
       }
     }
 
-    public async Task CheckStatusAndDateTimeBaseAsync(StatusType type, DateTime? dateTime)
+    public void CheckStatusAndDateTimeBaseAsync(StatusType type, DateTime? dateTime)
     {
       if (type == StatusType.Draft && dateTime.HasValue)//eğer üzerinde çalışılıyor ise tarih olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.DraftStatusCannotHaveaPublishingTime);
@@ -254,10 +249,6 @@ namespace NewsManagement.Entities.ListableContents
       if (type == StatusType.Scheduled && dateTime.Value <= DateTime.Now)//eğer planlanmış ise tarih geri olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.ScheduledStatusDatetimeMustBeInTheFuture);
 
-      if (type == StatusType.Scheduled && dateTime.Value > DateTime.Now)//eğer planlanmış ise tarihe göre işleme alınacak
-      {
-        //Burada background Job kullanılacak 
-      }
     }
 
     public async Task CheckListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto)
@@ -290,7 +281,37 @@ namespace NewsManagement.Entities.ListableContents
 
     #endregion
 
+
     #region CreateListableContentSubs
+
+    public async Task CreateCrossEntity(TEntityCreateDto createDto, int listableContentId)
+    {
+      await CreateListableContentTagBaseAsync(createDto.TagIds, listableContentId);
+      await CreateListableContentCityBaseAsync(createDto.CityIds, listableContentId);
+      await CreateListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos, listableContentId);
+
+      if (createDto.RelatedListableContentIds != null)
+        await CreateListableContentRelationBaseAsync(createDto.RelatedListableContentIds, listableContentId);
+    }
+
+    public async Task ReCreateCrossEntity(TEntityUpdateDto updateDto, int listableContentId)
+    {
+      await DeleteAllCrossEntitiesByListableContentId(listableContentId);
+
+      await CreateListableContentTagBaseAsync(updateDto.TagIds, listableContentId);
+      await CreateListableContentCityBaseAsync(updateDto.CityIds, listableContentId);
+      await CreateListableContentRelationBaseAsync(updateDto.RelatedListableContentIds, listableContentId);
+      await CreateListableContentCategoryBaseAsync(updateDto.ListableContentCategoryDtos, listableContentId);
+    }
+
+    public async Task DeleteAllCrossEntitiesByListableContentId(int listableContentId)
+    {
+      await _listableContentCategoryRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
+      await _listableContentCityRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
+      await _listableContentTagRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
+      await _listableContentRelationRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
+    }
+
 
     public async Task CreateListableContentTagBaseAsync(List<int> tagIds, int listableContentId)
     {
@@ -316,18 +337,6 @@ namespace NewsManagement.Entities.ListableContents
       await _listableContentCityRepository.InsertManyAsync(listableContentCitis, autoSave: true);
     }
 
-    public async Task CreateListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)
-    {
-      List<ListableContentCategory> listableContentCategories = new();
-      foreach (var item in listableContentCategoryDto)
-      {
-        var category = new ListableContentCategory { ListableContentId = listableContentId, CategoryId = item.CategoryId, IsPrimary = item.IsPrimary };
-        listableContentCategories.Add(category);
-      }
-
-      await _listableContentCategoryRepository.InsertManyAsync(listableContentCategories, autoSave: true);
-    }
-
     public async Task CreateListableContentRelationBaseAsync(List<int> RelatedListableContentIds, int listableContentId)
     {
       List<ListableContentRelation> listableContentRelations = new();
@@ -345,56 +354,16 @@ namespace NewsManagement.Entities.ListableContents
       await _listableContentRelationRepository.InsertManyAsync(listableContentRelations, autoSave: true);
     }
 
-    public async Task ReCreateListableContentTagBaseAsync(List<int> tagIds, int listableContentId)
+    public async Task CreateListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)
     {
-      var isExist = await _listableContentTagRepository.GetListAsync(x => x.ListableContentId == listableContentId);
+      List<ListableContentCategory> listableContentCategories = new();
+      foreach (var item in listableContentCategoryDto)
+      {
+        var category = new ListableContentCategory { ListableContentId = listableContentId, CategoryId = item.CategoryId, IsPrimary = item.IsPrimary };
+        listableContentCategories.Add(category);
+      }
 
-      if (isExist.Count() != 0)
-        await _listableContentTagRepository.DeleteManyAsync(isExist, autoSave: true);
-
-
-      await CreateListableContentTagBaseAsync(tagIds, listableContentId);
-    }
-
-    public async Task CreateCrossEntity(int listableContentId, List<int> tagIds, List<int> cityIds, List<ListableContentCategoryDto> listableContentCategoryDto, List<int> RelatedListableContentIds)
-    {
-      await DeleteCrossEntity(listableContentId);
-
-      await CreateListableContentTagBaseAsync(tagIds, listableContentId);
-      await CreateListableContentCityBaseAsync(cityIds, listableContentId);
-      await CreateListableContentCategoryBaseAsync(listableContentCategoryDto, listableContentId);
-      await CreateListableContentRelationBaseAsync(RelatedListableContentIds, listableContentId);
-
-    }
-
-    public async Task DeleteCrossEntity(int listableContentId)
-    {
-      await _listableContentCategoryRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
-      await _listableContentCityRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
-      await _listableContentTagRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
-      await _listableContentRelationRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
-    }
-
-    public async Task ReCreateListableContentCityBaseAsync(List<int> cityIds, int listableContentId)
-    {
-      var isExist = await _listableContentCityRepository.GetListAsync(x => x.ListableContentId == listableContentId);
-
-      if (isExist.Count() != 0)
-        await _listableContentCityRepository.DeleteManyAsync(isExist, autoSave: true);
-
-
-      await CreateListableContentCityBaseAsync(cityIds, listableContentId);
-    }
-
-    public async Task ReCreateListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)
-    {
-      var isExist = await _listableContentCategoryRepository.GetListAsync(x => x.ListableContentId == listableContentId);
-
-      if (isExist.Count() != 0)
-        await _listableContentCategoryRepository.DeleteManyAsync(isExist, autoSave: true);
-
-
-      await CreateListableContentCategoryBaseAsync(listableContentCategoryDto, listableContentId);
+      await _listableContentCategoryRepository.InsertManyAsync(listableContentCategories, autoSave: true);
     }
 
     public async Task ReCreateListableContentRelationBaseAsync(List<int> RelatedListableContentIds, int listableContentId)
@@ -407,6 +376,7 @@ namespace NewsManagement.Entities.ListableContents
 
       await CreateListableContentRelationBaseAsync(RelatedListableContentIds, listableContentId);
     }
+
 
     #endregion
 
