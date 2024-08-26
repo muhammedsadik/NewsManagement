@@ -76,8 +76,8 @@ namespace NewsManagement.Entities.Galleries
 
       var creatingGallery = _objectMapper.Map<CreateGalleryDto, Gallery>(createGalleryDto);
 
-      creatingGallery.PublishTime = DateTime.Now;
-      creatingGallery.Status = StatusType.PendingReview;
+      //creatingGallery.PublishTime = DateTime.Now;  ❗ Create Metoduna bu ikisi geliyor artık düzenle
+      //creatingGallery.Status = StatusType.PendingReview;
       creatingGallery.listableContentType = ListableContentType.Gallery;
 
       //updateGalleryDto.GalleryImage  kontrolü
@@ -96,7 +96,7 @@ namespace NewsManagement.Entities.Galleries
     {
       var updatingGallery = await CheckUpdateInputBaseAsync(id, updateGalleryDto);
 
-      updatingGallery.listableContentType = ListableContentType.Gallery;// ❓ ❓
+      updatingGallery.listableContentType = ListableContentType.Gallery;
 
       //updateGalleryDto.GalleryImage  kontrolü
       // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩

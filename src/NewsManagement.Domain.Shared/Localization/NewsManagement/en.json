@@ -19,7 +19,7 @@
     "NewsManagement:510": "Rejected status cannot have a publishing time.",
     "NewsManagement:511": "Deleted status cannot have a publishing time.",
     "NewsManagement:512": "Published status must have a publishing time.",
-    "NewsManagement:513": "Published Status Datetime Error: Must be within the last hour.",
+    "NewsManagement:513": "Published Status Datetime Error: Datetime must be now.",
     "NewsManagement:514": "Published Status Datetime Error: Must be now or null.",
     "NewsManagement:515": "Scheduled Status Datetime Error: Must be in the future.",
     "NewsManagement:516": "A subcategory cannot be assigned without its parent. Assigned subcategories= {categoryId}",

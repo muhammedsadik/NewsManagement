@@ -93,11 +93,9 @@ namespace NewsManagement.Entities.ListableContents
 
       await CheckTagByIdBaseAsync(createDto.TagIds);
       await CheckCityByIdBaseAsync(createDto.CityIds);
-
-      if (createDto.RelatedListableContentIds != null)
-        await CheckListableContentByIdBaseAsync(createDto.RelatedListableContentIds);
-
+      await CheckListableContentByIdBaseAsync(createDto.RelatedListableContentIds);
       await CheckListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos);
+
 
     }
 
@@ -202,21 +200,6 @@ namespace NewsManagement.Entities.ListableContents
     }
 
 
-    public async Task CheckListableContentByIdBaseAsync(List<int> RelatedListableContentIds)
-    {
-      CheckDuplicateInputsBase(nameof(RelatedListableContentIds), RelatedListableContentIds);
-
-      foreach (var ListableContentId in RelatedListableContentIds)
-      {
-        var gallery = await _galleryRepository.AnyAsync(x => x.Id == ListableContentId);
-        var Video = await _videoRepository.AnyAsync(x => x.Id == ListableContentId);
-        var News = await _newsRepository.AnyAsync(x => x.Id == ListableContentId);
-
-        if (!gallery && !Video && !News)
-          throw new NotFoundException(typeof(ListableContent), ListableContentId.ToString());
-      }
-    }
-
     public void CheckStatusAndDateTimeBaseAsync(StatusType type, DateTime? dateTime)
     {
       if (type == StatusType.Draft && dateTime.HasValue)//eğer üzerinde çalışılıyor ise tarih olamaz
@@ -240,15 +223,30 @@ namespace NewsManagement.Entities.ListableContents
       if (!dateTime.HasValue) // veri tabanına birşeyler kaydetmek gerekir.
         dateTime = DateTime.Now;
 
-      if (type == StatusType.Published && dateTime.Value < DateTime.Now)//eğer yayında ise tarih en fazla şimdi den 1 saat önce olabilir ⚠ 
+      if (type == StatusType.Published && dateTime.Value != DateTime.Now)//eğer yayında ise tarih şimdi olmalıdır
         throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusDatetimeTimeoutError);
 
-      if (type == StatusType.Published && dateTime.Value > DateTime.Now)//eğer yayında ise tarih ileri olamaz.⚠yayına alınan içerik için zamanı yönet⚠ 
+      if (type == StatusType.Published && dateTime.Value > DateTime.Now)//eğer yayında ise tarih ileri olamaz.
         throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusDatetimeMustNowOrNull);
 
       if (type == StatusType.Scheduled && dateTime.Value <= DateTime.Now)//eğer planlanmış ise tarih geri olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.ScheduledStatusDatetimeMustBeInTheFuture);
 
+    }
+
+    public async Task CheckListableContentByIdBaseAsync(List<int> RelatedListableContentIds)
+    {
+      CheckDuplicateInputsBase(nameof(RelatedListableContentIds), RelatedListableContentIds);
+
+      foreach (var ListableContentId in RelatedListableContentIds)
+      {
+        var gallery = await _galleryRepository.AnyAsync(x => x.Id == ListableContentId);
+        var Video = await _videoRepository.AnyAsync(x => x.Id == ListableContentId);
+        var News = await _newsRepository.AnyAsync(x => x.Id == ListableContentId);
+
+        if (!gallery && !Video && !News)
+          throw new NotFoundException(typeof(ListableContent), ListableContentId.ToString());
+      }
     }
 
     public async Task CheckListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto)
