@@ -44,6 +44,10 @@ using EasyAbp.FileManagement.Files;
 using EasyAbp.FileManagement.Containers;
 using Volo.Abp.BlobStoring;
 using Volo.Abp.BlobStoring.Minio;
+using Volo.Abp.BackgroundJobs.Hangfire;
+using Hangfire;
+using Hangfire.PostgreSql;
+using Volo.Abp.Hangfire;
 
 namespace NewsManagement.Web;
 
@@ -60,6 +64,8 @@ namespace NewsManagement.Web;
     typeof(FileManagementWebModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule),
+    typeof(AbpBackgroundJobsHangfireModule),
+    //typeof(AbpHangfireModule),
     typeof(AbpBlobStoringMinioModule)
     )]
 public class NewsManagementWebModule : AbpModule
@@ -145,6 +151,15 @@ public class NewsManagementWebModule : AbpModule
     ConfigureNavigationServices();
     ConfigureAutoApiControllers();
     ConfigureSwaggerServices(context.Services);
+    ConfigureHangfire(context, configuration);
+  }
+
+  private void ConfigureHangfire(ServiceConfigurationContext context, IConfiguration configuration)
+  {
+    context.Services.AddHangfire(config =>
+    {
+      config.UsePostgreSqlStorage(configuration.GetConnectionString("Default"));
+    });
   }
 
   private void ConfigureAuthentication(ServiceConfigurationContext context)
