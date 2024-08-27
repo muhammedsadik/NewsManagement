@@ -71,12 +71,8 @@ namespace NewsManagement.Entities.Newses
 
     public async Task<NewsDto> CreateAsync(CreateNewsDto createNewsDto)
     {
-      await CheckCreateInputBaseAsync(createNewsDto);
+      var creatingNews = await CheckCreateInputBaseAsync(createNewsDto);
 
-      var creatingNews = _objectMapper.Map<CreateNewsDto, News>(createNewsDto);
-
-      creatingNews.PublishTime = DateTime.Now;
-      creatingNews.Status = StatusType.PendingReview;
       creatingNews.listableContentType = ListableContentType.News;
 
       // updateNewsDto.DetailImageId  kontrolü
@@ -95,8 +91,7 @@ namespace NewsManagement.Entities.Newses
     {
       var updatingNews = await CheckUpdateInputBaseAsync(id, updateNewsDto);
 
-      updatingNews.listableContentType = ListableContentType.News;
-     
+
       // updateNewsDto.DetailImageId  kontrolü
       // ❓ DetailImageId ye ait bir item varmı kontrolünü yap ve => 📩
 

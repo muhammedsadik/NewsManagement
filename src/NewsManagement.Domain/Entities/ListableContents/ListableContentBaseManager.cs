@@ -80,23 +80,26 @@ namespace NewsManagement.Entities.ListableContents
       //_fileAppService = fileAppService;
     }
 
-    public async Task CheckCreateInputBaseAsync(TEntityCreateDto createDto)
+    public async Task<TEntity> CheckCreateInputBaseAsync(TEntityCreateDto createDto)
     {
       var isExist = await _genericRepository.AnyAsync(x => x.Title == createDto.Title);
       if (isExist)
         throw new AlreadyExistException(typeof(TEntity), createDto.Title);
 
+      if (createDto.Status == StatusType.Deleted)
+        throw new BusinessException(NewsManagementDomainErrorCodes.OnCreationStatusCannotBeDelete);
+
       //var isExistImageId = await _fileAppService.GetAsync(createDto.ImageId);
       //if (isExistImageId)
       //  throw new AlreadyExistException(typeof(TEntityDto), createDto.Title);
-
 
       await CheckTagByIdBaseAsync(createDto.TagIds);
       await CheckCityByIdBaseAsync(createDto.CityIds);
       await CheckListableContentByIdBaseAsync(createDto.RelatedListableContentIds);
       await CheckListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos);
+      CheckStatusAndDateTimeBaseAsync(createDto.Status, createDto.PublishTime);
 
-
+      return _objectMapper.Map<TEntityCreateDto, TEntity>(createDto);
     }
 
     public async Task<TEntity> CheckUpdateInputBaseAsync(int id, TEntityUpdateDto updateDto)
@@ -111,7 +114,6 @@ namespace NewsManagement.Entities.ListableContents
 
       await CheckTagByIdBaseAsync(updateDto.TagIds);
       await CheckCityByIdBaseAsync(updateDto.CityIds);
-      CheckStatusAndDateTimeBaseAsync(updateDto.Status, updateDto.PublishTime);
 
       var listableContentSelfReference = updateDto.RelatedListableContentIds.Any(x => x == id);
       if (listableContentSelfReference)
@@ -119,8 +121,14 @@ namespace NewsManagement.Entities.ListableContents
 
       await CheckListableContentByIdBaseAsync(updateDto.RelatedListableContentIds);
       await CheckListableContentCategoryBaseAsync(updateDto.ListableContentCategoryDtos);
+      CheckStatusAndDateTimeBaseAsync(updateDto.Status, updateDto.PublishTime);
 
-      return _objectMapper.Map(updateDto, await _genericRepository.GetAsync(id));
+      var entity = _objectMapper.Map(updateDto, await _genericRepository.GetAsync(id));
+
+      if (entity.Status == StatusType.Deleted)// Bunun kontrollerini yap
+        entity.IsDeleted = true;
+
+      return entity;
     }
 
     public async Task<PagedResultDto<TEntityDto>> GetListFilterBaseAsync(TPagedDto input)
@@ -205,29 +213,21 @@ namespace NewsManagement.Entities.ListableContents
       if (type == StatusType.Draft && dateTime.HasValue)//eğer üzerinde çalışılıyor ise tarih olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.DraftStatusCannotHaveaPublishingTime);
 
-      if (type == StatusType.PendingReview && dateTime.HasValue)//eğer onay bekliyor ise tarih olamaz
-        throw new BusinessException(NewsManagementDomainErrorCodes.PendingReviewStatusCannotHaveaPublishingTime);
-
       if (type == StatusType.Archived && dateTime.HasValue)//eğer Arşivlenmiş eski haberler ise tarih olamaz.
         throw new BusinessException(NewsManagementDomainErrorCodes.ArchivedStatusCannotHaveaPublishingTime);
-
-      if (type == StatusType.Rejected && dateTime.HasValue)//eğer Reddedilmiş ise tarih olamaz.
-        throw new BusinessException(NewsManagementDomainErrorCodes.RejectedStatusCannotHaveaPublishingTime);
 
       if (type == StatusType.Deleted && dateTime.HasValue)//eğer Silinmiş ise tarih olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.DeletedStatusCannotHaveaPublishingTime);
 
       if (type == StatusType.Published && !dateTime.HasValue)//eğer yayında ise tarih olmalı
-        throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusMustHaveaPublishingTime);
+        throw new BusinessException(NewsManagementDomainErrorCodes.SelectedStatusMustHaveaPublishingTime);
 
-      if (!dateTime.HasValue) // veri tabanına birşeyler kaydetmek gerekir.
-        dateTime = DateTime.Now;
+        //yayında ise tarih şimdi olmalı. sn göz ardı edildi
+      if (type == StatusType.Published && dateTime.Value.ToString("yyyyMMddHHmm") != DateTime.Now.ToString("yyyyMMddHHmm"))
+        throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusDatetimeMustBeNow);
 
-      if (type == StatusType.Published && dateTime.Value != DateTime.Now)//eğer yayında ise tarih şimdi olmalıdır
-        throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusDatetimeTimeoutError);
-
-      if (type == StatusType.Published && dateTime.Value > DateTime.Now)//eğer yayında ise tarih ileri olamaz.
-        throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusDatetimeMustNowOrNull);
+      if (type == StatusType.Scheduled && !dateTime.HasValue)//eğer planlanmış ise tarih olmalı
+        throw new BusinessException(NewsManagementDomainErrorCodes.SelectedStatusMustHaveaPublishingTime);
 
       if (type == StatusType.Scheduled && dateTime.Value <= DateTime.Now)//eğer planlanmış ise tarih geri olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.ScheduledStatusDatetimeMustBeInTheFuture);
