@@ -6,10 +6,10 @@ namespace NewsManagement.EntityConsts.ListableContentConsts
 {
   public enum StatusType
   {
-    Draft,          // Taslak  
-    Archived,       // Arşivlenmiş 
-    Published,      // Yayınlanmış  
-    Scheduled,      // Planlanmış 
-    Deleted,        // Silinmiş  
+    Draft,          //0 Taslak  
+    Archived,       //1 Arşivlenmiş 
+    Published,      //2 Yayınlanmış  
+    Scheduled,      //3 Planlanmış 
+    Deleted,        //4 Silinmiş  
   }
 }
