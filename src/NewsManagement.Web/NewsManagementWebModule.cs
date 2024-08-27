@@ -281,3 +281,4 @@ public class NewsManagementWebModule : AbpModule
     app.UseConfiguredEndpoints();
   }
 }
+
