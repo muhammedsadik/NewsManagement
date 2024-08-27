@@ -14,12 +14,13 @@ public static class NewsManagementDomainErrorCodes
   public const string ArchivedStatusCannotHaveaPublishingTime = "NewsManagement:509";
   public const string RejectedStatusCannotHaveaPublishingTime = "NewsManagement:510";
   public const string DeletedStatusCannotHaveaPublishingTime = "NewsManagement:511";
-  public const string PublishedStatusMustHaveaPublishingTime = "NewsManagement:512";
-  public const string PublishedStatusDatetimeTimeoutError = "NewsManagement:513";
-  public const string PublishedStatusDatetimeMustNowOrNull = "NewsManagement:514";
+  public const string SelectedStatusMustHaveaPublishingTime = "NewsManagement:512";
+  public const string BurayaYeniHataKodu = "NewsManagement:513";//silindi BurayaYeniHataKodu
+  public const string PublishedStatusDatetimeMustBeNow = "NewsManagement:514";
   public const string ScheduledStatusDatetimeMustBeInTheFuture = "NewsManagement:515";
   public const string WithoutParentCategory = "NewsManagement:516";
   public const string CannotAddItself = "NewsManagement:517";
+  public const string OnCreationStatusCannotBeDelete = "NewsManagement:518";
 
 
 

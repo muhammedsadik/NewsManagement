@@ -74,12 +74,8 @@ namespace NewsManagement.Entities.Videos
 
     public async Task<VideoDto> CreateAsync(CreateVideoDto createVideoDto)
     {
-      await CheckCreateInputBaseAsync(createVideoDto);
+      var creatingVideo = await CheckCreateInputBaseAsync(createVideoDto);
 
-      var creatingVideo = _objectMapper.Map<CreateVideoDto, Video>(createVideoDto);
-
-      creatingVideo.PublishTime = DateTime.Now;
-      creatingVideo.Status = StatusType.PendingReview;
       creatingVideo.listableContentType = ListableContentType.Video;
 
       //if(createVideoDto.VideoType == VideoType.Link)
@@ -98,8 +94,7 @@ namespace NewsManagement.Entities.Videos
     {
       var updatingVideo = await CheckUpdateInputBaseAsync(id, updateVideoDto);
 
-      updatingVideo.listableContentType = ListableContentType.Video;
-     
+
       //if(updateVideoDto.VideoType == VideoType.Physical) burada type değişmiş olabilir. ❗❗❗
       // ❓  VideoType (Physical, Link) kontrolünü yap ve => 📩
 
