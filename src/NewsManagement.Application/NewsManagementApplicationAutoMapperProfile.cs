@@ -61,6 +61,11 @@ public class NewsManagementApplicationAutoMapperProfile : Profile
     CreateMap<ListableContent, ListableContentDto>().ReverseMap();
     CreateMap<UpdateListableContentDto, ListableContent>().ReverseMap();
     CreateMap<CreateListableContentDto, ListableContent>().ReverseMap();
+
+    CreateMap<ListableContentWithRelationDto, ListableContent>().ReverseMap();
+
+
+    CreateMap<ListableContentWithCrossDto, ListableContent>().ReverseMap();
     #endregion
 
 
