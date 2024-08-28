@@ -1,4 +1,5 @@
-﻿using NewsManagement.Entities.Categories;
+﻿using EasyAbp.FileManagement.Files;
+using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Cities;
 using NewsManagement.Entities.Galleries;
 using NewsManagement.Entities.ListableContentRelations;
@@ -14,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
@@ -25,6 +27,7 @@ namespace NewsManagement.Entities.Newses
   {
     private readonly IObjectMapper _objectMapper;
     private readonly ITagRepository _tagRepository;
+    private readonly IFileAppService _fileAppService;
     private readonly ICityRepository _cityRepository;
     private readonly INewsRepository _newsRepository;
     private readonly IVideoRepository _videoRepository;
@@ -36,12 +39,13 @@ namespace NewsManagement.Entities.Newses
     private readonly IRepository<ListableContentCategory> _listableContentCategoryRepository;
     private readonly IRepository<ListableContentRelation> _listableContentRelationRepository;
 
-
+    
     public NewsManager(
       IObjectMapper objectMapper,
       ITagRepository tagRepository,
-      ICityRepository cityRepository,
+      IFileAppService fileAppService,
       INewsRepository newsRepository,
+      ICityRepository cityRepository,
       IVideoRepository videoRepository,
       IGalleryRepository galleryRepository,
       ICategoryRepository categoryRepository,
@@ -59,6 +63,7 @@ namespace NewsManagement.Entities.Newses
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
       _newsRepository = newsRepository;
+      _fileAppService = fileAppService;
       _videoRepository = videoRepository;
       _galleryRepository = galleryRepository;
       _genericRepository = genericRepository;
@@ -75,8 +80,13 @@ namespace NewsManagement.Entities.Newses
 
       creatingNews.listableContentType = ListableContentType.News;
 
-      // updateNewsDto.DetailImageId  kontrolü
-      // ❓ DetailImageId ye ait bir item varmı kontrolünü yap ve => 📩
+      foreach (var imageId in creatingNews.DetailImageId)
+      {
+        var images = _fileAppService.GetAsync(imageId);//düzenle
+
+        if (images == null)
+          throw new UserFriendlyException("News Detail Image Bulunamadı...");// 📩
+      }
 
       var news = await _genericRepository.InsertAsync(creatingNews, autoSave: true);
 
@@ -92,8 +102,13 @@ namespace NewsManagement.Entities.Newses
       var updatingNews = await CheckUpdateInputBaseAsync(id, updateNewsDto);
 
 
-      // updateNewsDto.DetailImageId  kontrolü
-      // ❓ DetailImageId ye ait bir item varmı kontrolünü yap ve => 📩
+      foreach (var imageId in updatingNews.DetailImageId)
+      {
+        var images = _fileAppService.GetAsync(imageId);//düzenle
+
+        if (images == null)
+          throw new UserFriendlyException("News Detail Image Bulunamadı...");// 📩
+      }
 
       var news = await _genericRepository.UpdateAsync(updatingNews, autoSave: true);
 
