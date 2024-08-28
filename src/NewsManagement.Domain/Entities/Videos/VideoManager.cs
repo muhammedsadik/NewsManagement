@@ -21,6 +21,8 @@ using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.Entities.Galleries;
 using NewsManagement.Entities.Newses;
 using NewsManagement.EntityDtos.GalleryDtos;
+using NewsManagement.EntityConsts.VideoConsts;
+using EasyAbp.FileManagement.Files;
 
 namespace NewsManagement.Entities.Videos
 {
@@ -28,6 +30,7 @@ namespace NewsManagement.Entities.Videos
   {
     private readonly IObjectMapper _objectMapper;
     private readonly ITagRepository _tagRepository;
+    private readonly IFileAppService _fileAppService;
     private readonly ICityRepository _cityRepository;
     private readonly INewsRepository _newsRepository;
     private readonly IVideoRepository _videoRepository;
@@ -43,7 +46,8 @@ namespace NewsManagement.Entities.Videos
       IObjectMapper objectMapper,
       ITagRepository tagRepository,
       ICityRepository cityRepository,
-       INewsRepository newsRepository,
+      INewsRepository newsRepository,
+      IFileAppService fileAppService,
       IVideoRepository videoRepository,
       IGalleryRepository galleryRepository,
       ICategoryRepository categoryRepository,
@@ -61,6 +65,7 @@ namespace NewsManagement.Entities.Videos
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
       _newsRepository = newsRepository;
+      _fileAppService = fileAppService;
       _videoRepository = videoRepository;
       _galleryRepository = galleryRepository;
       _genericRepository = genericRepository;
@@ -78,8 +83,29 @@ namespace NewsManagement.Entities.Videos
 
       creatingVideo.listableContentType = ListableContentType.Video;
 
-      //if(createVideoDto.VideoType == VideoType.Link)
-      // ❓ VideoType (Physical, Link) kontrolünü yap ve 📩, ayrıca type göre iş kuralları varsa uygula
+      if (creatingVideo.VideoType == VideoType.Physical)
+      {
+        if(creatingVideo.VideoId == null)
+          throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeExistForPhysicalType);
+        
+        if (creatingVideo.Url != null)
+          throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeNullForPhysicalType);
+
+        var images = _fileAppService.GetAsync((Guid)creatingVideo.VideoId);//düzenle
+
+        if (images == null)
+          throw new UserFriendlyException("VideoId Bulunamadı...");// 📩
+      }
+
+      if (creatingVideo.VideoType == VideoType.Link)
+      {
+        if (creatingVideo.Url == null)
+          throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeExistForLinkType);
+
+        if (creatingVideo.VideoId != null)
+        throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeNullForLinkType);
+      }
+
 
       var video = await _genericRepository.InsertAsync(creatingVideo, autoSave: true);
 
@@ -94,9 +120,28 @@ namespace NewsManagement.Entities.Videos
     {
       var updatingVideo = await CheckUpdateInputBaseAsync(id, updateVideoDto);
 
+      if(updatingVideo.VideoType == VideoType.Physical)
+      {
+        if (updatingVideo.VideoId == null)
+          throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeExistForPhysicalType);
 
-      //if(updateVideoDto.VideoType == VideoType.Physical) burada type değişmiş olabilir. ❗❗❗
-      // ❓  VideoType (Physical, Link) kontrolünü yap ve => 📩
+        if (updatingVideo.Url != null)
+          throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeNullForPhysicalType);
+
+        var images = _fileAppService.GetAsync((Guid)updatingVideo.VideoId);//düzenle
+
+        if (images == null)
+          throw new UserFriendlyException("VideoId Bulunamadı...");// 📩
+      }
+
+      if (updatingVideo.VideoType == VideoType.Link)
+      {
+        if (updatingVideo.Url == null)
+          throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeExistForLinkType);
+
+        if (updatingVideo.VideoId != null)
+          throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeNullForLinkType);
+      }
 
       var video = await _genericRepository.UpdateAsync(updatingVideo, autoSave: true);
 

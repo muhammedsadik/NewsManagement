@@ -19,13 +19,16 @@
     "NewsManagement:510": "Rejected status cannot have a publishing time.",
     "NewsManagement:511": "Deleted status cannot have a publishing time.",
     "NewsManagement:512": "Selected Status must have a publishing time.",
-    "NewsManagement:513": "Published Status Datetime Error: Datetime must be now.",//silindi
+    "NewsManagement:513": "Published Status Datetime Error: Datetime must be now.", //silindi
     "NewsManagement:514": "Published Status Datetime Error: Must be now.",
     "NewsManagement:515": "Scheduled Status Datetime Error: Must be in the future.",
     "NewsManagement:516": "A subcategory cannot be assigned without its parent. Assigned subcategories= {categoryId}",
     "NewsManagement:517": "Cannot add itself as related content.",
     "NewsManagement:518": "Status cannot be 'Delete' during creation.",
-
+    "NewsManagement:519": "Url must be null for physical type.",
+    "NewsManagement:520": "VideoId must be null for link type.",
+    "NewsManagement:521": "VideoId must be exist for physical type.",
+    "NewsManagement:522": "Url must be exist for link type.",
 
 
     //ValidationErrors

@@ -21,6 +21,10 @@ public static class NewsManagementDomainErrorCodes
   public const string WithoutParentCategory = "NewsManagement:516";
   public const string CannotAddItself = "NewsManagement:517";
   public const string OnCreationStatusCannotBeDelete = "NewsManagement:518";
+  public const string UrlMustBeNullForPhysicalType = "NewsManagement:519";
+  public const string VideoIdMustBeNullForLinkType = "NewsManagement:520";
+  public const string VideoIdMustBeExistForPhysicalType = "NewsManagement:521";
+  public const string UrlMustBeExistForLinkType = "NewsManagement:522";
 
 
 

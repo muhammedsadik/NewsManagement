@@ -1,4 +1,5 @@
-﻿using NewsManagement.Entities.Categories;
+﻿using EasyAbp.FileManagement.Files;
+using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Cities;
 using NewsManagement.Entities.Exceptions;
 using NewsManagement.Entities.ListableContentRelations;
@@ -26,6 +27,7 @@ namespace NewsManagement.Entities.Galleries
   {
     private readonly IObjectMapper _objectMapper;
     private readonly ITagRepository _tagRepository;
+    private readonly IFileAppService _fileAppService;
     private readonly ICityRepository _cityRepository;
     private readonly INewsRepository _newsRepository;
     private readonly IVideoRepository _videoRepository;
@@ -40,6 +42,7 @@ namespace NewsManagement.Entities.Galleries
     public GalleryManager(
       IObjectMapper objectMapper,
       ITagRepository tagRepository,
+      IFileAppService fileAppService,
       ICityRepository cityRepository,
       INewsRepository newsRepository,
       IVideoRepository videoRepository,
@@ -57,6 +60,7 @@ namespace NewsManagement.Entities.Galleries
     {
       _objectMapper = objectMapper;
       _tagRepository = tagRepository;
+      _fileAppService = fileAppService;
       _cityRepository = cityRepository;
       _newsRepository = newsRepository;
       _videoRepository = videoRepository;
@@ -74,11 +78,17 @@ namespace NewsManagement.Entities.Galleries
     {
       var creatingGallery = await CheckCreateInputBaseAsync(createGalleryDto);
 
-
       creatingGallery.listableContentType = ListableContentType.Gallery;
 
-      //updateGalleryDto.GalleryImage  kontrolü
-      // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
+
+      foreach (var galleryImage in creatingGallery.GalleryImage)
+      {
+        var images = _fileAppService.GetAsync(galleryImage.ImageId);//düzenle
+
+        if (images == null)
+          throw new UserFriendlyException("Gallery image Bulunamadı...");// 📩
+      }
+
 
       var gallery = await _genericRepository.InsertAsync(creatingGallery, autoSave: true);
 
@@ -93,9 +103,13 @@ namespace NewsManagement.Entities.Galleries
     {
       var updatingGallery = await CheckUpdateInputBaseAsync(id, updateGalleryDto);
 
+      foreach (var galleryImage in updatingGallery.GalleryImage)
+      {
+        var images = _fileAppService.GetAsync(galleryImage.ImageId);//düzenle
 
-      //updateGalleryDto.GalleryImage  kontrolü
-      // ❓ ImageId ye ait bir item varmı kontrolünü yap ve => 📩
+        if (images == null)
+          throw new UserFriendlyException("Gallery image Bulunamadı...");// 📩
+      }
 
       var gallery = await _genericRepository.UpdateAsync(updatingGallery, autoSave: true);
 
