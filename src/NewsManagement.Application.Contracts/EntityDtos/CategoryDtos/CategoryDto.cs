@@ -1,4 +1,5 @@
 ﻿using NewsManagement.EntityConsts.CategoryConsts;
+using NewsManagement.EntityConsts.ListableContentConsts;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,5 +13,7 @@ namespace NewsManagement.EntityDtos.CategoryDtos
     public string ColorCode { get; set; }
     public bool IsActive { get; set; }
     public int? ParentCategoryId { get; set; }
+    public ListableContentType listableContentType { get; set; }
+
   }
 }

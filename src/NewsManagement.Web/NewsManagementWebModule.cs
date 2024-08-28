@@ -48,6 +48,8 @@ using Volo.Abp.BackgroundJobs.Hangfire;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Volo.Abp.Hangfire;
+using NewsManagement.Entities.BackgroundJobs;
+using Volo.Abp.BackgroundJobs;
 
 namespace NewsManagement.Web;
 
@@ -65,7 +67,7 @@ namespace NewsManagement.Web;
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule),
     typeof(AbpBackgroundJobsHangfireModule),
-    //typeof(AbpHangfireModule),
+    typeof(AbpHangfireModule),
     typeof(AbpBlobStoringMinioModule)
     )]
 public class NewsManagementWebModule : AbpModule
@@ -152,10 +154,12 @@ public class NewsManagementWebModule : AbpModule
     ConfigureAutoApiControllers();
     ConfigureSwaggerServices(context.Services);
     ConfigureHangfire(context, configuration);
+    context.Services.AddHangfireServer();
   }
 
   private void ConfigureHangfire(ServiceConfigurationContext context, IConfiguration configuration)
   {
+
     context.Services.AddHangfire(config =>
     {
       config.UsePostgreSqlStorage(configuration.GetConnectionString("Default"));
@@ -245,6 +249,7 @@ public class NewsManagementWebModule : AbpModule
   {
     var app = context.GetApplicationBuilder();
     var env = context.GetEnvironment();
+    var backgroundJobManager = context.ServiceProvider.GetRequiredService<IBackgroundJobManager>();
 
     if (env.IsDevelopment())
     {
@@ -278,6 +283,15 @@ public class NewsManagementWebModule : AbpModule
     });
     app.UseAuditing();
     app.UseAbpSerilogEnrichers();
+
+
+    RecurringJob.AddOrUpdate<ChangingStatusTypeJob>(
+        "ChangingStatusTypeJob",
+        job => job.ExecuteAsync(0),
+        Cron.MinuteInterval(1)
+    );
+
+
     app.UseConfiguredEndpoints();
   }
 }

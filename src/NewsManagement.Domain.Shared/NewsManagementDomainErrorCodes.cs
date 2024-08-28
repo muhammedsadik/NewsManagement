@@ -15,7 +15,7 @@ public static class NewsManagementDomainErrorCodes
   public const string RejectedStatusCannotHaveaPublishingTime = "NewsManagement:510";
   public const string DeletedStatusCannotHaveaPublishingTime = "NewsManagement:511";
   public const string SelectedStatusMustHaveaPublishingTime = "NewsManagement:512";
-  public const string BurayaYeniHataKodu = "NewsManagement:513";//silindi BurayaYeniHataKodu
+  public const string MustHaveTheSameContentType = "NewsManagement:513";
   public const string PublishedStatusDatetimeMustBeNow = "NewsManagement:514";
   public const string ScheduledStatusDatetimeMustBeInTheFuture = "NewsManagement:515";
   public const string WithoutParentCategory = "NewsManagement:516";

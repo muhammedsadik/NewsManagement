@@ -1,6 +1,7 @@
 ﻿using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Cities;
 using NewsManagement.Entities.Tags;
+using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.EntityConsts.RoleConsts;
 using NewsManagement.Permissions;
 using System;
@@ -284,7 +285,8 @@ namespace NewsManagement
           CategoryName = "Kültür",
           ColorCode = "#f9e79f",
           IsActive = true,
-          ParentCategoryId = null
+          ParentCategoryId = null,
+          listableContentType = ListableContentType.Gallery
         },
         autoSave: true
       );
@@ -295,7 +297,8 @@ namespace NewsManagement
           CategoryName = "Ekonomi",
           ColorCode = "#148f77",
           IsActive = true,
-          ParentCategoryId = null
+          ParentCategoryId = null,
+          listableContentType = ListableContentType.Video
         },
         autoSave: true
       );
@@ -306,7 +309,8 @@ namespace NewsManagement
           CategoryName = "Siyaset",
           ColorCode = "#ec7063",
           IsActive = true,
-          ParentCategoryId = null
+          ParentCategoryId = null,
+          listableContentType = ListableContentType.News
         },
         autoSave: true
       );
@@ -317,7 +321,8 @@ namespace NewsManagement
           CategoryName = "Asya Kültürü",
           ColorCode = "#ec70ff",
           IsActive = true,
-          ParentCategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id
+          ParentCategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id,
+          listableContentType = ListableContentType.Gallery
         },
         autoSave: true
       );
@@ -328,7 +333,8 @@ namespace NewsManagement
           CategoryName = "Yaşam",
           ColorCode = "#8c7063",
           IsActive = true,
-          ParentCategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id
+          ParentCategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id,
+          listableContentType = ListableContentType.Gallery
         },
         autoSave: true
       );
@@ -339,7 +345,20 @@ namespace NewsManagement
           CategoryName = "Makroekonomi",
           ColorCode = "#7c0e63",
           IsActive = true,
-          ParentCategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Ekonomi")).Id
+          ParentCategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Ekonomi")).Id,
+          listableContentType = ListableContentType.Video
+        },
+        autoSave: true
+      );
+      
+      await _categoryRepository.InsertAsync(
+        new Category()
+        {
+          CategoryName = "Mikroekonomi",
+          ColorCode = "#7a0e65",
+          IsActive = true,
+          ParentCategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Ekonomi")).Id,
+          listableContentType = ListableContentType.Video
         },
         autoSave: true
       );
