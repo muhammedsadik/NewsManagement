@@ -52,6 +52,7 @@ namespace NewsManagement.Entities.Categories
       var isExistCategory = await _categoryRepository.AnyAsync(
         c => c.CategoryName == category.CategoryName
         && c.ParentCategoryId == category.ParentCategoryId
+        && c.listableContentType == category.listableContentType
         && c.Id != category.Id
       );
       if (isExistCategory)
@@ -63,12 +64,16 @@ namespace NewsManagement.Entities.Categories
       var isExistCategory = await _categoryRepository.AnyAsync(
         c => c.CategoryName == category.CategoryName
         && c.ParentCategoryId == category.ParentCategoryId
+        && c.listableContentType == category.listableContentType
         && c.Id != id
       );
       if (isExistCategory)
         throw new AlreadyExistException(typeof(Category), category.CategoryName);
 
       var parentCategory = await _categoryRepository.GetAsync((int)category.ParentCategoryId);
+
+      if (parentCategory.listableContentType != category.listableContentType)
+        throw new BusinessException(NewsManagementDomainErrorCodes.MustHaveTheSameContentType);
 
       if (parentCategory.ParentCategoryId.HasValue)
         throw new BusinessException(NewsManagementDomainErrorCodes.OnlyOneSubCategory);
@@ -81,10 +86,13 @@ namespace NewsManagement.Entities.Categories
 
     public async Task<CategoryDto> UpdateAsync(int id, UpdateCategoryDto updateCategoryDto)
     {
-      if (!(await _categoryRepository.GetAsync(id)).ParentCategoryId.HasValue && updateCategoryDto.ParentCategoryId.HasValue)
+      var existingCategory = await _categoryRepository.GetAsync(id);
+
+      if (!(existingCategory).ParentCategoryId.HasValue && updateCategoryDto.ParentCategoryId.HasValue)
         await ChangingParentIdOfMainCategory(id);
 
-      var existingCategory = await _categoryRepository.GetAsync(id);
+      //if (existingCategory.listableContentType != updateCategoryDto.listableContentType)       Şu an burayı düzenliyorum
+      //  throw new BusinessException();                                                       gerek olursa kontrolü uygularım
 
       var updatingCategory = _objectMapper.Map(updateCategoryDto, existingCategory);
 
@@ -113,7 +121,10 @@ namespace NewsManagement.Entities.Categories
 
     private async Task UpdateSubCategoryByMainIsActiveAsync(Category category)
     {
-      var subCategories = await _categoryRepository.GetListAsync(c => c.ParentCategoryId == category.Id);
+      var subCategories = await _categoryRepository.GetListAsync(
+        c => c.ParentCategoryId == category.Id 
+        && c.listableContentType ==category.listableContentType
+      );
 
       foreach (var subCategory in subCategories)
       {
@@ -152,7 +163,10 @@ namespace NewsManagement.Entities.Categories
 
       if (!category.ParentCategoryId.HasValue)
       {
-        deletingList.AddRange(await _categoryRepository.GetListAsync(c => c.ParentCategoryId == id));
+        deletingList.AddRange(await _categoryRepository.GetListAsync(
+          c => c.ParentCategoryId == id 
+          && c.listableContentType == category.listableContentType)
+        );
       }
 
       deletingList.Add(category);
@@ -168,7 +182,10 @@ namespace NewsManagement.Entities.Categories
       {
         using (_softDeleteFilter.Disable())
         {
-          var deletingList = await _categoryRepository.GetListAsync(c => c.ParentCategoryId == id);
+          var deletingList = await _categoryRepository.GetListAsync(
+            c => c.ParentCategoryId == id
+            && c.listableContentType == category.listableContentType
+            );
           deletingList.Add(category);
 
           await _categoryRepository.HardDeleteAsync(deletingList);
@@ -189,13 +206,21 @@ namespace NewsManagement.Entities.Categories
 
       if (!category.ParentCategoryId.HasValue)
       {
-        listCategory.AddRange(await _categoryRepository.GetListAsync(c => c.ParentCategoryId == id && c.IsActive==true));
+        listCategory.AddRange(await _categoryRepository.GetListAsync(
+          c => c.ParentCategoryId == id
+          && c.listableContentType == category.listableContentType
+          && c.IsActive==true)          
+          );
         listCategory.Add(category);
       }
 
       if (category.ParentCategoryId.HasValue)
       {
-        listCategory.AddRange(await _categoryRepository.GetListAsync(c => c.ParentCategoryId == category.ParentCategoryId && c.IsActive == true));
+        listCategory.AddRange(await _categoryRepository.GetListAsync(
+          c => c.ParentCategoryId == category.ParentCategoryId
+          && c.listableContentType == category.listableContentType
+          && c.IsActive == true)
+        );
         listCategory.Add(await _categoryRepository.GetAsync((int)category.ParentCategoryId));
       }
 

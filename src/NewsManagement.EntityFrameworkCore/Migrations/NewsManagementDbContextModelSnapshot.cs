@@ -187,6 +187,9 @@ namespace NewsManagement.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("TenantId");
 
+                    b.Property<int>("listableContentType")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.ToTable("AppCategories", (string)null);

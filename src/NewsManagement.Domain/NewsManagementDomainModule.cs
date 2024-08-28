@@ -1,6 +1,7 @@
 ﻿using EasyAbp.FileManagement;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NewsManagement.Entities.BackgroundJobs;
@@ -38,13 +39,15 @@ namespace NewsManagement;
     typeof(AbpSettingManagementDomainModule),
     typeof(AbpTenantManagementDomainModule),
     typeof(AbpBackgroundJobsHangfireModule),
-    //typeof(AbpHangfireModule),
+    typeof(AbpHangfireModule),
     typeof(AbpEmailingModule)
 )]
 public class NewsManagementDomainModule : AbpModule
 {
   public override void ConfigureServices(ServiceConfigurationContext context)
   {
+    var configuration = context.Services.GetConfiguration();
+
     Configure<AbpLocalizationOptions>(options =>
     {
       options.Languages.Add(new LanguageInfo("ar", "ar", "العربية", "ae"));
@@ -75,6 +78,10 @@ public class NewsManagementDomainModule : AbpModule
 #if DEBUG
     context.Services.Replace(ServiceDescriptor.Singleton<IEmailSender, NullEmailSender>());
 #endif
+    context.Services.AddHangfire(config =>
+    {
+      config.UsePostgreSqlStorage(configuration.GetConnectionString("Default"));
+    });
 
     context.Services.AddHangfireServer();
   }
@@ -88,6 +95,7 @@ public class NewsManagementDomainModule : AbpModule
         job => job.ExecuteAsync(0),
         Cron.MinuteInterval(1)
     );
+
   }
 
 

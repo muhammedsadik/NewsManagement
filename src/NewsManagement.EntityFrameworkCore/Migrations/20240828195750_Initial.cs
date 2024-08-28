@@ -383,6 +383,7 @@ namespace NewsManagement.Migrations
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     ColorCode = table.Column<string>(type: "text", nullable: false),
                     ParentCategoryId = table.Column<int>(type: "integer", nullable: true),
+                    listableContentType = table.Column<int>(type: "integer", nullable: false),
                     ExtraProperties = table.Column<string>(type: "text", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: true),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),

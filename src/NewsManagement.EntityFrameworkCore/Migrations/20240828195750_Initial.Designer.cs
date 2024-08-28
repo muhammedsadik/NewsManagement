@@ -14,7 +14,7 @@ using Volo.Abp.EntityFrameworkCore;
 namespace NewsManagement.Migrations
 {
     [DbContext(typeof(NewsManagementDbContext))]
-    [Migration("20240822030046_Initial")]
+    [Migration("20240828195750_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -189,6 +189,9 @@ namespace NewsManagement.Migrations
                     b.Property<Guid?>("TenantId")
                         .HasColumnType("uuid")
                         .HasColumnName("TenantId");
+
+                    b.Property<int>("listableContentType")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
