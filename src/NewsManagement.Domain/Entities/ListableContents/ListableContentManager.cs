@@ -12,6 +12,10 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.ObjectMapping;
+using NewsManagement.Entities.Cities;
+using NewsManagement.Entities.Exceptions;
+using NewsManagement.EntityDtos.CityDtos;
+using Volo.Abp;
 
 namespace NewsManagement.Entities.ListableContents
 {
@@ -94,9 +98,29 @@ namespace NewsManagement.Entities.ListableContents
       return items;
     }
 
-    public Task<PagedResultDto<ListableContentDto>> GetListAsync(GetListPagedAndSortedDto getListPagedAndSortedDto)
+    public async Task<PagedResultDto<ListableContentDto>> GetListAsync(GetListPagedAndSortedDto input)
     {
-      throw new NotImplementedException();
+
+      var totalCount = input.Filter == null
+       ? await _listableContentRepository.CountAsync()
+       : await _listableContentRepository.CountAsync(c => c.Title.Contains(input.Filter));
+
+      if (totalCount == 0)
+        throw new NotFoundException(typeof(ListableContent), input.Filter ?? string.Empty);
+
+      if (input.SkipCount >= totalCount)
+        throw new BusinessException(NewsManagementDomainErrorCodes.FilterLimitsError);
+
+      if (input.Sorting.IsNullOrWhiteSpace())
+        input.Sorting = nameof(ListableContent.Title);
+
+      var listableContents = await _listableContentRepository.GetListAsync(input.SkipCount, input.MaxResultCount, input.Sorting, input.Filter);
+
+      var listableContentDtos = _objectMapper.Map<List<ListableContent>, List<ListableContentDto>>(listableContents);
+
+      return new PagedResultDto<ListableContentDto>(totalCount, listableContentDtos);
+
+
     }
 
 
