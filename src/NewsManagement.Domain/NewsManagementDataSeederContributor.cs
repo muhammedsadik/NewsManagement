@@ -1,6 +1,9 @@
 ﻿using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Cities;
+using NewsManagement.Entities.Galleries;
+using NewsManagement.Entities.Newses;
 using NewsManagement.Entities.Tags;
+using NewsManagement.Entities.Videos;
 using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.EntityConsts.RoleConsts;
 using NewsManagement.Permissions;
@@ -26,6 +29,9 @@ namespace NewsManagement
     private readonly IRepository<Tag, int> _tagRepository;
     private readonly IRepository<City, int> _cityRepository;
     private readonly IRepository<Category, int> _categoryRepository;
+    private readonly IRepository<News, int> _newsRepository;
+    private readonly IRepository<Video, int> _videoRepository;
+    private readonly IRepository<Gallery, int> _galleryRepository;
     private readonly IRepository<IdentityUser, Guid> _userRepository;
     private readonly IRepository<IdentityRole, Guid> _roleRepository;
     private readonly IdentityUserManager _identityUserManager;
@@ -40,6 +46,9 @@ namespace NewsManagement
       IRepository<Tag, int> tagRepository,
       IRepository<City, int> cityRepository,
       IRepository<Category, int> categoryRepository,
+      IRepository<News, int> newsRepository,
+      IRepository<Video, int> videoRepository,
+      IRepository<Gallery, int> galleryRepository,
       IRepository<IdentityUser, Guid> userRepository,
       IRepository<IdentityRole, Guid> roleRepository,
       IdentityRoleManager identityRoleManager,
@@ -54,6 +63,9 @@ namespace NewsManagement
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
       _categoryRepository = categoryRepository;
+      _newsRepository = newsRepository;
+      _videoRepository = videoRepository;
+      _galleryRepository = galleryRepository;
       _userRepository = userRepository;
       _roleRepository = roleRepository;
       _identityRoleManager = identityRoleManager;
@@ -72,6 +84,7 @@ namespace NewsManagement
       await SeedCityAsync();
       await SeedCategoryAsync();
     }
+    //file ekle repo kullanarak
 
     #region Tenant
 
@@ -218,7 +231,7 @@ namespace NewsManagement
     {
       Guid? tenantId = _currentTenant.GetId();
 
-      if (tenantId.HasValue || await _tagRepository.CountAsync() > 0 )
+      if (tenantId.HasValue || await _tagRepository.CountAsync() > 0)
         return;
 
       await _tagRepository.InsertAsync(
@@ -251,14 +264,15 @@ namespace NewsManagement
     #region City
     private async Task SeedCityAsync()
     {
-      Guid? tenantId = _currentTenant.GetId();
+      //Guid? tenantId = _currentTenant.GetId(); tenantId.HasValue ||
 
-      if ( tenantId.HasValue || await _cityRepository.CountAsync() > 0)
+      if (await _cityRepository.CountAsync() > 0)
         return;
 
       await _cityRepository.InsertAsync(
         new City()
         {
+          TenantId = _currentTenant.GetId(),
           CityName = "İstanbul",
           CityCode = 34
         },
@@ -365,7 +379,7 @@ namespace NewsManagement
         },
         autoSave: true
       );
-      
+
       await _categoryRepository.InsertAsync(
         new Category()
         {
@@ -381,7 +395,58 @@ namespace NewsManagement
     }
     #endregion
 
+    #region
+    private async Task SeedFileAsync()
+    {
+      if (await _newsRepository.CountAsync() > 0)
+        return;
 
+
+
+
+
+    }
+
+    #endregion
+
+    #region News
+    private async Task SeedNewsAsync()
+    {
+      if (await _newsRepository.CountAsync() > 0)
+        return;
+
+
+
+
+
+    }
+
+    #endregion
+
+    #region Video
+    private async Task SeedVideoAsync()
+    {
+      if (await _videoRepository.CountAsync() > 0)
+        return;
+
+
+
+
+    }
+
+    #endregion
+
+    #region Gallery
+    private async Task SeedGalleryAsync()
+    {
+      if (await _galleryRepository.CountAsync() > 0)
+        return;
+
+
+
+    }
+
+    #endregion
 
 
 

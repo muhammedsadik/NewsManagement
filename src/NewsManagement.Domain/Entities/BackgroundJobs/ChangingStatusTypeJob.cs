@@ -21,7 +21,6 @@ namespace NewsManagement.Entities.BackgroundJobs
       _repository = repository;
     }
 
-    //[UnitOfWork]
     public override async Task ExecuteAsync(int args)
     {
       var listableContents = await _repository.GetListAsync(x => x.Status == StatusType.Scheduled && x.PublishTime <= DateTime.Now);

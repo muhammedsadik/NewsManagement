@@ -8,36 +8,38 @@ using Volo.Abp.Content;
 
 namespace EasyAbp.FileManagement.Files
 {
-    public interface IFileAppService :
-        IReadOnlyAppService< 
-            FileInfoDto, 
-            Guid, 
-            GetFileListInput>
-    {
-        Task<CreateFileOutput> CreateAsync(CreateFileInput input);
+  public interface IFileAppService :
+      IReadOnlyAppService<
+          FileInfoDto,
+          Guid,
+          GetFileListInput>
+  {
+    Task<CreateFileOutput> CreateAsync(CreateFileInput input);
 
-        Task<CreateFileOutput> CreateWithStreamAsync(CreateFileWithStreamInput input);
+    Task<PagedResultDto<FileInfoDto>> GetListFilterAsync(GetFileListFilterInput input);
 
-        Task<CreateManyFileOutput> CreateManyAsync(CreateManyFileInput input);
+    Task<CreateFileOutput> CreateWithStreamAsync(CreateFileWithStreamInput input);
 
-        Task<CreateManyFileOutput> CreateManyWithStreamAsync(CreateManyFileWithStreamInput input);
+    Task<CreateManyFileOutput> CreateManyAsync(CreateManyFileInput input);
 
-        Task<FileInfoDto> UpdateAsync(Guid id, UpdateFileInput input);
+    Task<CreateManyFileOutput> CreateManyWithStreamAsync(CreateManyFileWithStreamInput input);
 
-        Task<FileInfoDto> UpdateWithStreamAsync(Guid id, UpdateFileWithStreamInput input);
+    Task<FileInfoDto> UpdateAsync(Guid id, UpdateFileInput input);
 
-        Task<FileInfoDto> MoveAsync(Guid id, MoveFileInput input);
+    Task<FileInfoDto> UpdateWithStreamAsync(Guid id, UpdateFileWithStreamInput input);
 
-        Task DeleteAsync(Guid id);
+    Task<FileInfoDto> MoveAsync(Guid id, MoveFileInput input);
 
-        Task<FileDownloadInfoModel> GetDownloadInfoAsync(Guid id);
-        
-        Task<FileInfoDto> UpdateInfoAsync(Guid id, UpdateFileInfoInput input);
+    Task DeleteAsync(Guid id);
 
-        Task<FileDownloadOutput> DownloadAsync(Guid id, string token);
+    Task<FileDownloadInfoModel> GetDownloadInfoAsync(Guid id);
 
-        Task<IRemoteStreamContent> DownloadWithStreamAsync(Guid id, string token);
+    Task<FileInfoDto> UpdateInfoAsync(Guid id, UpdateFileInfoInput input);
 
-        Task<PublicFileContainerConfiguration> GetConfigurationAsync(string fileContainerName, Guid? ownerUserId);
-    }
+    Task<FileDownloadOutput> DownloadAsync(Guid id, string token);
+
+    Task<IRemoteStreamContent> DownloadWithStreamAsync(Guid id, string token);
+
+    Task<PublicFileContainerConfiguration> GetConfigurationAsync(string fileContainerName, Guid? ownerUserId);
+  }
 }
