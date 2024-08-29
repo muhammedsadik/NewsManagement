@@ -10,9 +10,11 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Features;
 
 namespace NewsManagement.AppService.ListableContents
 {
+  [RequiresFeature("NewsApp.ListableContent")]
   public class ListableContentAppService : NewsManagementAppService, IListableContentAppService
   {
     private readonly ListableContentManager _listableContentManager;
@@ -22,6 +24,7 @@ namespace NewsManagement.AppService.ListableContents
       _listableContentManager = listableContentManager;
     }
 
+    
     public async Task<ListableContentWithCrossDto> GetByIdAsync(int id)
     {
       return await _listableContentManager.GetByIdAsync(id);
