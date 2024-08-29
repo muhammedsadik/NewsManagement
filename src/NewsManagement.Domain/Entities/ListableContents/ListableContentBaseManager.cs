@@ -23,6 +23,7 @@ using NewsManagement.Entities.Newses;
 using NewsManagement.Entities.Videos;
 using NewsManagement.Entities.Galleries;
 using NewsManagement.EntityDtos.GalleryDtos;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 
 namespace NewsManagement.Entities.ListableContents
@@ -93,13 +94,23 @@ namespace NewsManagement.Entities.ListableContents
       //if (isExistImageId)
       //  throw new AlreadyExistException(typeof(TEntityDto), createDto.Title);
 
+      var entity = _objectMapper.Map<TEntityCreateDto, TEntity>(createDto);
+
+      string entityTypeName = typeof(TEntity).Name;
+      entity.listableContentType = (ListableContentType)Enum.Parse(typeof(ListableContentType), entityTypeName);
+
       await CheckTagByIdBaseAsync(createDto.TagIds);
       await CheckCityByIdBaseAsync(createDto.CityIds);
-      await CheckListableContentByIdBaseAsync(createDto.RelatedListableContentIds);
-      await CheckListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos);
+
+      if (createDto.RelatedListableContentIds != null)
+        await CheckListableContentByIdBaseAsync(createDto.RelatedListableContentIds);
+
+      await CheckListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos, entity.listableContentType);
       CheckStatusAndDateTimeBaseAsync(createDto.Status, createDto.PublishTime);
 
-      return _objectMapper.Map<TEntityCreateDto, TEntity>(createDto);
+
+
+      return entity;
     }
 
     public async Task<TEntity> CheckUpdateInputBaseAsync(int id, TEntityUpdateDto updateDto)
@@ -112,6 +123,8 @@ namespace NewsManagement.Entities.ListableContents
       if (isExist)
         throw new AlreadyExistException(typeof(TEntity), updateDto.Title);
 
+      var entity = _objectMapper.Map(updateDto, await _genericRepository.GetAsync(id));
+
       await CheckTagByIdBaseAsync(updateDto.TagIds);
       await CheckCityByIdBaseAsync(updateDto.CityIds);
 
@@ -119,11 +132,12 @@ namespace NewsManagement.Entities.ListableContents
       if (listableContentSelfReference)
         throw new BusinessException(NewsManagementDomainErrorCodes.CannotAddItself);
 
-      await CheckListableContentByIdBaseAsync(updateDto.RelatedListableContentIds);
-      await CheckListableContentCategoryBaseAsync(updateDto.ListableContentCategoryDtos);
+      if (updateDto.RelatedListableContentIds != null)
+        await CheckListableContentByIdBaseAsync(updateDto.RelatedListableContentIds);
+
+      await CheckListableContentCategoryBaseAsync(updateDto.ListableContentCategoryDtos, entity.listableContentType);
       CheckStatusAndDateTimeBaseAsync(updateDto.Status, updateDto.PublishTime);
 
-      var entity = _objectMapper.Map(updateDto, await _genericRepository.GetAsync(id));
 
       if (entity.Status == StatusType.Deleted)// Bunun kontrollerini yap
         entity.IsDeleted = true;
@@ -222,7 +236,7 @@ namespace NewsManagement.Entities.ListableContents
       if (type == StatusType.Published && !dateTime.HasValue)//eğer yayında ise tarih olmalı
         throw new BusinessException(NewsManagementDomainErrorCodes.SelectedStatusMustHaveaPublishingTime);
 
-        //yayında ise tarih şimdi olmalı. sn göz ardı edildi
+      //yayında ise tarih şimdi olmalı. sn göz ardı edildi
       if (type == StatusType.Published && dateTime.Value.ToString("yyyyMMddHHmm") != DateTime.Now.ToString("yyyyMMddHHmm"))
         throw new BusinessException(NewsManagementDomainErrorCodes.PublishedStatusDatetimeMustBeNow);
 
@@ -249,7 +263,7 @@ namespace NewsManagement.Entities.ListableContents
       }
     }
 
-    public async Task CheckListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto)
+    public async Task CheckListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, ListableContentType type)
     {
       var categoryIds = listableContentCategoryDto.Select(x => x.CategoryId).ToList();
 
@@ -269,18 +283,22 @@ namespace NewsManagement.Entities.ListableContents
     .Select(c => c.Id)
     .ToList();
 
-      if (missingCategoryIds.Any())
-        throw new BusinessException(NewsManagementDomainErrorCodes.WithoutParentCategory).WithData("categoryId", string.Join(", ", missingCategoryIds));
+      if (categories.Any(x => x.listableContentType != type))
+        throw new BusinessException(NewsManagementDomainErrorCodes.MustHaveTheSameContentType);
 
       if (listableContentCategoryDto.Count(x => x.IsPrimary) != 1)
         throw new BusinessException(NewsManagementDomainErrorCodes.OnlyOneCategoryIsActiveStatusTrue)
           .WithData("0", listableContentCategoryDto.Count(x => x.IsPrimary));
+
+      if (missingCategoryIds.Any())
+        throw new BusinessException(NewsManagementDomainErrorCodes.WithoutParentCategory).WithData("categoryId", string.Join(", ", missingCategoryIds));
+
     }
 
     #endregion
 
 
-    #region CreateListableContentSubs
+    #region CreateListableContent Cross entity
 
     public async Task CreateCrossEntity(TEntityCreateDto createDto, int listableContentId)
     {
@@ -298,8 +316,10 @@ namespace NewsManagement.Entities.ListableContents
 
       await CreateListableContentTagBaseAsync(updateDto.TagIds, listableContentId);
       await CreateListableContentCityBaseAsync(updateDto.CityIds, listableContentId);
-      await CreateListableContentRelationBaseAsync(updateDto.RelatedListableContentIds, listableContentId);
       await CreateListableContentCategoryBaseAsync(updateDto.ListableContentCategoryDtos, listableContentId);
+
+      if (updateDto.RelatedListableContentIds != null)
+        await CreateListableContentRelationBaseAsync(updateDto.RelatedListableContentIds, listableContentId);
     }
 
     public async Task DeleteAllCrossEntitiesByListableContentId(int listableContentId)

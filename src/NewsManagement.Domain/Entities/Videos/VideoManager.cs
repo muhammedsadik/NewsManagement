@@ -81,8 +81,6 @@ namespace NewsManagement.Entities.Videos
     {
       var creatingVideo = await CheckCreateInputBaseAsync(createVideoDto);
 
-      creatingVideo.listableContentType = ListableContentType.Video;
-
       if (creatingVideo.VideoType == VideoType.Physical)
       {
         if(creatingVideo.VideoId == null)
@@ -128,10 +126,10 @@ namespace NewsManagement.Entities.Videos
         if (updatingVideo.Url != null)
           throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeNullForPhysicalType);
 
-        var images = _fileAppService.GetAsync((Guid)updatingVideo.VideoId);//düzenle
+        //var images = _fileAppService.GetAsync((Guid)updatingVideo.VideoId);//düzenle
 
-        if (images == null)
-          throw new UserFriendlyException("VideoId Bulunamadı...");// 📩
+        //if (images == null)
+        //  throw new UserFriendlyException("VideoId Bulunamadı...");// 📩
       }
 
       if (updatingVideo.VideoType == VideoType.Link)

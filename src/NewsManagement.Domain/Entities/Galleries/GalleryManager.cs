@@ -76,18 +76,16 @@ namespace NewsManagement.Entities.Galleries
 
     public async Task<GalleryDto> CreateAsync(CreateGalleryDto createGalleryDto)
     {
+
       var creatingGallery = await CheckCreateInputBaseAsync(createGalleryDto);
 
-      creatingGallery.listableContentType = ListableContentType.Gallery;
+      //foreach (var galleryImage in creatingGallery.GalleryImage)
+      //{
+      //  var images = _fileAppService.GetAsync(galleryImage.ImageId);//düzenle
 
-
-      foreach (var galleryImage in creatingGallery.GalleryImage)
-      {
-        var images = _fileAppService.GetAsync(galleryImage.ImageId);//düzenle
-
-        if (images == null)
-          throw new UserFriendlyException("Gallery image Bulunamadı...");// 📩
-      }
+      //  if (images == null)
+      //    throw new UserFriendlyException("Gallery image Bulunamadı...");// 📩
+      //}
 
 
       var gallery = await _genericRepository.InsertAsync(creatingGallery, autoSave: true);

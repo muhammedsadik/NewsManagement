@@ -24,7 +24,7 @@ namespace NewsManagement.Entities.ListableContents
     public List<ListableContentCategory> ListableContentCategories { get; set; }
 
 
-    public List<ListableContentRelation> ListableContentRelations { get; set; }
+    public List<ListableContentRelation>? ListableContentRelations { get; set; }
 
     public ListableContent()
     {
