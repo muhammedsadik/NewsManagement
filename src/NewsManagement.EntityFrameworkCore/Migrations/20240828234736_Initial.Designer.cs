@@ -14,7 +14,7 @@ using Volo.Abp.EntityFrameworkCore;
 namespace NewsManagement.Migrations
 {
     [DbContext(typeof(NewsManagementDbContext))]
-    [Migration("20240828195750_Initial")]
+    [Migration("20240828234736_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

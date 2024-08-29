@@ -13,7 +13,7 @@ namespace NewsManagement.EntityDtos.ListableContentDtos
     public Guid? ImageId { get; set; }
     public List<int> TagIds { get; set; } 
     public List<int> CityIds { get; set; }
-    public List<int> RelatedListableContentIds { get; set; }
+    public List<int>? RelatedListableContentIds { get; set; }
     public List<ListableContentCategoryDto> ListableContentCategoryDtos { get; set; }
     public DateTime? PublishTime { get; set; }
     public StatusType Status { get; set; }
