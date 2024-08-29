@@ -10,7 +10,7 @@ namespace NewsManagement.Entities.Videos
 {
   public class Video : ListableContent
   {
-    public VideoType VideoType { get; set; }// bunun hakkında bilgi sahibi ol.
+    public VideoType VideoType { get; set; }
     public string? Url { get; set; }
     public Guid? VideoId { get; set; }
     

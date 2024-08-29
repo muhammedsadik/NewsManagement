@@ -78,13 +78,13 @@ namespace NewsManagement.Entities.Newses
     {
       var creatingNews = await CheckCreateInputBaseAsync(createNewsDto);
 
-      //foreach (var imageId in creatingNews.DetailImageId)
-      //{
-      //  var images = _fileAppService.GetAsync(imageId);//düzenle
+      foreach (var imageId in creatingNews.DetailImageId)
+      {
+        var images = _fileAppService.GetAsync(imageId);//düzenle
 
-      //  if (images == null)
-      //    throw new UserFriendlyException("News Detail Image Bulunamadı...");// 📩
-      //}
+        if (images == null)
+          throw new UserFriendlyException("News Detail Image Bulunamadı...");// 📩
+      }
 
       var news = await _genericRepository.InsertAsync(creatingNews, autoSave: true);
 
