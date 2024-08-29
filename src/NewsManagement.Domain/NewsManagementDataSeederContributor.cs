@@ -14,6 +14,7 @@ using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Guids;
 using Volo.Abp.Identity;
+using Volo.Abp.MultiTenancy;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.TenantManagement;
 
@@ -32,6 +33,7 @@ namespace NewsManagement
     private readonly IPermissionManager _permissionManager;
     private readonly ITenantManager _tenantManager;
     private readonly ITenantRepository _tenantRepository;
+    private readonly ICurrentTenant _currentTenant;
 
     public NewsManagementDataSeederContributor(
       IGuidGenerator guidGenerator,
@@ -44,7 +46,8 @@ namespace NewsManagement
       IdentityUserManager identityUserManager,
       IPermissionManager permissionManager,
       ITenantManager tenantManager,
-      ITenantRepository tenantRepository
+      ITenantRepository tenantRepository,
+      ICurrentTenant currentTenant
       )
     {
       _guidGenerator = guidGenerator;
@@ -58,6 +61,7 @@ namespace NewsManagement
       _permissionManager = permissionManager;
       _tenantManager = tenantManager;
       _tenantRepository = tenantRepository;
+      _currentTenant = currentTenant;
     }
 
     public async Task SeedAsync(DataSeedContext context)
@@ -94,7 +98,8 @@ namespace NewsManagement
           new IdentityRole
           (
             _guidGenerator.Create(),
-            RoleConst.Editor
+            RoleConst.Editor,
+            _currentTenant.GetId()
           )
         );
 
@@ -136,7 +141,8 @@ namespace NewsManagement
           new IdentityRole
           (
             _guidGenerator.Create(),
-            RoleConst.Reporter
+            RoleConst.Reporter,
+            _currentTenant.GetId()
           )
         );
 
@@ -165,7 +171,8 @@ namespace NewsManagement
           (
             _guidGenerator.Create(),
             "Ahmet",
-            "ahmet@gmail.com"
+            "ahmet@gmail.com",
+            _currentTenant.GetId()
           );
 
         await _identityUserManager.CreateAsync(userAhmet, "1q2w3E*");
@@ -180,7 +187,8 @@ namespace NewsManagement
           (
             _guidGenerator.Create(),
             "Halil",
-            "halil@gmail.com"
+            "halil@gmail.com",
+            _currentTenant.GetId()
           );
 
         await _identityUserManager.CreateAsync(userHalil, "1q2w3E*");
@@ -193,7 +201,8 @@ namespace NewsManagement
           (
             _guidGenerator.Create(),
             "Murat",
-            "murat@gmail.com"
+            "murat@gmail.com",
+            _currentTenant.GetId()
           );
 
         await _identityUserManager.CreateAsync(userMurat, "1q2w3E*");
@@ -207,7 +216,9 @@ namespace NewsManagement
     #region Tag
     private async Task SeedTagAsync()
     {
-      if (await _tagRepository.CountAsync() > 0)
+      Guid? tenantId = _currentTenant.GetId();
+
+      if (tenantId.HasValue || await _tagRepository.CountAsync() > 0 )
         return;
 
       await _tagRepository.InsertAsync(
@@ -240,7 +251,9 @@ namespace NewsManagement
     #region City
     private async Task SeedCityAsync()
     {
-      if (await _cityRepository.CountAsync() > 0)
+      Guid? tenantId = _currentTenant.GetId();
+
+      if ( tenantId.HasValue || await _cityRepository.CountAsync() > 0)
         return;
 
       await _cityRepository.InsertAsync(
@@ -276,7 +289,9 @@ namespace NewsManagement
     #region Category
     private async Task SeedCategoryAsync()
     {
-      if (await _categoryRepository.CountAsync() > 0)
+      Guid? tenantId = _currentTenant.GetId();
+
+      if (tenantId.HasValue || await _categoryRepository.CountAsync() > 0)
         return;
 
       await _categoryRepository.InsertAsync(

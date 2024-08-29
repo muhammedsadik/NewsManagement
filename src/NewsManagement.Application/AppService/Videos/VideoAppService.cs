@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Features;
 
 namespace NewsManagement.AppService.Videos
 {
@@ -32,6 +33,7 @@ namespace NewsManagement.AppService.Videos
       return await _videoManager.UpdateAsync(id, updateVideoDto);
     }
 
+    [RequiresFeature("NewsApp.Video")]
     public async override Task<PagedResultDto<VideoDto>> GetListAsync(GetListPagedAndSortedDto input)
     {
      return await _videoManager.GetListAsync(input);
