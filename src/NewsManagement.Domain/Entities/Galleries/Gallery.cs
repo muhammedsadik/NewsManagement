@@ -9,7 +9,7 @@ namespace NewsManagement.Entities.Galleries
 {
   public class Gallery : ListableContent
   {
-    public List<GalleryImage> GalleryImage { get; set; }
+    public List<GalleryImage> GalleryImages { get; set; }
 
     public Gallery() { }
   }

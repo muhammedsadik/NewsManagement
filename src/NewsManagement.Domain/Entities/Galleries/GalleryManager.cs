@@ -101,7 +101,7 @@ namespace NewsManagement.Entities.Galleries
     {
       var updatingGallery = await CheckUpdateInputBaseAsync(id, updateGalleryDto);
 
-      foreach (var galleryImage in updatingGallery.GalleryImage)
+      foreach (var galleryImage in updatingGallery.GalleryImages)
       {
         var images = _fileAppService.GetAsync(galleryImage.ImageId);//düzenle
 

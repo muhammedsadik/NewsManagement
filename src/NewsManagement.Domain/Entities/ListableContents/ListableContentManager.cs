@@ -74,7 +74,7 @@ namespace NewsManagement.Entities.ListableContents
 
     public async Task<List<ListableContentDto>> GetByContentTypeAsync(ListableContentType type)
     {
-      var ListableContents = await _listableContentRepository.GetListAsync(x => x.listableContentType == type);
+      var ListableContents = await _listableContentRepository.GetListAsync(x => x.ListableContentType == type);
 
       var listableContentDtos = _objectMapper.Map<List<ListableContent>, List<ListableContentDto>>(ListableContents);
 

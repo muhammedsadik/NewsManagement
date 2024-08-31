@@ -97,7 +97,7 @@ namespace NewsManagement.Entities.ListableContents
       var entity = _objectMapper.Map<TEntityCreateDto, TEntity>(createDto);
 
       string entityTypeName = typeof(TEntity).Name;
-      entity.listableContentType = (ListableContentType)Enum.Parse(typeof(ListableContentType), entityTypeName);
+      entity.ListableContentType = (ListableContentType)Enum.Parse(typeof(ListableContentType), entityTypeName);
 
       await CheckTagByIdBaseAsync(createDto.TagIds);
       await CheckCityByIdBaseAsync(createDto.CityIds);
@@ -105,7 +105,7 @@ namespace NewsManagement.Entities.ListableContents
       if (createDto.RelatedListableContentIds != null)
         await CheckListableContentByIdBaseAsync(createDto.RelatedListableContentIds);
 
-      await CheckListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos, entity.listableContentType);
+      await CheckListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos, entity.ListableContentType);
       CheckStatusAndDateTimeBaseAsync(createDto.Status, createDto.PublishTime);
 
 
@@ -128,16 +128,17 @@ namespace NewsManagement.Entities.ListableContents
       await CheckTagByIdBaseAsync(updateDto.TagIds);
       await CheckCityByIdBaseAsync(updateDto.CityIds);
 
-      var listableContentSelfReference = updateDto.RelatedListableContentIds.Any(x => x == id);
-      if (listableContentSelfReference)
-        throw new BusinessException(NewsManagementDomainErrorCodes.CannotAddItself);
-
       if (updateDto.RelatedListableContentIds != null)
+      {
+        var listableContentSelfReference = updateDto.RelatedListableContentIds.Any(x => x == id);
+        if (listableContentSelfReference)
+          throw new BusinessException(NewsManagementDomainErrorCodes.CannotAddItself);
+
         await CheckListableContentByIdBaseAsync(updateDto.RelatedListableContentIds);
-
-      await CheckListableContentCategoryBaseAsync(updateDto.ListableContentCategoryDtos, entity.listableContentType);
+      }
+      
+      await CheckListableContentCategoryBaseAsync(updateDto.ListableContentCategoryDtos, entity.ListableContentType);
       CheckStatusAndDateTimeBaseAsync(updateDto.Status, updateDto.PublishTime);
-
 
       if (entity.Status == StatusType.Deleted)// Bunun kontrollerini yap
         entity.IsDeleted = true;
@@ -297,7 +298,6 @@ namespace NewsManagement.Entities.ListableContents
 
     #endregion
 
-
     #region CreateListableContent Cross entity
 
     public async Task CreateCrossEntity(TEntityCreateDto createDto, int listableContentId)
@@ -397,8 +397,6 @@ namespace NewsManagement.Entities.ListableContents
 
 
     #endregion
-
-
 
 
   }

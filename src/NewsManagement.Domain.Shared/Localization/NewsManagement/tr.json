@@ -41,7 +41,7 @@
 
     //ValidasyonHataları
     "NewsManagement:v401": "Listelenebilir Enum türünde değil. Enum türü şunları içermelidir = { Haber için = 0 , Video için = 1 , Galeri için = 2 }.",
-    "NewsManagement:v402": "Video Enum türünde değil. Enum türü şunları içermelidir = { Fiziksel Video için = 0 , Link Video için = 1 }.",
+    "NewsManagement:v402": "Video Enum türünde değil. Enum türü şunları içermelidir = { Video için = 0 , Link için = 1 }.",
     "NewsManagement:v403": "Sadece bir kategori Birincil Kategori olabilir. Sizin seçiminiz = {0}",
     "NewsManagement:v404": "Durum Enum türünde değil. Enum türü şunları içermelidir  = { Draft = 0 , Pending Review = 1 , Archived = 2 , Published = 3 , Scheduled = 4 , Deleted = 5 , Rejected = 6 }.",
 
