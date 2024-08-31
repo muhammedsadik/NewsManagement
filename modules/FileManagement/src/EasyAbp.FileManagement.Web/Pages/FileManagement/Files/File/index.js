@@ -8,6 +8,7 @@ $(function () {
     var renameModal = new abp.ModalManager(abp.appPath + 'FileManagement/Files/File/RenameModal');
     var reUploadModal = new abp.ModalManager(abp.appPath + 'FileManagement/Files/File/ReUploadModal');
     var moveModal = new abp.ModalManager(abp.appPath + 'FileManagement/Files/File/MoveModal');
+    $('#ViewModel_FileContainerName').val('default');
 
     var dataTable = $('#FileTable').DataTable(abp.libs.datatables.normalizeConfiguration({
         processing: true,

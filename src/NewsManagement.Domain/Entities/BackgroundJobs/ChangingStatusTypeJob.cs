@@ -37,3 +37,64 @@ namespace NewsManagement.Entities.BackgroundJobs
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+public class ChangingStatusTypeJob : ITransientDependency
+{
+    private readonly IRepository<ListableContent, int> _repository;
+
+    public ChangingStatusTypeJob(IRepository<ListableContent, int> repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task ExecuteAsync()
+    {
+        var listableContents = await _repository.GetListAsync(x => x.Status == StatusType.Scheduled && x.PublishTime <= DateTime.Now);
+
+        foreach (var item in listableContents)
+        {
+            item.Status = StatusType.Published;
+            item.PublishTime = DateTime.Now;
+
+            await _repository.UpdateAsync(item, autoSave: true);
+        }
+    }
+}
+ 
+ RecurringJob.AddOrUpdate<ChangingStatusTypeJob>(
+    "ChangingStatusTypeJob",
+    job => job.ExecuteAsync(),
+    Cron.MinuteInterval(1)
+);
+
+*/

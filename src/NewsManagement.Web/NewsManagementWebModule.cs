@@ -110,7 +110,7 @@ public class NewsManagementWebModule : AbpModule
 
     Configure<AbpBlobStoringOptions>(options =>
     {
-      options.Containers.ConfigureDefault(container =>
+      options.Containers.Configure<LocalFileSystemBlobContainer>(container =>
       {
         container.IsMultiTenant = true;
         container.UseMinio(minio =>
@@ -122,6 +122,21 @@ public class NewsManagementWebModule : AbpModule
         });
       });
     });
+
+    //Configure<AbpBlobStoringOptions>(options =>          ? yukarýdakini deniyorum ?
+    //{
+    //  options.Containers.ConfigureDefault(container =>
+    //  {
+    //    container.IsMultiTenant = true;
+    //    container.UseMinio(minio =>
+    //    {
+    //      minio.EndPoint = "localhost:9000";
+    //      minio.AccessKey = "91SeWqvmiDpCEVjre26j";
+    //      minio.SecretKey = "NZv0m4gcZr8WzYm7vgmqXVoxzQrho2kOGr3QoGKt";
+    //      minio.BucketName = "newsmanagement";
+    //    });
+    //  });
+    //});
 
     Configure<FileManagementOptions>(options =>
     {
@@ -284,13 +299,11 @@ public class NewsManagementWebModule : AbpModule
     app.UseAuditing();
     app.UseAbpSerilogEnrichers();
 
-
     RecurringJob.AddOrUpdate<ChangingStatusTypeJob>(
         "ChangingStatusTypeJob",
         job => job.ExecuteAsync(0),
         Cron.MinuteInterval(1)
     );
-
 
     app.UseConfiguredEndpoints();
   }

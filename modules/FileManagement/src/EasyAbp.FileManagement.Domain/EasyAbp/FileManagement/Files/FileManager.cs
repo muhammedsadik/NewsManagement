@@ -41,17 +41,17 @@ namespace EasyAbp.FileManagement.Files
     }
 
     public virtual async Task<File> CreateAsync(string fileContainerName, Guid? ownerUserId, string fileName,
-        string mimeType, FileType fileType, File parent, byte[] fileContent)
+        string mimeType, FileType fileType, File parent, byte[] fileContent)  //  3
     {
       Check.NotNullOrWhiteSpace(fileContainerName, nameof(File.FileContainerName));
       Check.NotNullOrWhiteSpace(fileName, nameof(File.FileName));
 
       var configuration = _configurationProvider.Get(fileContainerName);
 
-      CheckFileName(fileName, configuration);
-      CheckDirectoryHasNoFileContent(fileType, fileContent);
+      CheckFileName(fileName, configuration);     //  4 
+      CheckDirectoryHasNoFileContent(fileType, fileContent);   //   5
 
-      var hashString = _fileContentHashProvider.GetHashString(fileContent);
+      var hashString = _fileContentHashProvider.GetHashString(fileContent);  //  6
 
       string blobName = null;
 
@@ -76,7 +76,7 @@ namespace EasyAbp.FileManagement.Files
 
       if (configuration.EnableAutoRename)
       {
-        if (await IsFileExistAsync(fileName, parent?.Id, fileContainerName, ownerUserId))
+        if (await IsFileExistAsync(fileName, parent?.Id, fileContainerName, ownerUserId))  //   7
         {
           fileName = await _fileRepository.GetFileNameWithNextSerialNumberAsync(fileName, parent?.Id,
               fileContainerName, ownerUserId);
@@ -221,7 +221,7 @@ namespace EasyAbp.FileManagement.Files
       }
     }
 
-    protected virtual void CheckFileName(string fileName, FileContainerConfiguration configuration)
+    protected virtual void CheckFileName(string fileName, FileContainerConfiguration configuration)  //  4
     {
       if (fileName.Contains(FileManagementConsts.DirectorySeparator))
       {
@@ -229,7 +229,7 @@ namespace EasyAbp.FileManagement.Files
       }
     }
 
-    protected virtual void CheckDirectoryHasNoFileContent(FileType fileType, byte[] fileContent)
+    protected virtual void CheckDirectoryHasNoFileContent(FileType fileType, byte[] fileContent)  //   5
     {
       if (fileType == FileType.Directory && !fileContent.IsNullOrEmpty())
       {
@@ -238,14 +238,14 @@ namespace EasyAbp.FileManagement.Files
     }
 
     public virtual async Task<bool> TrySaveBlobAsync(File file, byte[] fileContent, bool disableBlobReuse = false,
-        bool allowBlobOverriding = false, CancellationToken cancellationToken = default)
+        bool allowBlobOverriding = false, CancellationToken cancellationToken = default)    //    11
     {
       if (file.FileType != FileType.RegularFile)
       {
         throw new UnexpectedFileTypeException(file.Id, file.FileType);
       }
 
-      var blobContainer = GetBlobContainer(file);
+      var blobContainer = GetBlobContainer(file);   //   12
 
       if (!disableBlobReuse && await blobContainer.ExistsAsync(file.BlobName, cancellationToken))
       {
@@ -255,7 +255,7 @@ namespace EasyAbp.FileManagement.Files
       await blobContainer.SaveAsync(file.BlobName, fileContent, allowBlobOverriding, cancellationToken);
 
       return true;
-    }  // Burayı kullanacaz
+    }  // Bura
 
     public virtual async Task<byte[]> GetBlobAsync(File file, CancellationToken cancellationToken = default)
     {
@@ -269,7 +269,7 @@ namespace EasyAbp.FileManagement.Files
       return await blobContainer.GetAllBytesAsync(file.BlobName, cancellationToken: cancellationToken);
     }
 
-    public virtual IBlobContainer GetBlobContainer(File file)
+    public virtual IBlobContainer GetBlobContainer(File file)  //   12
     {
       var configuration = _configurationProvider.Get(file.FileContainerName);
 
@@ -318,7 +318,7 @@ namespace EasyAbp.FileManagement.Files
           : providers.Single(p => p.GetType() == specifiedProviderType);
     }
 
-    protected virtual async Task CheckFileNotExistAsync(string fileName, Guid? parentId, string fileContainerName, Guid? ownerUserId)
+    protected virtual async Task CheckFileNotExistAsync(string fileName, Guid? parentId, string fileContainerName, Guid? ownerUserId)   //   8
     {
       if (await IsFileExistAsync(fileName, parentId, fileContainerName, ownerUserId))
       {
@@ -326,9 +326,9 @@ namespace EasyAbp.FileManagement.Files
       }
     }
 
-    protected virtual async Task<bool> IsFileExistAsync(string fileName, Guid? parentId, string fileContainerName, Guid? ownerUserId)
+    protected virtual async Task<bool> IsFileExistAsync(string fileName, Guid? parentId, string fileContainerName, Guid? ownerUserId)  //   7
     {
       return await _fileRepository.FindAsync(fileName, parentId, fileContainerName, ownerUserId) != null;
     }
   }
-}
+} 
