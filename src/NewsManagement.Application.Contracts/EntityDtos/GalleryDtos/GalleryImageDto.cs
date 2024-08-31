@@ -9,7 +9,6 @@ namespace NewsManagement.EntityDtos.GalleryDtos
   {
     public Guid ImageId { get; set; }
     public int Order { get; set; }
-
     public string NewsContent { get; set; }
   }
 }

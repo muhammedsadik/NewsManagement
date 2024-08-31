@@ -11,6 +11,7 @@ namespace NewsManagement.Validations.GalleryValidation
     public GalleryImageDtoValidator()
     {
       RuleFor(g => g.ImageId).NotEmpty();
+      RuleFor(g => g.Order).NotEmpty();
       RuleFor(g => g.NewsContent).NotEmpty();
 
     }
