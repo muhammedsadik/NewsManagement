@@ -6,8 +6,8 @@ namespace EasyAbp.FileManagement.Web.Pages.FileManagement.Files.File.ViewModels
 {
     public class FileListFilterViewModel
     {
-        [Placeholder("e.g. default")]
-        public string FileContainerName { get; set; }
+    //[Placeholder("e.g. default")]
+    public string FileContainerName { get; set; }
         
         [EasySelector(
             getListedDataSourceUrl: "/api/identity/users",

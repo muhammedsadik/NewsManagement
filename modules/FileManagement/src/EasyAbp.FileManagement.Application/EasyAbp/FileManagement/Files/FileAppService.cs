@@ -45,7 +45,6 @@ namespace EasyAbp.FileManagement.Files
       return await MapToGetOutputDtoAsync(file);
     }
 
-
     public async Task<PagedResultDto<FileInfoDto>> GetListFilterAsync(GetFileListFilterInput input)
     {
       await AuthorizationService.CheckAsync(new FileOperationInfoModel
@@ -117,7 +116,7 @@ namespace EasyAbp.FileManagement.Files
     }
 
     [Authorize]
-    public virtual async Task<CreateFileOutput> CreateAsync(CreateFileInput input)//1
+    public virtual async Task<CreateFileOutput> CreateAsync(CreateFileInput input)//  1
     {
       var configuration = _configurationProvider.Get(input.FileContainerName);
 
@@ -128,16 +127,16 @@ namespace EasyAbp.FileManagement.Files
         CheckFileExtension(new[] { input.FileName }, configuration);
       }
 
-      var file = await CreateFileEntityAsync(input);
+      var file = await CreateFileEntityAsync(input);   //  8
 
       await AuthorizationService.CheckAsync(CreateFileOperationInfoModel(file),
-          new OperationAuthorizationRequirement { Name = FileManagementPermissions.File.Create });
+          new OperationAuthorizationRequirement { Name = FileManagementPermissions.File.Create });   //   9
 
       await _repository.InsertAsync(file);
 
-      await TrySaveBlobAsync(file, input.Content, configuration.DisableBlobReuse, configuration.AllowBlobOverriding);
+      await TrySaveBlobAsync(file, input.Content, configuration.DisableBlobReuse, configuration.AllowBlobOverriding);   //   10
 
-      return await MapToCreateOutputDtoAsync(file);
+      return await MapToCreateOutputDtoAsync(file);  //  12
     }//
 
     [Authorize]
@@ -170,7 +169,7 @@ namespace EasyAbp.FileManagement.Files
       return await MapToCreateOutputDtoAsync(file);
     }
 
-    protected virtual async Task<CreateFileOutput> MapToCreateOutputDtoAsync(File file)
+    protected virtual async Task<CreateFileOutput> MapToCreateOutputDtoAsync(File file)   //   12
     {
       var downloadInfo = file.FileType == FileType.RegularFile
           ? await _fileManager.GetDownloadInfoAsync(file)
@@ -471,14 +470,14 @@ namespace EasyAbp.FileManagement.Files
       return CreateFileEntityAsync(input, input.FileType, input.FileName, input.MimeType, input.Content);
     }
 
-    protected virtual async Task<File> CreateFileEntityAsync(CreateFileInputBase input, FileType fileType, string fileName, string mimeType, byte[] fileContent, bool generateUniqueFileName = false)
+    protected virtual async Task<File> CreateFileEntityAsync(CreateFileInputBase input, FileType fileType, string fileName, string mimeType, byte[] fileContent, bool generateUniqueFileName = false)  //  2
     {
       var parent = await TryGetEntityByNullableIdAsync(input.ParentId);
 
       fileName = generateUniqueFileName ? GenerateUniqueFileName(fileName) : fileName;
 
       var file = await _fileManager.CreateAsync(input.FileContainerName, input.OwnerUserId, fileName.Trim(),
-          mimeType, fileType, parent, fileContent);
+          mimeType, fileType, parent, fileContent);  //  3
 
       input.MapExtraPropertiesTo(file);
 
@@ -524,7 +523,7 @@ namespace EasyAbp.FileManagement.Files
       return await MapToGetOutputDtoAsync(file);
     }
 
-    protected virtual FileOperationInfoModel CreateFileOperationInfoModel(File file)
+    protected virtual FileOperationInfoModel CreateFileOperationInfoModel(File file)  //   8
     {
       return new FileOperationInfoModel
       {
@@ -579,15 +578,15 @@ namespace EasyAbp.FileManagement.Files
       return Guid.NewGuid().ToString("N") + Path.GetExtension(fileName);
     }
 
-    protected virtual async Task<bool> TrySaveBlobAsync(File file, byte[] fileContent,//4 blob staring kayýt yeri : kullanýlacak.
-        bool disableBlobReuse = false, bool allowBlobOverriding = false)
+    protected virtual async Task<bool> TrySaveBlobAsync(File file, byte[] fileContent,//4 blob staring kayýt yeri 
+        bool disableBlobReuse = false, bool allowBlobOverriding = false)     //    10
     {
       if (file.FileType is not FileType.RegularFile)
       {
         return false;
       }
 
-      await _fileManager.TrySaveBlobAsync(file, fileContent, disableBlobReuse, allowBlobOverriding);
+      await _fileManager.TrySaveBlobAsync(file, fileContent, disableBlobReuse, allowBlobOverriding);  //  11
 
       return true;
     }

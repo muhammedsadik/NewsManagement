@@ -78,28 +78,25 @@ public class NewsManagementDomainModule : AbpModule
 #if DEBUG
     context.Services.Replace(ServiceDescriptor.Singleton<IEmailSender, NullEmailSender>());
 #endif
-    context.Services.AddHangfire(config =>
-    {
-      config.UsePostgreSqlStorage(configuration.GetConnectionString("Default"));
-    });
 
-    context.Services.AddHangfireServer();
+    //context.Services.AddHangfire(config =>
+    //{
+    //  config.UsePostgreSqlStorage(configuration.GetConnectionString("Default"));
+    //});
+
+    //context.Services.AddHangfireServer();
   }
 
-  public override void OnApplicationInitialization(ApplicationInitializationContext context)
-  {
-    var backgroundJobManager = context.ServiceProvider.GetRequiredService<IBackgroundJobManager>();
+  //public override void OnApplicationInitialization(ApplicationInitializationContext context)
+  //{
+  //  var backgroundJobManager = context.ServiceProvider.GetRequiredService<IBackgroundJobManager>();
 
-    RecurringJob.AddOrUpdate<ChangingStatusTypeJob>(
-        "ChangingStatusTypeJob",
-        job => job.ExecuteAsync(0),
-        Cron.MinuteInterval(1)
-    );
+  //  RecurringJob.AddOrUpdate<ChangingStatusTypeJob>(
+  //      "ChangingStatusTypeJob",
+  //      job => job.ExecuteAsync(0),
+  //      Cron.MinuteInterval(1)
+  //  );
 
-  }
-
-
-
+  //}
 
 }
-
