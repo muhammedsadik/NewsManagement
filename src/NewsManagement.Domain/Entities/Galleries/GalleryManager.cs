@@ -87,6 +87,8 @@ namespace NewsManagement.Entities.Galleries
       //    throw new UserFriendlyException("Gallery image Bulunamadı...");// 📩
       //}
 
+      var orders = createGalleryDto.GalleryImage.Select(x => x.Order).ToList();
+      CheckOrderInput(orders);
 
       var gallery = await _genericRepository.InsertAsync(creatingGallery, autoSave: true);
 
@@ -108,6 +110,9 @@ namespace NewsManagement.Entities.Galleries
         if (images == null)
           throw new UserFriendlyException("Gallery image Bulunamadı...");// 📩
       }
+
+      var orders = updateGalleryDto.GalleryImage.Select(x => x.Order).ToList();
+      CheckOrderInput(orders);
 
       var gallery = await _genericRepository.UpdateAsync(updatingGallery, autoSave: true);
 
@@ -133,6 +138,18 @@ namespace NewsManagement.Entities.Galleries
       await CheckDeleteHardInputBaseAsync(id);
     }
 
+
+    public void CheckOrderInput(List<int> input)
+    {
+      input.Sort();
+
+      for (int i = 1; i <= input.Count ; i++)
+      {
+        if (input[i] != i)
+          throw new BusinessException(); // 📩
+      }
+
+    }
 
   }
 }
