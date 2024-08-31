@@ -81,13 +81,13 @@ namespace NewsManagement.Entities.Videos
     {
       var creatingVideo = await CheckCreateInputBaseAsync(createVideoDto);
 
-      if (creatingVideo.VideoType == VideoType.Physical)
+      if (creatingVideo.VideoType == VideoType.Video)
       {
         if(creatingVideo.VideoId == null)
-          throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeExistForPhysicalType);
+          throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeExistForVideoType);
         
         if (creatingVideo.Url != null)
-          throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeNullForPhysicalType);
+          throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeNullForVideoType);
 
         var images = _fileAppService.GetAsync((Guid)creatingVideo.VideoId);//düzenle
 
@@ -118,13 +118,13 @@ namespace NewsManagement.Entities.Videos
     {
       var updatingVideo = await CheckUpdateInputBaseAsync(id, updateVideoDto);
 
-      if(updatingVideo.VideoType == VideoType.Physical)
+      if(updatingVideo.VideoType == VideoType.Video)
       {
         if (updatingVideo.VideoId == null)
-          throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeExistForPhysicalType);
+          throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeExistForVideoType);
 
         if (updatingVideo.Url != null)
-          throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeNullForPhysicalType);
+          throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeNullForVideoType);
 
         //var images = _fileAppService.GetAsync((Guid)updatingVideo.VideoId);//düzenle
 

@@ -91,7 +91,7 @@ public class NewsManagementDbContext :
 
 
 
-      b.OwnsOne(x => x.GalleryImage);
+      b.OwnsOne(x => x.GalleryImages);
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Galleries", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();

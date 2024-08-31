@@ -18,7 +18,7 @@ namespace NewsManagement.Entities.ListableContents
     public Guid? TenantId { get; set; }
     public StatusType Status { get; set; }
     public DateTime PublishTime { get; set; }
-    public ListableContentType listableContentType { get; set; }
+    public ListableContentType ListableContentType { get; set; }
     public List<ListableContentTag> ListableContentTags { get; set; }
     public List<ListableContentCity> ListableContentCities { get; set; }
     public List<ListableContentCategory> ListableContentCategories { get; set; }

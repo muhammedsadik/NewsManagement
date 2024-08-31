@@ -6,7 +6,7 @@ namespace NewsManagement.EntityConsts.VideoConsts
 {
   public enum VideoType
   {
-    Physical,
+    Video,
     Link
   }
 }

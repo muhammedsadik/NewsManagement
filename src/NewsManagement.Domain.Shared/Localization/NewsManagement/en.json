@@ -25,15 +25,15 @@
     "NewsManagement:516": "A subcategory cannot be assigned without its parent. Assigned subcategories= {categoryId}",
     "NewsManagement:517": "Cannot add itself as related content.",
     "NewsManagement:518": "Status cannot be 'Delete' during creation.",
-    "NewsManagement:519": "Url must be null for physical type.",
+    "NewsManagement:519": "Url must be null for Video type.",
     "NewsManagement:520": "VideoId must be null for link type.",
-    "NewsManagement:521": "VideoId must be exist for physical type.",
+    "NewsManagement:521": "VideoId must be exist for Video type.",
     "NewsManagement:522": "Url must be exist for link type.",
 
 
     //ValidationErrors
     "NewsManagement:v401": "Not in ListableContent enum type. Enum type must contain = { News = 0 , Video = 1 , Gallery = 2 }.",
-    "NewsManagement:v402": "Not in Video enum type. Enum type must contain = { Physical Video = 0 , Link Video = 1 }.",
+    "NewsManagement:v402": "Not in Video enum type. Enum type must contain = { Video = 0 , Link = 1 }.",
     "NewsManagement:v403": "Only one category can be the Primary Category. Your choice = {0}",
     "NewsManagement:v404": "Not in Status enum type. Enum type must contain = { Draft = 0 , Pending Review = 1 , Archived = 2 , Published = 3 , Scheduled = 4 , Deleted = 5 , Rejected = 6 }.",
 
