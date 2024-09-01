@@ -6,25 +6,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.MultiTenancy;
 
 namespace NewsManagement.Entities.ListableContentRelations
 {
-    public class ListableContentCategory : Entity
+  public class ListableContentCategory : Entity, IMultiTenant
+  {
+    public Guid? TenantId { get; set; }
+    public bool IsPrimary { get; set; }
+    public int CategoryId { get; set; }
+    public Category Category { get; set; }
+    public int ListableContentId { get; set; }
+    public ListableContent ListableContent { get; set; }
+
+
+
+    internal ListableContentCategory() { }
+
+    public override object[] GetKeys()
     {
-        public bool IsPrimary { get; set; }
-        public int CategoryId { get; set; }
-        public Category Category { get; set; }
-        public int ListableContentId { get; set; }
-        public ListableContent ListableContent { get; set; }
-
-
-
-        internal ListableContentCategory() { }
-
-        public override object[] GetKeys()
-        {
-            return new object[] { CategoryId, ListableContentId };
-        }
-
+      return new object[] { CategoryId, ListableContentId };
     }
+
+  }
 }
