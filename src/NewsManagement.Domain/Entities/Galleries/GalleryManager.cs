@@ -146,7 +146,8 @@ namespace NewsManagement.Entities.Galleries
       for (int i = 1; i <= input.Count ; i++)
       {
         if (input[i] != i)
-          throw new BusinessException(); // 📩
+          throw new BusinessException(NewsManagementDomainErrorCodes.SortingError)
+            .WithData("0", input[i]);
       }
 
     }

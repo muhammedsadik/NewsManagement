@@ -29,6 +29,7 @@
     "NewsManagement:520": "VideoId must be null for link type.",
     "NewsManagement:521": "VideoId must be exist for Video type.",
     "NewsManagement:522": "Url must be exist for link type.",
+    "NewsManagement:523": "Sorting error. Index : {0}",
 
 
     //ValidationErrors
