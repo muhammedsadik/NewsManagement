@@ -116,27 +116,12 @@ public class NewsManagementWebModule : AbpModule
         container.UseMinio(minio =>
         {
           minio.EndPoint = "localhost:9000";
-          minio.AccessKey = "91SeWqvmiDpCEVjre26j";
-          minio.SecretKey = "NZv0m4gcZr8WzYm7vgmqXVoxzQrho2kOGr3QoGKt";
+          minio.AccessKey = "h5lqrBpgTtFVNoWC12CK";
+          minio.SecretKey = "Rw2FQ3g6hOK3fv8A4wNLi4nItp6ExhIU1WqsjdX6";
           minio.BucketName = "newsmanagement";
         });
       });
     });
-
-    //Configure<AbpBlobStoringOptions>(options =>          ? yukarýdakini deniyorum ?
-    //{
-    //  options.Containers.ConfigureDefault(container =>
-    //  {
-    //    container.IsMultiTenant = true;
-    //    container.UseMinio(minio =>
-    //    {
-    //      minio.EndPoint = "localhost:9000";
-    //      minio.AccessKey = "91SeWqvmiDpCEVjre26j";
-    //      minio.SecretKey = "NZv0m4gcZr8WzYm7vgmqXVoxzQrho2kOGr3QoGKt";
-    //      minio.BucketName = "newsmanagement";
-    //    });
-    //  });
-    //});
 
     Configure<FileManagementOptions>(options =>
     {
