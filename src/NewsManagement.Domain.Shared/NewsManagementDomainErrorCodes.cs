@@ -25,6 +25,7 @@ public static class NewsManagementDomainErrorCodes
   public const string VideoIdMustBeNullForLinkType = "NewsManagement:520";
   public const string VideoIdMustBeExistForVideoType = "NewsManagement:521";
   public const string UrlMustBeExistForLinkType = "NewsManagement:522";
+  public const string SortingError = "NewsManagement:523";
 
 
 

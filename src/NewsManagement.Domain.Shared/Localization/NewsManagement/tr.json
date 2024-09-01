@@ -35,6 +35,7 @@
     "NewsManagement:520": "Link türü için VideoId null olmalıdır.",
     "NewsManagement:521": "VideoId Fiziksel tür için VideoId null olamaz.",
     "NewsManagement:522": "Link türü için URL null olamaz.",
+    "NewsManagement:523": "Sıralama hatası. Index : {0}",
 
 
 

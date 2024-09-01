@@ -16,6 +16,7 @@ namespace NewsManagement.Entities.ListableContents
     public string Spot { get; set; }
     public Guid? ImageId { get; set; }
     public Guid? TenantId { get; set; }
+    public int ViewsCount { get; set; }
     public StatusType Status { get; set; }
     public DateTime PublishTime { get; set; }
     public ListableContentType ListableContentType { get; set; }
