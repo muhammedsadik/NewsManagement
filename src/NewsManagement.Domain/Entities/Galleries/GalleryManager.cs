@@ -79,16 +79,16 @@ namespace NewsManagement.Entities.Galleries
 
       var creatingGallery = await CheckCreateInputBaseAsync(createGalleryDto);
 
-      //foreach (var galleryImage in creatingGallery.GalleryImage)
-      //{
-      //  var images = _fileAppService.GetAsync(galleryImage.ImageId);//düzenle
-
-      //  if (images == null)
-      //    throw new UserFriendlyException("Gallery image Bulunamadı...");// 📩
-      //}
-
-      var orders = createGalleryDto.GalleryImage.Select(x => x.Order).ToList();
+      var orders = createGalleryDto.GalleryImages.Select(x => x.Order).ToList();
       CheckOrderInput(orders);
+
+      foreach (var galleryImage in creatingGallery.GalleryImages)
+      {
+        var images = _fileAppService.GetAsync(galleryImage.ImageId);//düzenle
+
+        if (images == null)
+          throw new UserFriendlyException("Gallery image Bulunamadı...");// 📩
+      }
 
       var gallery = await _genericRepository.InsertAsync(creatingGallery, autoSave: true);
 
@@ -103,6 +103,9 @@ namespace NewsManagement.Entities.Galleries
     {
       var updatingGallery = await CheckUpdateInputBaseAsync(id, updateGalleryDto);
 
+      var orders = updateGalleryDto.GalleryImages.Select(x => x.Order).ToList();
+      CheckOrderInput(orders);
+
       foreach (var galleryImage in updatingGallery.GalleryImages)
       {
         var images = _fileAppService.GetAsync(galleryImage.ImageId);//düzenle
@@ -110,9 +113,6 @@ namespace NewsManagement.Entities.Galleries
         if (images == null)
           throw new UserFriendlyException("Gallery image Bulunamadı...");// 📩
       }
-
-      var orders = updateGalleryDto.GalleryImage.Select(x => x.Order).ToList();
-      CheckOrderInput(orders);
 
       var gallery = await _genericRepository.UpdateAsync(updatingGallery, autoSave: true);
 
@@ -149,7 +149,7 @@ namespace NewsManagement.Entities.Galleries
 
       for (int i = 1; i <= input.Count; i++)
       {
-        if (input[i] != i)
+        if (input[i-1] != i)
           throw new BusinessException(NewsManagementDomainErrorCodes.SortingError)
             .WithData("0", input[i]);
       }
