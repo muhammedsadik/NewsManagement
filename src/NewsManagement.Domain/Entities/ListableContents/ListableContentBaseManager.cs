@@ -48,7 +48,7 @@ namespace NewsManagement.Entities.ListableContents
     private readonly IRepository<ListableContentCity> _listableContentCityRepository;
     private readonly IRepository<ListableContentCategory> _listableContentCategoryRepository;
     private readonly IRepository<ListableContentRelation> _listableContentRelationRepository;
-    //private readonly FileAppService _fileAppService;
+    private readonly IFileRepository _fileRepository;
 
     protected ListableContentBaseManager(
       IObjectMapper objectMapper,
@@ -62,8 +62,8 @@ namespace NewsManagement.Entities.ListableContents
       IRepository<ListableContentTag> listableContentTagRepository,
       IRepository<ListableContentCity> listableContentCityRepository,
       IRepository<ListableContentCategory> listableContentCategoryRepository,
-      IRepository<ListableContentRelation> listableContentRelationRepository
-    //FileAppService fileAppService
+      IRepository<ListableContentRelation> listableContentRelationRepository,
+      IFileRepository fileRepository
     )
     {
       _objectMapper = objectMapper;
@@ -78,7 +78,7 @@ namespace NewsManagement.Entities.ListableContents
       _listableContentCityRepository = listableContentCityRepository;
       _listableContentCategoryRepository = listableContentCategoryRepository;
       _listableContentRelationRepository = listableContentRelationRepository;
-      //_fileAppService = fileAppService;
+      _fileRepository = fileRepository;
     }
 
     public async Task<TEntity> CheckCreateInputBaseAsync(TEntityCreateDto createDto)
@@ -90,9 +90,8 @@ namespace NewsManagement.Entities.ListableContents
       if (createDto.Status == StatusType.Deleted)
         throw new BusinessException(NewsManagementDomainErrorCodes.OnCreationStatusCannotBeDelete);
 
-      //var isExistImageId = await _fileAppService.GetAsync(createDto.ImageId);
-      //if (isExistImageId)
-      //  throw new AlreadyExistException(typeof(TEntityDto), createDto.Title);
+      if (createDto.ImageId != null)
+       await _fileRepository.GetAsync((Guid)createDto.ImageId);
 
       var entity = _objectMapper.Map<TEntityCreateDto, TEntity>(createDto);
 
@@ -107,8 +106,6 @@ namespace NewsManagement.Entities.ListableContents
 
       await CheckListableContentCategoryBaseAsync(createDto.ListableContentCategoryDtos, entity.ListableContentType);
       CheckStatusAndDateTimeBaseAsync(createDto.Status, createDto.PublishTime);
-
-
 
       return entity;
     }
