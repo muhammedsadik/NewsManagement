@@ -155,6 +155,11 @@ namespace NewsManagement.Entities.Videos
       return await GetListFilterBaseAsync(input);
     }
 
+    public async Task GetEntityByIdAsync(int id)
+    {
+      await CheckGetEntityByIdBaseAsync(id);
+    }
+
     public async Task DeleteAsync(int id)
     {
       await CheckDeleteInputBaseAsync(id);

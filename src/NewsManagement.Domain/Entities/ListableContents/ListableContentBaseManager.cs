@@ -136,7 +136,7 @@ namespace NewsManagement.Entities.ListableContents
 
         await CheckListableContentByIdBaseAsync(updateDto.RelatedListableContentIds);
       }
-      
+
       await CheckListableContentCategoryBaseAsync(updateDto.ListableContentCategoryDtos, entity.ListableContentType);
       CheckStatusAndDateTimeBaseAsync(updateDto.Status, updateDto.PublishTime);
 
@@ -182,6 +182,14 @@ namespace NewsManagement.Entities.ListableContents
       await _genericRepository.HardDeleteAsync(entity);
     }
 
+    public async Task CheckGetEntityByIdBaseAsync(int id)
+    {
+      var entity = await _genericRepository.GetAsync(id);
+
+      entity.ViewsCount += 1;
+
+      await _genericRepository.UpdateAsync(entity);
+    }
 
     #region Helper Method
 

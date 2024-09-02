@@ -116,6 +116,7 @@ namespace NewsManagement
     public async Task SeedAsync(DataSeedContext context)
     {
       Guid? tenantId = _currentTenant.Id; //.HasValue ? _currentTenant.Id.Value : (Guid?)null;  //tenant eklerken çalışmaz sa (//) <= kaldır
+
       using (_currentTenant.Change(tenantId))
       {
         await SeedRoleAsync(tenantId);
@@ -274,7 +275,7 @@ namespace NewsManagement
     #region Tag
     private async Task SeedTagAsync(Guid? tenantId)
     {
-      if (tenantId.HasValue || await _tagRepository.CountAsync() > 0)
+      if (await _tagRepository.CountAsync() > 0)
         return;
 
       await _tagRepository.InsertAsync(
