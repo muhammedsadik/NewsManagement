@@ -68,7 +68,6 @@ public class NewsManagementDbContext :
   public NewsManagementDbContext(DbContextOptions<NewsManagementDbContext> options)
       : base(options)
   {
-
   }
 
   protected override void OnModelCreating(ModelBuilder builder)
@@ -88,9 +87,6 @@ public class NewsManagementDbContext :
     #region Gallery, Video, News
     builder.Entity<Gallery>(b =>
     {
-
-
-
       b.OwnsOne(x => x.GalleryImages);
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Galleries", NewsManagementConsts.DbSchema);
@@ -114,12 +110,6 @@ public class NewsManagementDbContext :
     #endregion
 
     #region ListableContent
-
-    //builder.Entity<ListableContent>(b =>
-    //{
-
-      
-    //});
 
     builder.Entity<ListableContentRelation>(b =>
     {
@@ -177,8 +167,6 @@ public class NewsManagementDbContext :
 
     builder.Entity<City>(b =>
     {
-      b.HasIndex(x => x.CityCode).IsUnique();
-
       b.HasMany(x => x.ListableContentCities).WithOne(x => x.City).HasForeignKey(x => x.CityId).IsRequired();
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Cities", NewsManagementConsts.DbSchema);

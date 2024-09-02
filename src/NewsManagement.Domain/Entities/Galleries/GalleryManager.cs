@@ -138,6 +138,10 @@ namespace NewsManagement.Entities.Galleries
       await CheckDeleteHardInputBaseAsync(id);
     }
 
+    public  async Task GetEntityByIdAsync(int id)
+    {
+
+    }
 
     public void CheckOrderInput(List<int> input)
     {

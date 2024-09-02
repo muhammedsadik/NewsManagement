@@ -116,8 +116,8 @@ public class NewsManagementWebModule : AbpModule
         container.UseMinio(minio =>
         {
           minio.EndPoint = "localhost:9000";
-          minio.AccessKey = "h5lqrBpgTtFVNoWC12CK";
-          minio.SecretKey = "Rw2FQ3g6hOK3fv8A4wNLi4nItp6ExhIU1WqsjdX6";
+          minio.AccessKey = "QBGosZfDfRWq3MsAy6Zi";
+          minio.SecretKey = "lOJwYpRl2KZUMDYq2YOBbMjBHsC0Nqaxpg8FQI4s";
           minio.BucketName = "newsmanagement";
         });
       });
@@ -153,18 +153,18 @@ public class NewsManagementWebModule : AbpModule
     ConfigureNavigationServices();
     ConfigureAutoApiControllers();
     ConfigureSwaggerServices(context.Services);
-    ConfigureHangfire(context, configuration);
-    context.Services.AddHangfireServer();
+    //ConfigureHangfire(context, configuration);
+    //context.Services.AddHangfireServer();
   }
 
-  private void ConfigureHangfire(ServiceConfigurationContext context, IConfiguration configuration)
-  {
+  //private void ConfigureHangfire(ServiceConfigurationContext context, IConfiguration configuration)
+  //{
 
-    context.Services.AddHangfire(config =>
-    {
-      config.UsePostgreSqlStorage(configuration.GetConnectionString("Default"));
-    });
-  }
+  //  context.Services.AddHangfire(config =>
+  //  {
+  //    config.UsePostgreSqlStorage(configuration.GetConnectionString("Default"));
+  //  });
+  //}
 
   private void ConfigureAuthentication(ServiceConfigurationContext context)
   {
@@ -249,7 +249,6 @@ public class NewsManagementWebModule : AbpModule
   {
     var app = context.GetApplicationBuilder();
     var env = context.GetEnvironment();
-    var backgroundJobManager = context.ServiceProvider.GetRequiredService<IBackgroundJobManager>();
 
     if (env.IsDevelopment())
     {

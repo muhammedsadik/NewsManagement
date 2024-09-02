@@ -79,12 +79,12 @@ public class NewsManagementDomainModule : AbpModule
     context.Services.Replace(ServiceDescriptor.Singleton<IEmailSender, NullEmailSender>());
 #endif
 
-    //context.Services.AddHangfire(config =>
-    //{
-    //  config.UsePostgreSqlStorage(configuration.GetConnectionString("Default"));
-    //});
+    context.Services.AddHangfire(config =>
+    {
+      config.UsePostgreSqlStorage(configuration.GetConnectionString("Default"));
+    });
 
-    //context.Services.AddHangfireServer();
+    context.Services.AddHangfireServer();
   }
 
   //public override void OnApplicationInitialization(ApplicationInitializationContext context)
