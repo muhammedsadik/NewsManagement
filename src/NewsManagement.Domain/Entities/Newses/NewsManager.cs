@@ -27,7 +27,7 @@ namespace NewsManagement.Entities.Newses
   {
     private readonly IObjectMapper _objectMapper;
     private readonly ITagRepository _tagRepository;
-    private readonly IFileAppService _fileAppService;
+    private readonly IFileRepository _fileRepository;
     private readonly ICityRepository _cityRepository;
     private readonly INewsRepository _newsRepository;
     private readonly IVideoRepository _videoRepository;
@@ -43,7 +43,7 @@ namespace NewsManagement.Entities.Newses
     public NewsManager(
       IObjectMapper objectMapper,
       ITagRepository tagRepository,
-      IFileAppService fileAppService,
+      IFileRepository fileRepository,
       INewsRepository newsRepository,
       ICityRepository cityRepository,
       IVideoRepository videoRepository,
@@ -56,14 +56,14 @@ namespace NewsManagement.Entities.Newses
       IRepository<ListableContentRelation> listableContentRelationRepository
       ) : base(objectMapper, tagRepository, cityRepository, newsRepository,
         videoRepository, galleryRepository, categoryRepository, genericRepository, listableContentTagRepository,
-        listableContentCityRepository, listableContentCategoryRepository, listableContentRelationRepository
+        listableContentCityRepository, listableContentCategoryRepository, listableContentRelationRepository, fileRepository
           )
     {
       _objectMapper = objectMapper;
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
       _newsRepository = newsRepository;
-      _fileAppService = fileAppService;
+      _fileRepository = fileRepository;
       _videoRepository = videoRepository;
       _galleryRepository = galleryRepository;
       _genericRepository = genericRepository;
@@ -80,10 +80,7 @@ namespace NewsManagement.Entities.Newses
 
       foreach (var imageId in creatingNews.DetailImageId)
       {
-        var images = _fileAppService.GetAsync(imageId);//düzenle
-
-        if (images == null)
-          throw new UserFriendlyException("News Detail Image Bulunamadı...");// 📩
+        var images = _fileRepository.GetAsync(imageId).Result;
       }
 
       var news = await _genericRepository.InsertAsync(creatingNews, autoSave: true);
@@ -102,10 +99,7 @@ namespace NewsManagement.Entities.Newses
 
       foreach (var imageId in updatingNews.DetailImageId)
       {
-        var images = _fileAppService.GetAsync(imageId);//düzenle
-
-        if (images == null)
-          throw new UserFriendlyException("News Detail Image Bulunamadı...");// 📩
+        var images = _fileRepository.GetAsync(imageId).Result;
       }
 
       var news = await _genericRepository.UpdateAsync(updatingNews, autoSave: true);

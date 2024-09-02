@@ -27,7 +27,7 @@ namespace NewsManagement.Entities.Galleries
   {
     private readonly IObjectMapper _objectMapper;
     private readonly ITagRepository _tagRepository;
-    private readonly IFileAppService _fileAppService;
+    private readonly IFileRepository _fileRepository;
     private readonly ICityRepository _cityRepository;
     private readonly INewsRepository _newsRepository;
     private readonly IVideoRepository _videoRepository;
@@ -42,7 +42,7 @@ namespace NewsManagement.Entities.Galleries
     public GalleryManager(
       IObjectMapper objectMapper,
       ITagRepository tagRepository,
-      IFileAppService fileAppService,
+      IFileRepository fileRepository,
       ICityRepository cityRepository,
       INewsRepository newsRepository,
       IVideoRepository videoRepository,
@@ -55,12 +55,12 @@ namespace NewsManagement.Entities.Galleries
       IRepository<ListableContentRelation> listableContentRelationRepository
       ) : base(objectMapper, tagRepository, cityRepository, newsRepository,
         videoRepository, galleryRepository, categoryRepository, genericRepository, listableContentTagRepository,
-        listableContentCityRepository, listableContentCategoryRepository, listableContentRelationRepository
+        listableContentCityRepository, listableContentCategoryRepository, listableContentRelationRepository, fileRepository
           )
     {
       _objectMapper = objectMapper;
       _tagRepository = tagRepository;
-      _fileAppService = fileAppService;
+      _fileRepository = fileRepository;
       _cityRepository = cityRepository;
       _newsRepository = newsRepository;
       _videoRepository = videoRepository;
@@ -84,10 +84,7 @@ namespace NewsManagement.Entities.Galleries
 
       foreach (var galleryImage in creatingGallery.GalleryImages)
       {
-        var images = _fileAppService.GetAsync(galleryImage.ImageId);//düzenle
-
-        if (images == null)
-          throw new UserFriendlyException("Gallery image Bulunamadı...");// 📩
+        var images = _fileRepository.GetAsync(galleryImage.ImageId).Result;
       }
 
       var gallery = await _genericRepository.InsertAsync(creatingGallery, autoSave: true);
@@ -108,10 +105,7 @@ namespace NewsManagement.Entities.Galleries
 
       foreach (var galleryImage in updatingGallery.GalleryImages)
       {
-        var images = _fileAppService.GetAsync(galleryImage.ImageId);//düzenle
-
-        if (images == null)
-          throw new UserFriendlyException("Gallery image Bulunamadı...");// 📩
+        var images = _fileRepository.GetAsync(galleryImage.ImageId).Result;
       }
 
       var gallery = await _genericRepository.UpdateAsync(updatingGallery, autoSave: true);
@@ -127,7 +121,7 @@ namespace NewsManagement.Entities.Galleries
     {
       return await GetListFilterBaseAsync(input);
     }
-    
+
     public async Task GetEntityByIdAsync(int id)
     {
       await CheckGetEntityByIdBaseAsync(id);
@@ -147,11 +141,13 @@ namespace NewsManagement.Entities.Galleries
     {
       input.Sort();
 
-      for (int i = 1; i <= input.Count; i++)
+      for (int i = 0; i < input.Count; i++)
       {
-        if (input[i-1] != i)
+        if (input[i] != i + 1)
+        {
           throw new BusinessException(NewsManagementDomainErrorCodes.SortingError)
-            .WithData("0", input[i]);
+            .WithData("0", input[i].ToString());
+        }
       }
 
     }

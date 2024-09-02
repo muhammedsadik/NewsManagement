@@ -30,7 +30,7 @@ namespace NewsManagement.Entities.Videos
   {
     private readonly IObjectMapper _objectMapper;
     private readonly ITagRepository _tagRepository;
-    private readonly IFileAppService _fileAppService;
+    private readonly IFileRepository _fileRepository;
     private readonly ICityRepository _cityRepository;
     private readonly INewsRepository _newsRepository;
     private readonly IVideoRepository _videoRepository;
@@ -47,7 +47,7 @@ namespace NewsManagement.Entities.Videos
       ITagRepository tagRepository,
       ICityRepository cityRepository,
       INewsRepository newsRepository,
-      IFileAppService fileAppService,
+      IFileRepository fileRepository,
       IVideoRepository videoRepository,
       IGalleryRepository galleryRepository,
       ICategoryRepository categoryRepository,
@@ -58,14 +58,14 @@ namespace NewsManagement.Entities.Videos
       IRepository<ListableContentRelation> listableContentRelationRepository
       ) : base(objectMapper, tagRepository, cityRepository, newsRepository,
         videoRepository, galleryRepository, categoryRepository, genericRepository, listableContentTagRepository,
-        listableContentCityRepository, listableContentCategoryRepository, listableContentRelationRepository
+        listableContentCityRepository, listableContentCategoryRepository, listableContentRelationRepository, fileRepository
           )
     {
       _objectMapper = objectMapper;
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
       _newsRepository = newsRepository;
-      _fileAppService = fileAppService;
+      _fileRepository = fileRepository;
       _videoRepository = videoRepository;
       _galleryRepository = galleryRepository;
       _genericRepository = genericRepository;
@@ -89,10 +89,7 @@ namespace NewsManagement.Entities.Videos
         if (creatingVideo.Url != null)
           throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeNullForVideoType);
 
-        var images = _fileAppService.GetAsync((Guid)creatingVideo.VideoId);//düzenle
-
-        if (images == null)
-          throw new UserFriendlyException("VideoId Bulunamadı...");// 📩
+        var images = _fileRepository.GetAsync((Guid)creatingVideo.VideoId).Result;
       }
 
       if (creatingVideo.VideoType == VideoType.Link)
@@ -103,7 +100,6 @@ namespace NewsManagement.Entities.Videos
         if (creatingVideo.VideoId != null)
         throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeNullForLinkType);
       }
-
 
       var video = await _genericRepository.InsertAsync(creatingVideo, autoSave: true);
 
@@ -126,10 +122,7 @@ namespace NewsManagement.Entities.Videos
         if (updatingVideo.Url != null)
           throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeNullForVideoType);
 
-        //var images = _fileAppService.GetAsync((Guid)updatingVideo.VideoId);//düzenle
-
-        //if (images == null)
-        //  throw new UserFriendlyException("VideoId Bulunamadı...");// 📩
+        var images = _fileRepository.GetAsync((Guid)updatingVideo.VideoId).Result;
       }
 
       if (updatingVideo.VideoType == VideoType.Link)
