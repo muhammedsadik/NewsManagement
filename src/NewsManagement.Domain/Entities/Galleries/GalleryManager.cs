@@ -127,6 +127,11 @@ namespace NewsManagement.Entities.Galleries
     {
       return await GetListFilterBaseAsync(input);
     }
+    
+    public async Task GetEntityByIdAsync(int id)
+    {
+      await CheckGetEntityByIdBaseAsync(id);
+    }
 
     public async Task DeleteAsync(int id)
     {
@@ -138,16 +143,11 @@ namespace NewsManagement.Entities.Galleries
       await CheckDeleteHardInputBaseAsync(id);
     }
 
-    public  async Task GetEntityByIdAsync(int id)
-    {
-
-    }
-
     public void CheckOrderInput(List<int> input)
     {
       input.Sort();
 
-      for (int i = 1; i <= input.Count ; i++)
+      for (int i = 1; i <= input.Count; i++)
       {
         if (input[i] != i)
           throw new BusinessException(NewsManagementDomainErrorCodes.SortingError)

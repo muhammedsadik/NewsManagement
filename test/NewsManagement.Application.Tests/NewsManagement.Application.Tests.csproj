@@ -18,10 +18,4 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Gallery\" />
-    <Folder Include="Video\" />
-    <Folder Include="News\" />
-  </ItemGroup>
-
 </Project>

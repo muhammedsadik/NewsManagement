@@ -122,6 +122,11 @@ namespace NewsManagement.Entities.Newses
       return await GetListFilterBaseAsync(input);
     }
 
+    public async Task GetEntityByIdAsync(int id)
+    {
+      await CheckGetEntityByIdBaseAsync(id);
+    }
+
     public async Task DeleteAsync(int id)
     {
       await CheckDeleteInputBaseAsync(id);

@@ -1,4 +1,5 @@
-﻿using NewsManagement.Entities.Videos;
+﻿using NewsManagement.Entities.Newses;
+using NewsManagement.Entities.Videos;
 using NewsManagement.EntityDtos.GalleryDtos;
 using NewsManagement.EntityDtos.PagedAndSortedDtos;
 using NewsManagement.EntityDtos.VideoDtos;
@@ -31,6 +32,13 @@ namespace NewsManagement.AppService.Videos
     public async override Task<VideoDto> UpdateAsync(int id, UpdateVideoDto updateVideoDto)
     {
       return await _videoManager.UpdateAsync(id, updateVideoDto);
+    }
+
+    protected override async Task<Video> GetEntityByIdAsync(int id)
+    {
+      await _videoManager.GetEntityByIdAsync(id);
+
+      return await base.GetEntityByIdAsync(id);
     }
 
     [RequiresFeature("NewsApp.Video")]

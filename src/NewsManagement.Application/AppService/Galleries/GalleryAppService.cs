@@ -41,7 +41,7 @@ namespace NewsManagement.AppService.Galleries
 
     protected override async Task<Gallery> GetEntityByIdAsync(int id)
     {
-
+      await _galleryManager.GetEntityByIdAsync(id);
 
       return await base.GetEntityByIdAsync(id);
     }
