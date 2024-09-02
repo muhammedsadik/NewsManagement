@@ -15,7 +15,7 @@ namespace NewsManagement.Validations.GalleryValidation
     {
       Include(new CreateListableContentDtoValidator(localizer));
 
-      RuleFor(x => x.GalleryImage).ForEach(x => x.SetValidator(new GalleryImageDtoValidator()));
+      RuleFor(x => x.GalleryImages).ForEach(x => x.SetValidator(new GalleryImageDtoValidator()));
 
     }
   }
