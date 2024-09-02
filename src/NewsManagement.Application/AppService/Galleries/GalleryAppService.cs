@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using NewsManagement.Entities.Cities;
 using NewsManagement.Entities.Galleries;
 using NewsManagement.EntityDtos.CityDtos;
@@ -36,6 +37,13 @@ namespace NewsManagement.AppService.Galleries
     public async override Task<GalleryDto> UpdateAsync(int id, UpdateGalleryDto updateGalleryDto)
     {
       return await _galleryManager.UpdateAsync(id, updateGalleryDto);
+    }
+
+    protected override async Task<Gallery> GetEntityByIdAsync(int id)
+    {
+
+
+      return await base.GetEntityByIdAsync(id);
     }
 
     public async override Task<PagedResultDto<GalleryDto>> GetListAsync(GetListPagedAndSortedDto input)

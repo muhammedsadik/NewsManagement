@@ -215,9 +215,9 @@ namespace EasyAbp.FileManagement.Files
 
     protected virtual bool IsFileExtensionAllowed(string fileName, FileContainerConfiguration configuration)
     {
-      var lowerFileName = fileName.ToLowerInvariant();
+      var lowerFileName = fileName.ToLowerInvariant(); // ToLower yaptý 
 
-      foreach (var pair in configuration.FileExtensionsConfiguration.Where(x => lowerFileName.EndsWith(x.Key.ToLowerInvariant())))
+      foreach (var pair in configuration.FileExtensionsConfiguration.Where(x => lowerFileName.EndsWith(x.Key.ToLowerInvariant()))) // burada dosya uzantýsýný alýyor
       {
         return pair.Value;
       }
@@ -296,9 +296,9 @@ namespace EasyAbp.FileManagement.Files
       for (var i = 0; i < input.FileContents.Count; i++)
       {
         var fileContentItem = input.FileContents[i];
-        var fileContent = await fileContentItem.GetStream().GetAllBytesAsync();
+        var fileContent = await fileContentItem.GetStream().GetAllBytesAsync();// burada byte[] çevrildi tekrar göz at
 
-        var file = await CreateFileEntityAsync(
+        var file = await CreateFileEntityAsync( // buraya gönder ilk
             input: input,
             fileType: FileType.RegularFile,
             fileName: fileContentItem.FileName,
@@ -310,7 +310,7 @@ namespace EasyAbp.FileManagement.Files
         await AuthorizationService.CheckAsync(CreateFileOperationInfoModel(file),
             new OperationAuthorizationRequirement { Name = FileManagementPermissions.File.Create });
 
-        await _repository.InsertAsync(file);
+        await _repository.InsertAsync(file); //sonra inserte
 
         files[i] = file;
         fileContents.Add(fileContent);
@@ -318,7 +318,7 @@ namespace EasyAbp.FileManagement.Files
 
       for (var i = 0; i < files.Length; i++)
       {
-        await TrySaveBlobAsync(files[i], fileContents[i], configuration.DisableBlobReuse,
+        await TrySaveBlobAsync(files[i], fileContents[i], configuration.DisableBlobReuse,//sonra da buraya
             configuration.AllowBlobOverriding);
       }
 

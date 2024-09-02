@@ -46,12 +46,12 @@ namespace EasyAbp.FileManagement.Files
       Check.NotNullOrWhiteSpace(fileContainerName, nameof(File.FileContainerName));
       Check.NotNullOrWhiteSpace(fileName, nameof(File.FileName));
 
-      var configuration = _configurationProvider.Get(fileContainerName);
+      var configuration = _configurationProvider.Get(fileContainerName);// ⚠⚠⚠ burada fileContainerName = default gönderdik ve blobcontainer name ile ilgili bilgiler verdi
 
       CheckFileName(fileName, configuration);     //  4 
       CheckDirectoryHasNoFileContent(fileType, fileContent);   //   5
 
-      var hashString = _fileContentHashProvider.GetHashString(fileContent);  //  6
+      var hashString = _fileContentHashProvider.GetHashString(fileContent);  //  6 buradan aldım
 
       string blobName = null;
 
@@ -71,7 +71,7 @@ namespace EasyAbp.FileManagement.Files
         }
 
         blobName ??= await _fileBlobNameGenerator.CreateAsync(fileType, fileName, parent, mimeType,
-            configuration.AbpBlobDirectorySeparator);
+            configuration.AbpBlobDirectorySeparator);//⚠⚠⚠ burada configuration ınıda gönderdik ve blobcontainer name ile ilgili bilgiler verdi
       }
 
       if (configuration.EnableAutoRename)
@@ -252,10 +252,10 @@ namespace EasyAbp.FileManagement.Files
         return false;
       }
 
-      await blobContainer.SaveAsync(file.BlobName, fileContent, allowBlobOverriding, cancellationToken);
+      await blobContainer.SaveAsync(file.BlobName, fileContent, allowBlobOverriding, cancellationToken); // burada file.BlobName sonuna .png eklenebilir
 
       return true;
-    }  // Bura
+    }  // Burada MinIO eklendi
 
     public virtual async Task<byte[]> GetBlobAsync(File file, CancellationToken cancellationToken = default)
     {
@@ -271,7 +271,7 @@ namespace EasyAbp.FileManagement.Files
 
     public virtual IBlobContainer GetBlobContainer(File file)  //   12
     {
-      var configuration = _configurationProvider.Get(file.FileContainerName);
+      var configuration = _configurationProvider.Get(file.FileContainerName); // burası null verdi
 
       return _blobContainerFactory.Create(configuration.AbpBlobContainerName);
     }
