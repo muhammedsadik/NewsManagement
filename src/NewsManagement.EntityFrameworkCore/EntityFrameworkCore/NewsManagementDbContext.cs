@@ -41,6 +41,8 @@ public class NewsManagementDbContext :
   public DbSet<Video> Videos { get; set; }
   public DbSet<Gallery> Galleries { get; set; }
   public DbSet<Category> Categories { get; set; }
+  public DbSet<GalleryImage> GalleryImages { get; set; }
+  public DbSet<NewsDetailImage> NewsDetailImages { get; set; }
   public DbSet<ListableContent> ListableContents { get; set; }
   public DbSet<ListableContentTag> ListableContentTags { get; set; }
   public DbSet<ListableContentCity> ListableContentCities { get; set; }
@@ -87,9 +89,36 @@ public class NewsManagementDbContext :
     #region Gallery, Video, News
     builder.Entity<Gallery>(b =>
     {
-      b.OwnsOne(x => x.GalleryImages);
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Galleries", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+    });
+
+    builder.Entity<GalleryImage>(b =>
+    {
+      b.HasKey(x => new { x.GalleryId, x.ImageId });
+
+      b.HasOne(x => x.Gallery).WithMany(x => x.GalleryImages).HasForeignKey(x => x.GalleryId);
+
+
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "GalleryImages", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+    });
+
+    builder.Entity<NewsDetailImage>(b =>
+    {
+      b.HasKey(x => new { x.NewsId, x.DetailImageId });
+
+      b.HasOne(x => x.News).WithMany(x => x.DetailImageIds).HasForeignKey(x => x.NewsId);
+
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "NewsDetailImages", NewsManagementConsts.DbSchema);
+      b.ConfigureByConvention();
+    });
+
+    builder.Entity<News>(b =>
+    {
+
+      b.ToTable(NewsManagementConsts.DbTablePrefix + "Newses", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
     });
 
@@ -99,14 +128,7 @@ public class NewsManagementDbContext :
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Videos", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();
     });
-
-    builder.Entity<News>(b =>
-    {
-
-
-      b.ToTable(NewsManagementConsts.DbTablePrefix + "Newses", NewsManagementConsts.DbSchema);
-      b.ConfigureByConvention();
-    });
+        
     #endregion
 
     #region ListableContent
@@ -175,7 +197,7 @@ public class NewsManagementDbContext :
 
     builder.Entity<Category>(b =>
     {
-      b.HasMany(x => x.ListableContentCategories).WithOne(x =>x.Category).HasForeignKey(x => x.CategoryId).IsRequired();
+      b.HasMany(x => x.ListableContentCategories).WithOne(x => x.Category).HasForeignKey(x => x.CategoryId).IsRequired();
 
       b.ToTable(NewsManagementConsts.DbTablePrefix + "Categories", NewsManagementConsts.DbSchema);
       b.ConfigureByConvention();

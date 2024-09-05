@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -803,8 +802,7 @@ namespace NewsManagement.Migrations
                 name: "AppGalleries",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false),
-                    GalleryImagesCapacity = table.Column<int>(name: "GalleryImages_Capacity", type: "integer", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -922,8 +920,7 @@ namespace NewsManagement.Migrations
                 name: "AppNewses",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false),
-                    DetailImageId = table.Column<List<Guid>>(type: "uuid[]", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1007,6 +1004,46 @@ namespace NewsManagement.Migrations
                         name: "FK_AbpEntityPropertyChanges_AbpEntityChanges_EntityChangeId",
                         column: x => x.EntityChangeId,
                         principalTable: "AbpEntityChanges",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AppGalleryImages",
+                columns: table => new
+                {
+                    ImageId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GalleryId = table.Column<int>(type: "integer", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Order = table.Column<int>(type: "integer", nullable: false),
+                    NewsContent = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppGalleryImages", x => new { x.GalleryId, x.ImageId });
+                    table.ForeignKey(
+                        name: "FK_AppGalleryImages_AppGalleries_GalleryId",
+                        column: x => x.GalleryId,
+                        principalTable: "AppGalleries",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AppNewsDetailImages",
+                columns: table => new
+                {
+                    DetailImageId = table.Column<Guid>(type: "uuid", nullable: false),
+                    NewsId = table.Column<int>(type: "integer", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AppNewsDetailImages", x => new { x.NewsId, x.DetailImageId });
+                    table.ForeignKey(
+                        name: "FK_AppNewsDetailImages_AppNewses_NewsId",
+                        column: x => x.NewsId,
+                        principalTable: "AppNewses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1381,7 +1418,7 @@ namespace NewsManagement.Migrations
                 name: "AbpUserTokens");
 
             migrationBuilder.DropTable(
-                name: "AppGalleries");
+                name: "AppGalleryImages");
 
             migrationBuilder.DropTable(
                 name: "AppListableContentCategories");
@@ -1396,7 +1433,7 @@ namespace NewsManagement.Migrations
                 name: "AppListableContentTags");
 
             migrationBuilder.DropTable(
-                name: "AppNewses");
+                name: "AppNewsDetailImages");
 
             migrationBuilder.DropTable(
                 name: "AppVideos");
@@ -1426,6 +1463,9 @@ namespace NewsManagement.Migrations
                 name: "AbpUsers");
 
             migrationBuilder.DropTable(
+                name: "AppGalleries");
+
+            migrationBuilder.DropTable(
                 name: "AppCategories");
 
             migrationBuilder.DropTable(
@@ -1435,13 +1475,16 @@ namespace NewsManagement.Migrations
                 name: "AppTags");
 
             migrationBuilder.DropTable(
-                name: "ListableContents");
+                name: "AppNewses");
 
             migrationBuilder.DropTable(
                 name: "OpenIddictAuthorizations");
 
             migrationBuilder.DropTable(
                 name: "AbpAuditLogs");
+
+            migrationBuilder.DropTable(
+                name: "ListableContents");
 
             migrationBuilder.DropTable(
                 name: "OpenIddictApplications");

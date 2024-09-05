@@ -33,6 +33,7 @@ namespace NewsManagement.Entities.Newses
     private readonly IVideoRepository _videoRepository;
     private readonly IGalleryRepository _galleryRepository;
     private readonly ICategoryRepository _categoryRepository;
+    private readonly IRepository<NewsDetailImage> _newsDetailImageRepository;
     private readonly IListableContentGenericRepository<News> _genericRepository;
     private readonly IRepository<ListableContentTag> _listableContentTagRepository;
     private readonly IRepository<ListableContentCity> _listableContentCityRepository;
@@ -49,6 +50,7 @@ namespace NewsManagement.Entities.Newses
       IVideoRepository videoRepository,
       IGalleryRepository galleryRepository,
       ICategoryRepository categoryRepository,
+      IRepository<NewsDetailImage> newsDetailImageRepository,
       IListableContentGenericRepository<News> genericRepository,
       IRepository<ListableContentTag> listableContentTagRepository,
       IRepository<ListableContentCity> listableContentCityRepository,
@@ -72,18 +74,21 @@ namespace NewsManagement.Entities.Newses
       _listableContentCityRepository = listableContentCityRepository;
       _listableContentCategoryRepository = listableContentCategoryRepository;
       _listableContentRelationRepository = listableContentRelationRepository;
+      _newsDetailImageRepository = newsDetailImageRepository;
     }
 
     public async Task<NewsDto> CreateAsync(CreateNewsDto createNewsDto)
     {
       var creatingNews = await CheckCreateInputBaseAsync(createNewsDto);
 
-      foreach (var imageId in creatingNews.DetailImageId)
+      foreach (var imageId in creatingNews.DetailImageIds)
       {
-        var images = _fileRepository.GetAsync(imageId).Result;
+        var images = _fileRepository.GetAsync(imageId.DetailImageId).Result;
       }
 
       var news = await _genericRepository.InsertAsync(creatingNews, autoSave: true);
+
+      await _newsDetailImageRepository.InsertManyAsync(creatingNews.DetailImageIds);
 
       await CreateCrossEntity(createNewsDto, news.Id);
 
@@ -96,13 +101,13 @@ namespace NewsManagement.Entities.Newses
     {
       var updatingNews = await CheckUpdateInputBaseAsync(id, updateNewsDto);
 
-
-      foreach (var imageId in updatingNews.DetailImageId)
+      foreach (var imageId in updatingNews.DetailImageIds)
       {
-        var images = _fileRepository.GetAsync(imageId).Result;
+        var images = _fileRepository.GetAsync(imageId.DetailImageId).Result;
       }
 
       var news = await _genericRepository.UpdateAsync(updatingNews, autoSave: true);
+      await _newsDetailImageRepository.UpdateManyAsync(updatingNews.DetailImageIds);
 
       await ReCreateCrossEntity(updateNewsDto, news.Id);
 
