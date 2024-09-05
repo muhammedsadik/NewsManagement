@@ -52,6 +52,7 @@ public class NewsManagementApplicationAutoMapperProfile : Profile
 
     CreateMap<CreateGalleryDto, GalleryDto>().ReverseMap();
     CreateMap<UpdateGalleryDto, GalleryDto>().ReverseMap();
+    CreateMap<UpdateGalleryDto, CreateGalleryDto>().ReverseMap();
 
     #endregion
     
