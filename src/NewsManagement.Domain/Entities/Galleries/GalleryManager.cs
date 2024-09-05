@@ -33,6 +33,7 @@ namespace NewsManagement.Entities.Galleries
     private readonly IVideoRepository _videoRepository;
     private readonly IGalleryRepository _galleryRepository;
     private readonly ICategoryRepository _categoryRepository;
+    private readonly IRepository<GalleryImage> _galleryImageRepository;
     private readonly IListableContentGenericRepository<Gallery> _genericRepository;
     private readonly IRepository<ListableContentTag> _listableContentTagRepository;
     private readonly IRepository<ListableContentCity> _listableContentCityRepository;
@@ -48,6 +49,7 @@ namespace NewsManagement.Entities.Galleries
       IVideoRepository videoRepository,
       IGalleryRepository galleryRepository,
       ICategoryRepository categoryRepository,
+      IRepository<GalleryImage> galleryImageRepository,
       IListableContentGenericRepository<Gallery> genericRepository,
       IRepository<ListableContentTag> listableContentTagRepository,
       IRepository<ListableContentCity> listableContentCityRepository,
@@ -67,6 +69,7 @@ namespace NewsManagement.Entities.Galleries
       _galleryRepository = galleryRepository;
       _genericRepository = genericRepository;
       _categoryRepository = categoryRepository;
+      _galleryImageRepository = galleryImageRepository;
       _listableContentTagRepository = listableContentTagRepository;
       _listableContentCityRepository = listableContentCityRepository;
       _listableContentCategoryRepository = listableContentCategoryRepository;
@@ -88,6 +91,7 @@ namespace NewsManagement.Entities.Galleries
       }
 
       var gallery = await _genericRepository.InsertAsync(creatingGallery, autoSave: true);
+      await _galleryImageRepository.InsertManyAsync(creatingGallery.GalleryImages);
 
       await CreateCrossEntity(createGalleryDto, gallery.Id);
 
@@ -109,6 +113,8 @@ namespace NewsManagement.Entities.Galleries
       }
 
       var gallery = await _genericRepository.UpdateAsync(updatingGallery, autoSave: true);
+      await _galleryImageRepository.UpdateManyAsync(updatingGallery.GalleryImages);
+
 
       await ReCreateCrossEntity(updateGalleryDto, gallery.Id);
 

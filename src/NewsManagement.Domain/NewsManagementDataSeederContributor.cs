@@ -42,6 +42,8 @@ namespace NewsManagement
     private readonly IRepository<News, int> _newsRepository;
     private readonly IRepository<Video, int> _videoRepository;
     private readonly IRepository<Gallery, int> _galleryRepository;
+    private readonly IRepository<GalleryImage> _galleryImageRepository;
+    private readonly IRepository<NewsDetailImage> _newsDetailImageRepository;
     private readonly IRepository<ListableContentTag> _listableContentTagRepository;
     private readonly IRepository<ListableContentCity> _listableContentCityRepository;
     private readonly IRepository<ListableContentCategory> _listableContentCategoryRepository;
@@ -70,6 +72,8 @@ namespace NewsManagement
       IRepository<News, int> newsRepository,
       IRepository<Video, int> videoRepository,
       IRepository<Gallery, int> galleryRepository,
+      IRepository<GalleryImage> galleryImageRepository,
+      IRepository<NewsDetailImage> newsDetailImageRepository,
       IRepository<ListableContentTag> listableContentTagRepository,
       IRepository<ListableContentCity> listableContentCityRepository,
       IRepository<ListableContentCategory> listableContentCategoryRepository,
@@ -111,11 +115,15 @@ namespace NewsManagement
       _fileManager = fileManager;
       _fileContentHashProvider = fileContentHashProvider;
       _fileRepository = fileRepository;
+      _newsDetailImageRepository = newsDetailImageRepository;
+      _galleryImageRepository = galleryImageRepository;
     }
 
     public async Task SeedAsync(DataSeedContext context)
     {
-      Guid? tenantId = _currentTenant.Id; //.HasValue ? _currentTenant.Id.Value : (Guid?)null;  //tenant eklerken çalışmaz sa (//) <= kaldır
+      Guid? tenantId = _currentTenant.Id;
+      var filesImageId = Guid.Parse("17a4c001-a570-c250-60e0-18b9bf25b001");
+      var uploadImageId = Guid.Parse("27a4c002-a570-c250-60e0-18b9bf25b002");
 
       using (_currentTenant.Change(tenantId))
       {
@@ -124,10 +132,10 @@ namespace NewsManagement
         await SeedTagAsync(tenantId);
         await SeedCityAsync(tenantId);
         await SeedCategoryAsync(tenantId);
-        //await SeedFileAsync(tenantId);
-        await SeedNewsAsync(tenantId);
-        await SeedVideoAsync(tenantId);
-        await SeedGalleryAsync(tenantId);
+        await SeedFileAsync(tenantId, filesImageId, uploadImageId);
+        await SeedNewsAsync(tenantId, filesImageId, uploadImageId);
+        await SeedVideoAsync(tenantId, filesImageId, uploadImageId);
+        await SeedGalleryAsync(tenantId, filesImageId, uploadImageId);
       }
     }
 
@@ -503,58 +511,109 @@ namespace NewsManagement
     #endregion
 
     #region File
-    private async Task SeedFileAsync(Guid? tenantId)
+    private async Task SeedFileAsync(Guid? tenantId, Guid filesImageId, Guid uploadImageId)
     {
+      if (await _fileRepository.CountAsync() > 0)
+        return;
 
-      var guid = Guid.Parse("77a4c000-a570-c250-60e0-18b9bf25b000");
-      var rootPath = @"C:\Users\LENOVO\Desktop\NewsManagement\src\NewsManagement.Web\wwwroot\Files.png";
-      var fileName = "Files.png";
-      var fileContainerName = "default";
-      var provider = new FileExtensionContentTypeProvider();
-      provider.TryGetContentType(rootPath, out var mimeType);
+      var currentDirectory = Directory.GetCurrentDirectory();
+      var projectRoot = Directory.GetParent(currentDirectory).Parent.Parent.Parent.Parent.CreateSubdirectory("src\\NewsManagement.Web").FullName;
+      var containerName = "default";
+      var typeProvider = new FileExtensionContentTypeProvider();
 
-      var byteSizeOfFiles = System.IO.File.ReadAllBytes(rootPath);
+      #region Files
 
+      var filesPath = Path.Combine(projectRoot, "wwwroot", "Files.png");
+      var filesName = Path.GetFileName(filesPath);
+      typeProvider.TryGetContentType(filesPath, out var filesMimeType);
+      var byteSizeOfFiles = System.IO.File.ReadAllBytes(filesPath);
+      var filesHashString = _fileContentHashProvider.GetHashString(byteSizeOfFiles);
 
+      var filesConfiguration = _configurationProvider.Get(containerName);
+      var filesBlobName = await _fileBlobNameGenerator.CreateAsync(FileType.RegularFile, filesName, null, filesMimeType, filesConfiguration.AbpBlobDirectorySeparator);
 
-      var hashString = _fileContentHashProvider.GetHashString(byteSizeOfFiles); // FileManager  6 
+      var files = new EasyAbp.FileManagement.Files.File(
+        id: uploadImageId,
+        tenantId: tenantId,
+        parent: null,
+        fileContainerName: containerName,
+        fileName: filesName,
+        mimeType: filesMimeType,
+        fileType: FileType.RegularFile,
+        subFilesQuantity: 0,
+        byteSize: byteSizeOfFiles.Length,
+        hash: filesHashString,
+        blobName: filesBlobName,
+        ownerUserId: null
+      );
 
-      //var configuration = _configurationProvider.Get(fileContainerName);
-      //var blobName = _fileBlobNameGenerator.CreateAsync(FileType.RegularFile, fileName, null, mimeType, configuration.AbpBlobDirectorySeparator);
+      await _fileRepository.InsertAsync(files, autoSave: true);
+      await _fileManager.TrySaveBlobAsync(files, byteSizeOfFiles);
 
-      var newFile = await _fileManager.CreateAsync(
-        fileContainerName, null, fileName.Trim() , mimeType, FileType.RegularFile, null, byteSizeOfFiles);
+      #endregion
 
-      //var file = new EasyAbp.FileManagement.Files.File(
-      //  id: guid,
-      //  tenantId: tenantId,
-      //  parent: null,
-      //  fileContainerName: fileContainerName,
-      //  fileName: fileName,
-      //  mimeType: mimeType,
-      //  fileType: FileType.RegularFile,
-      //  subFilesQuantity: 0,
-      //  byteSize: byteSizeOfFiles.Length,
-      //  hash: hashString,
-      //  blobName: "local/",
-      //  ownerUserId: null
-      //);
+      #region Upload
 
-      //var blobContainer = _fileManager.GetBlobContainer(file);
-      //await blobContainer.SaveAsync(fileName, memoryStream, false, default);
+      var uploadPath = Path.Combine(projectRoot, "wwwroot", "Upload.png");
+      var uploadName = Path.GetFileName(uploadPath);
+      typeProvider.TryGetContentType(uploadPath, out var uploadMimeType);
+      var byteSizeOfUpload = System.IO.File.ReadAllBytes(uploadPath);
+      var uploadHashString = _fileContentHashProvider.GetHashString(byteSizeOfUpload);
 
-      await _fileRepository.InsertAsync(newFile, autoSave: true);
-      await _fileManager.TrySaveBlobAsync(newFile, byteSizeOfFiles);   // FileManager  11
+      var uploadConfiguration = _configurationProvider.Get(containerName);
+      var uploadBlobName = await _fileBlobNameGenerator.CreateAsync(FileType.RegularFile, uploadName, null, uploadMimeType, uploadConfiguration.AbpBlobDirectorySeparator);
+
+      var upload = new EasyAbp.FileManagement.Files.File(
+        id: filesImageId,
+        tenantId: tenantId,
+        parent: null,
+        fileContainerName: containerName,
+        fileName: uploadName,
+        mimeType: uploadMimeType,
+        fileType: FileType.RegularFile,
+        subFilesQuantity: 0,
+        byteSize: byteSizeOfUpload.Length,
+        hash: uploadHashString,
+        blobName: uploadBlobName,
+        ownerUserId: null
+      );
+
+      await _fileRepository.InsertAsync(upload, autoSave: true);
+      await _fileManager.TrySaveBlobAsync(upload, byteSizeOfUpload);
+
+      #endregion
+
     }
 
     #endregion
 
     #region News
 
-    private async Task SeedNewsAsync(Guid? tenantId)
+    private async Task SeedNewsAsync(Guid? tenantId, Guid filesImageId, Guid uploadImageId)
     {
       if (await _newsRepository.CountAsync() > 0)
         return;
+
+      var tagSporId = (await _tagRepository.GetAsync(x => x.TagName == "Spor")).Id;
+      var tagYasamId = (await _tagRepository.GetAsync(x => x.TagName == "Yaşam")).Id;
+      var tagSanayiId = (await _tagRepository.GetAsync(x => x.TagName == "Sanayi")).Id;
+      var tagTeknolojiId = (await _tagRepository.GetAsync(x => x.TagName == "Teknoloji")).Id;
+
+      var cityKonyaId = (await _cityRepository.GetAsync(x => x.CityName == "Konya")).Id;
+      var cityAnkaraId = (await _cityRepository.GetAsync(x => x.CityName == "Ankara")).Id;
+      var cityMardinId = (await _cityRepository.GetAsync(x => x.CityName == "Mardin")).Id;
+      var cityIstanbulId = (await _cityRepository.GetAsync(x => x.CityName == "İstanbul")).Id;
+      var cityDiyarbakırId = (await _cityRepository.GetAsync(x => x.CityName == "Diyarbakır")).Id;
+
+      var categorySaglıkId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Sağlık")).Id;
+      var categoryKulturId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id;
+      var categoryEgitimId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Eğitim")).Id;
+      var categoryEkonomiId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Ekonomi")).Id;
+      var categorySiyasetId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Siyaset")).Id;
+      var categoryYasamKulturuId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Yaşam")).Id;
+      var categoryAsyaKulturId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Asya Kültürü")).Id;
+      var categoryMakroekonomiId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Makroekonomi")).Id;
+      var categoryMikroekonomiId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Mikroekonomi")).Id;
 
       #region News Haber 1
 
@@ -563,17 +622,33 @@ namespace NewsManagement
         {
           Title = "News Haber 1",
           Spot = "News haber 1 içeriği",
-          ImageId = _guidGenerator.Create(), // File dan gelen Id
+          ImageId = filesImageId,
           TenantId = tenantId,
           Status = StatusType.Draft,
           PublishTime = null,
-          ListableContentType = ListableContentType.News,
-          DetailImageId = new List<Guid>
-          {
-            _guidGenerator.Create(), _guidGenerator.Create() // File dan gelen Ids
-          }
+          ListableContentType = ListableContentType.News
         },
         autoSave: true
+      );
+
+      var news1Id = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id;
+
+      await _newsDetailImageRepository.InsertManyAsync(
+        new List<NewsDetailImage>()
+        {
+          new()
+          {
+            NewsId = news1Id,
+            DetailImageId =filesImageId,
+            TenantId = tenantId
+          },
+          new()
+          {
+            NewsId = news1Id,
+            DetailImageId =uploadImageId,
+            TenantId = tenantId
+          }
+        }
       );
 
       await _listableContentTagRepository.InsertManyAsync(
@@ -581,20 +656,20 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
-            TagId = (await _tagRepository.GetAsync(x => x.TagName == "Yaşam")).Id,
+            ListableContentId = news1Id,
+            TagId = tagYasamId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
-            TagId = (await _tagRepository.GetAsync(x => x.TagName == "Sanayi")).Id,
+            ListableContentId = news1Id,
+            TagId = tagSanayiId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
-            TagId = (await _tagRepository.GetAsync(x => x.TagName == "Spor")).Id,
+            ListableContentId = news1Id,
+            TagId = tagSporId,
             TenantId =tenantId
           }
         },
@@ -604,8 +679,8 @@ namespace NewsManagement
       await _listableContentCityRepository.InsertAsync(
         new ListableContentCity()
         {
-          ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
-          CityId = (await _cityRepository.GetAsync(x => x.CityName == "Konya")).Id,
+          ListableContentId = news1Id,
+          CityId = cityKonyaId,
           TenantId = tenantId
         }
         , autoSave: true
@@ -616,14 +691,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Ekonomi")).Id,
+            ListableContentId = news1Id,
+            CategoryId = categoryEkonomiId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Eğitim")).Id,
+            ListableContentId = news1Id,
+            CategoryId = categoryEgitimId,
             TenantId =tenantId
           }
         }
@@ -639,17 +714,33 @@ namespace NewsManagement
         {
           Title = "News Haber 2",
           Spot = "News haber 2 içeriği",
-          ImageId = _guidGenerator.Create(), // File dan gelen Id
+          ImageId = uploadImageId,
           TenantId = tenantId,
           Status = StatusType.Published,
           PublishTime = DateTime.Now,
-          ListableContentType = ListableContentType.News,
-          DetailImageId = new List<Guid>
-          {
-            _guidGenerator.Create(), _guidGenerator.Create() // File dan gelen Ids
-          }
+          ListableContentType = ListableContentType.News
         },
         autoSave: true
+      );
+
+      var news2Id = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id;
+
+      await _newsDetailImageRepository.InsertManyAsync(
+        new List<NewsDetailImage>()
+        {
+          new()
+          {
+            NewsId = news2Id,
+            DetailImageId = uploadImageId,
+            TenantId = tenantId
+          },
+          new()
+          {
+            NewsId = news2Id,
+            DetailImageId = filesImageId,
+            TenantId = tenantId
+          }
+        }
       );
 
       await _listableContentTagRepository.InsertManyAsync(
@@ -657,14 +748,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id,
-            TagId = (await _tagRepository.GetAsync(x => x.TagName == "Yaşam")).Id,
+            ListableContentId = news2Id,
+            TagId = tagYasamId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id,
-            TagId = (await _tagRepository.GetAsync(x => x.TagName == "Spor")).Id,
+            ListableContentId = news2Id,
+            TagId = tagSporId,
             TenantId =tenantId
           }
         },
@@ -676,14 +767,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Diyarbakır")).Id,
+            ListableContentId = news2Id,
+            CityId = cityDiyarbakırId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Mardin")).Id,
+            ListableContentId = news2Id,
+            CityId = cityMardinId,
             TenantId =tenantId
           }
         }
@@ -695,14 +786,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id,
+            ListableContentId = news2Id,
+            CategoryId = categoryKulturId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Asya Kültürü")).Id,
+            ListableContentId = news2Id,
+            CategoryId = categoryAsyaKulturId,
             TenantId =tenantId
           }
         }
@@ -712,8 +803,8 @@ namespace NewsManagement
       await _listableContentRelationRepository.InsertAsync(
         new ListableContentRelation()
         {
-          ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id,
-          RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
+          ListableContentId = news2Id,
+          RelatedListableContentId = news1Id,
           TenantId = tenantId
         },
         autoSave: true
@@ -728,17 +819,33 @@ namespace NewsManagement
         {
           Title = "News Haber 3",
           Spot = "News Haber 3 içeriği",
-          ImageId = _guidGenerator.Create(), // File dan gelen Id
+          ImageId = uploadImageId,
           TenantId = tenantId,
           Status = StatusType.Published,
           PublishTime = DateTime.Now,
-          ListableContentType = ListableContentType.News,
-          DetailImageId = new List<Guid>
-          {
-            _guidGenerator.Create(), _guidGenerator.Create() // File dan gelen Ids
-          }
+          ListableContentType = ListableContentType.News
         },
         autoSave: true
+      );
+
+      var news3Id = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id;
+
+      await _newsDetailImageRepository.InsertManyAsync(
+        new List<NewsDetailImage>()
+        {
+          new()
+          {
+            NewsId = news3Id,
+            DetailImageId = filesImageId,
+            TenantId = tenantId
+          },
+          new()
+          {
+            NewsId = news3Id,
+            DetailImageId = uploadImageId,
+            TenantId = tenantId
+          }
+        }
       );
 
       await _listableContentTagRepository.InsertManyAsync(
@@ -746,14 +853,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id,
-            TagId = (await _tagRepository.GetAsync(x => x.TagName == "Sanayi")).Id,
+            ListableContentId = news3Id,
+            TagId = tagSanayiId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id,
-            TagId = (await _tagRepository.GetAsync(x => x.TagName == "Teknoloji")).Id,
+            ListableContentId = news3Id,
+            TagId = tagTeknolojiId,
             TenantId =tenantId
           }
         },
@@ -765,14 +872,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "İstanbul")).Id,
+            ListableContentId = news3Id,
+            CityId = cityIstanbulId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Konya")).Id,
+            ListableContentId = news3Id,
+            CityId = cityKonyaId,
             TenantId =tenantId
           }
         }
@@ -784,14 +891,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id,
+            ListableContentId = news3Id,
+            CategoryId = categoryKulturId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Eğitim")).Id,
+            ListableContentId = news3Id,
+            CategoryId = categoryEgitimId,
             TenantId =tenantId
           }
         }
@@ -803,14 +910,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
+            ListableContentId = news3Id,
+            RelatedListableContentId = news1Id,
             TenantId = tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id,
+            ListableContentId = news3Id,
+            RelatedListableContentId = news2Id,
             TenantId = tenantId
           }
         },
@@ -826,17 +933,33 @@ namespace NewsManagement
         {
           Title = "News Haber 4",
           Spot = "News Haber 4 içeriği",
-          ImageId = _guidGenerator.Create(), // File dan gelen Id
+          ImageId = filesImageId,
           TenantId = tenantId,
           Status = StatusType.Published,
           PublishTime = DateTime.Now,
-          ListableContentType = ListableContentType.News,
-          DetailImageId = new List<Guid>
-          {
-            _guidGenerator.Create(), _guidGenerator.Create() // File dan gelen Ids
-          }
+          ListableContentType = ListableContentType.News
         },
         autoSave: true
+      );
+
+      var news4Id = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id;
+
+      await _newsDetailImageRepository.InsertManyAsync(
+        new List<NewsDetailImage>()
+        {
+          new()
+          {
+            NewsId = news4Id,
+            DetailImageId = uploadImageId,
+            TenantId = tenantId
+          },
+          new()
+          {
+            NewsId = news4Id,
+            DetailImageId = filesImageId,
+            TenantId = tenantId
+          }
+        }
       );
 
       await _listableContentTagRepository.InsertManyAsync(
@@ -844,14 +967,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
-            TagId = (await _tagRepository.GetAsync(x => x.TagName == "Yaşam")).Id,
+            ListableContentId = news4Id,
+            TagId = tagYasamId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
-            TagId = (await _tagRepository.GetAsync(x => x.TagName == "Sanayi")).Id,
+            ListableContentId = news4Id,
+            TagId = tagSanayiId,
             TenantId =tenantId
           }
         },
@@ -863,14 +986,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Konya")).Id,
+            ListableContentId = news4Id,
+            CityId = cityKonyaId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Mardin")).Id,
+            ListableContentId = news4Id,
+            CityId =cityMardinId,
             TenantId =tenantId
           }
         }
@@ -882,14 +1005,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Sağlık")).Id,
+            ListableContentId = news4Id,
+            CategoryId = categorySaglıkId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Ekonomi")).Id,
+            ListableContentId = news4Id,
+            CategoryId = categoryEgitimId,
             TenantId =tenantId
           }
         }
@@ -901,20 +1024,20 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id,
+            ListableContentId = news4Id,
+            RelatedListableContentId = news2Id,
             TenantId = tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id,
+            ListableContentId = news4Id,
+            RelatedListableContentId = news3Id,
             TenantId = tenantId
           },
           new()
           {
-            ListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
+            ListableContentId = news4Id,
+            RelatedListableContentId = news1Id,
             TenantId = tenantId
           }
         },
@@ -929,10 +1052,36 @@ namespace NewsManagement
 
     #region Video
 
-    private async Task SeedVideoAsync(Guid? tenantId)
+    private async Task SeedVideoAsync(Guid? tenantId, Guid filesImageId, Guid uploadImageId)
     {
       if (await _videoRepository.CountAsync() > 0)
         return;
+
+      var tagSporId = (await _tagRepository.GetAsync(x => x.TagName == "Spor")).Id;
+      var tagYasamId = (await _tagRepository.GetAsync(x => x.TagName == "Yaşam")).Id;
+      var tagSanayiId = (await _tagRepository.GetAsync(x => x.TagName == "Sanayi")).Id;
+      var tagTeknolojiId = (await _tagRepository.GetAsync(x => x.TagName == "Teknoloji")).Id;
+
+      var cityKonyaId = (await _cityRepository.GetAsync(x => x.CityName == "Konya")).Id;
+      var cityAnkaraId = (await _cityRepository.GetAsync(x => x.CityName == "Ankara")).Id;
+      var cityMardinId = (await _cityRepository.GetAsync(x => x.CityName == "Mardin")).Id;
+      var cityIstanbulId = (await _cityRepository.GetAsync(x => x.CityName == "İstanbul")).Id;
+      var cityDiyarbakırId = (await _cityRepository.GetAsync(x => x.CityName == "Diyarbakır")).Id;
+
+      var categorySaglıkId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Sağlık")).Id;
+      var categoryKulturId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id;
+      var categoryEgitimId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Eğitim")).Id;
+      var categoryEkonomiId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Ekonomi")).Id;
+      var categorySiyasetId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Siyaset")).Id;
+      var categoryYasamKulturuId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Yaşam")).Id;
+      var categoryAsyaKulturId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Asya Kültürü")).Id;
+      var categoryMakroekonomiId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Makroekonomi")).Id;
+      var categoryMikroekonomiId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Mikroekonomi")).Id;
+
+      var news1Id = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id;
+      var news2Id = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id;
+      var news3Id = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id;
+      var news4Id = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id;
 
       #region Video Haber 1 (Url)
 
@@ -941,22 +1090,24 @@ namespace NewsManagement
         {
           Title = "Video Haber 1",
           Spot = "Video haber 1 içeriği",
-          ImageId = _guidGenerator.Create(), // File dan gelen Id
+          ImageId = filesImageId,
           TenantId = tenantId,
           Status = StatusType.Published,
           PublishTime = DateTime.Now,
           ListableContentType = ListableContentType.Video,
           VideoType = VideoType.Link,
-          Url = null // Url Verilecek
+          Url = "www.dogruhaber.com.tr"
         },
         autoSave: true
       );
 
+      var video1Id = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 1")).Id;
+
       await _listableContentTagRepository.InsertAsync(
         new ListableContentTag()
         {
-          ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 1")).Id,
-          TagId = (await _tagRepository.GetAsync(x => x.TagName == "Spor")).Id,
+          ListableContentId = video1Id,
+          TagId = tagSporId,
           TenantId = tenantId
         },
         autoSave: true
@@ -967,14 +1118,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 1")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "İstanbul")).Id,
+            ListableContentId = video1Id,
+            CityId = cityIstanbulId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 1")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Mardin")).Id,
+            ListableContentId = video1Id,
+            CityId =cityMardinId,
             TenantId =tenantId
           }
         }
@@ -984,8 +1135,8 @@ namespace NewsManagement
       await _listableContentCategoryRepository.InsertAsync(
         new ListableContentCategory()
         {
-          ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 1")).Id,
-          CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Siyaset")).Id,
+          ListableContentId = video1Id,
+          CategoryId = categorySiyasetId,
           TenantId = tenantId
         },
         autoSave: true
@@ -996,14 +1147,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 1")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
+            ListableContentId = video1Id,
+            RelatedListableContentId = news1Id,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 1")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
+            ListableContentId = video1Id,
+            RelatedListableContentId = news4Id,
             TenantId =tenantId
           }
         },
@@ -1019,22 +1170,24 @@ namespace NewsManagement
         {
           Title = "Video Haber 2",
           Spot = "Video haber 2 içeriği",
-          ImageId = _guidGenerator.Create(), // File dan gelen Id
+          ImageId = filesImageId,
           TenantId = tenantId,
           Status = StatusType.Published,
           PublishTime = DateTime.Now,
           ListableContentType = ListableContentType.Video,
           VideoType = VideoType.Video,
-          VideoId = null // VideoId Verilecek
+          VideoId = uploadImageId
         },
         autoSave: true
       );
 
+      var video2Id = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id;
+
       await _listableContentTagRepository.InsertAsync(
         new ListableContentTag()
         {
-          ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
-          TagId = (await _tagRepository.GetAsync(x => x.TagName == "Teknoloji")).Id,
+          ListableContentId = video2Id,
+          TagId = tagTeknolojiId,
           TenantId = tenantId
         },
         autoSave: true
@@ -1045,14 +1198,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "İstanbul")).Id,
+            ListableContentId = video2Id,
+            CityId = cityIstanbulId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Konya")).Id,
+            ListableContentId = video2Id,
+            CityId = cityKonyaId,
             TenantId =tenantId
           }
         }
@@ -1064,20 +1217,20 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Ekonomi")).Id,
+            ListableContentId = video2Id,
+            CategoryId = categoryEkonomiId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Mikroekonomi")).Id,
+            ListableContentId = video2Id,
+            CategoryId = categoryMikroekonomiId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Makroekonomi")).Id,
+            ListableContentId = video2Id,
+            CategoryId = categoryMakroekonomiId,
             TenantId =tenantId
           }
         },
@@ -1089,32 +1242,32 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
+            ListableContentId = video2Id,
+            RelatedListableContentId = news1Id,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id,
+            ListableContentId = video2Id,
+            RelatedListableContentId = news3Id,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
+            ListableContentId = video2Id,
+            RelatedListableContentId = news4Id,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id,
+            ListableContentId = video2Id,
+            RelatedListableContentId = news2Id,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
-            RelatedListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 1")).Id,
+            ListableContentId = video2Id,
+            RelatedListableContentId = video1Id,
             TenantId =tenantId
           }
         },
@@ -1130,36 +1283,38 @@ namespace NewsManagement
         {
           Title = "Video Haber 3",
           Spot = "Video haber 3 içeriği",
-          ImageId = _guidGenerator.Create(), // File dan gelen Id
+          ImageId = filesImageId,
           TenantId = tenantId,
           Status = StatusType.Published,
           PublishTime = DateTime.Now,
           ListableContentType = ListableContentType.Video,
           VideoType = VideoType.Video,
-          VideoId = null // VideoId Verilecek
+          VideoId = uploadImageId
         },
         autoSave: true
       );
+
+      var video3Id = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id;
 
       await _listableContentTagRepository.InsertManyAsync(
         new List<ListableContentTag>()
         {
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
-            TagId = (await _tagRepository.GetAsync(x => x.TagName == "Teknoloji")).Id,
+            ListableContentId = video3Id,
+            TagId = tagTeknolojiId,
             TenantId = tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
-            TagId = (await _tagRepository.GetAsync(x => x.TagName == "Yaşam")).Id,
+            ListableContentId = video3Id,
+            TagId = tagYasamId,
             TenantId = tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
-            TagId = (await _tagRepository.GetAsync(x => x.TagName == "Sanayi")).Id,
+            ListableContentId = video3Id,
+            TagId = tagSporId,
             TenantId = tenantId
           },
         },
@@ -1171,14 +1326,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "İstanbul")).Id,
+            ListableContentId = video3Id,
+            CityId = cityIstanbulId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Ankara")).Id,
+            ListableContentId = video3Id,
+            CityId = cityAnkaraId,
             TenantId =tenantId
           }
         }
@@ -1190,14 +1345,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Sağlık")).Id,
+            ListableContentId = video3Id,
+            CategoryId = categorySaglıkId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
-            CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Siyaset")).Id,
+            ListableContentId = video3Id,
+            CategoryId = categorySiyasetId,
             TenantId =tenantId
           }
         },
@@ -1209,32 +1364,32 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
+            ListableContentId = video3Id,
+            RelatedListableContentId = news1Id,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id,
+            ListableContentId = video3Id,
+            RelatedListableContentId = news3Id,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
+            ListableContentId = video3Id,
+            RelatedListableContentId = news4Id,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
-            RelatedListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
+            ListableContentId = video3Id,
+            RelatedListableContentId = video2Id,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
-            RelatedListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 1")).Id,
+            ListableContentId = video3Id,
+            RelatedListableContentId = video1Id,
             TenantId =tenantId
           }
         },
@@ -1250,22 +1405,24 @@ namespace NewsManagement
         {
           Title = "Video Haber 4",
           Spot = "Video haber 4 içeriği",
-          ImageId = _guidGenerator.Create(), // File dan gelen Id
+          ImageId = null,
           TenantId = tenantId,
           Status = StatusType.Published,
           PublishTime = DateTime.Now,
           ListableContentType = ListableContentType.Video,
           VideoType = VideoType.Link,
-          Url = null // Url Verilecek
+          Url = "www.dogruhaber.com.tr"
         },
         autoSave: true
       );
 
+      var video4Id = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 4")).Id;
+
       await _listableContentTagRepository.InsertAsync(
         new ListableContentTag()
         {
-          ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 4")).Id,
-          TagId = (await _tagRepository.GetAsync(x => x.TagName == "Yaşam")).Id,
+          ListableContentId = video4Id,
+          TagId = tagYasamId,
           TenantId = tenantId
         },
         autoSave: true
@@ -1276,14 +1433,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 4")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Diyarbakır")).Id,
+            ListableContentId = video4Id,
+            CityId = cityDiyarbakırId,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 4")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Ankara")).Id,
+            ListableContentId = video4Id,
+            CityId = cityAnkaraId,
             TenantId =tenantId
           }
         }
@@ -1293,8 +1450,8 @@ namespace NewsManagement
       await _listableContentCategoryRepository.InsertAsync(
         new ListableContentCategory()
         {
-          ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 4")).Id,
-          CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Eğitim")).Id,
+          ListableContentId = video4Id,
+          CategoryId = categoryEgitimId,
           TenantId = tenantId
         },
         autoSave: true
@@ -1305,14 +1462,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 4")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
+            ListableContentId = video4Id,
+            RelatedListableContentId = news1Id,
             TenantId =tenantId
           },
           new()
           {
-            ListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 1")).Id,
-            RelatedListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id,
+            ListableContentId = video4Id,
+            RelatedListableContentId = video3Id,
             TenantId =tenantId
           }
         },
@@ -1326,37 +1483,87 @@ namespace NewsManagement
     #endregion
 
     #region Gallery
-    private async Task SeedGalleryAsync(Guid? tenantId)
+    private async Task SeedGalleryAsync(Guid? tenantId, Guid filesImageId, Guid uploadImageId)
     {
       if (await _galleryRepository.CountAsync() > 0)
         return;
 
-      #region Gallery Haber 1 
+      var tagSporId = (await _tagRepository.GetAsync(x => x.TagName == "Spor")).Id;
+      var tagYasamId = (await _tagRepository.GetAsync(x => x.TagName == "Yaşam")).Id;
+      var tagSanayiId = (await _tagRepository.GetAsync(x => x.TagName == "Sanayi")).Id;
+      var tagTeknolojiId = (await _tagRepository.GetAsync(x => x.TagName == "Teknoloji")).Id;
+
+      var cityKonyaId = (await _cityRepository.GetAsync(x => x.CityName == "Konya")).Id;
+      var cityAnkaraId = (await _cityRepository.GetAsync(x => x.CityName == "Ankara")).Id;
+      var cityMardinId = (await _cityRepository.GetAsync(x => x.CityName == "Mardin")).Id;
+      var cityIstanbulId = (await _cityRepository.GetAsync(x => x.CityName == "İstanbul")).Id;
+      var cityDiyarbakırId = (await _cityRepository.GetAsync(x => x.CityName == "Diyarbakır")).Id;
+
+      var categorySaglıkId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Sağlık")).Id;
+      var categoryKulturId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id;
+      var categoryEgitimId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Eğitim")).Id;
+      var categoryEkonomiId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Ekonomi")).Id;
+      var categorySiyasetId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Siyaset")).Id;
+      var categoryYasamKulturuId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Yaşam")).Id;
+      var categoryAsyaKulturId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Asya Kültürü")).Id;
+      var categoryMakroekonomiId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Makroekonomi")).Id;
+      var categoryMikroekonomiId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Mikroekonomi")).Id;
+
+      var news1Id = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id;
+      var news2Id = (await _newsRepository.GetAsync(x => x.Title == "News Haber 2")).Id;
+      var news3Id = (await _newsRepository.GetAsync(x => x.Title == "News Haber 3")).Id;
+      var news4Id = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id;
+
+      var video1Id = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 1")).Id;
+      var video2Id = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id;
+      var video3Id = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 3")).Id;
+      var video4Id = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 4")).Id;
+
+      #region Gallery Haber 1
 
       await _galleryRepository.InsertAsync(
         new Gallery()
         {
           Title = "Gallery Haber 1",
           Spot = "Gallery haber 1 içeriği",
-          ImageId = _guidGenerator.Create(), // File dan gelen Id
+          ImageId = filesImageId,
           TenantId = tenantId,
           Status = StatusType.Published,
           PublishTime = DateTime.Now,
           ListableContentType = ListableContentType.Gallery,
-          GalleryImages = new List<GalleryImage>()
-          {
-            new(){Order = 1, ImageId = _guidGenerator.Create(), NewsContent = "Image 1 Content 1"},  // File dan gelen Id
-            new(){Order = 2, ImageId = _guidGenerator.Create(), NewsContent = "Image 2 Content 1"}   // File dan gelen Id
-          }
         },
         autoSave: true
+      );
+
+      var gallery1Id = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 1")).Id;
+
+      await _galleryImageRepository.InsertManyAsync(
+        new List<GalleryImage>()
+        {
+          new()
+          {
+            GalleryId = gallery1Id,
+            ImageId = filesImageId,
+            TenantId = tenantId,
+            NewsContent = "Gallery 1 imege 1",
+            Order = 1,
+          },
+          new()
+          {
+            GalleryId = gallery1Id,
+            ImageId = uploadImageId,
+            TenantId = tenantId,
+            NewsContent = "Gallery 1 imege 2",
+            Order = 2,
+          }
+        }
       );
 
       await _listableContentTagRepository.InsertAsync(
         new ListableContentTag()
         {
-          ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 1")).Id,
-          TagId = (await _tagRepository.GetAsync(x => x.TagName == "Spor")).Id,
+          ListableContentId = gallery1Id,
+          TagId = tagSporId,
           TenantId = tenantId
         },
         autoSave: true
@@ -1367,14 +1574,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 1")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Diyarbakır")).Id,
-          TenantId = tenantId
+            ListableContentId = gallery1Id,
+            CityId = cityDiyarbakırId,
+            TenantId = tenantId
           },
           new()
           {
-            ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 1")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Ankara")).Id,
+            ListableContentId = gallery1Id,
+            CityId =cityAnkaraId,
           TenantId = tenantId
           }
         }
@@ -1384,8 +1591,8 @@ namespace NewsManagement
       await _listableContentCategoryRepository.InsertAsync(
         new ListableContentCategory()
         {
-          ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 1")).Id,
-          CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id,
+          ListableContentId = gallery1Id,
+          CategoryId = categoryKulturId,
           TenantId = tenantId
         },
         autoSave: true
@@ -1396,14 +1603,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 1")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 4")).Id,
+            ListableContentId = gallery1Id,
+            RelatedListableContentId = news4Id,
             TenantId = tenantId
           },
           new()
           {
-            ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 1")).Id,
-            RelatedListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 2")).Id,
+            ListableContentId = gallery1Id,
+            RelatedListableContentId = video2Id,
             TenantId = tenantId
           }
         },
@@ -1419,25 +1626,44 @@ namespace NewsManagement
         {
           Title = "Gallery Haber 2",
           Spot = "Gallery haber 2 içeriği",
-          ImageId = _guidGenerator.Create(), // File dan gelen Id
+          ImageId = uploadImageId,
           TenantId = tenantId,
           Status = StatusType.Published,
           PublishTime = DateTime.Now,
-          ListableContentType = ListableContentType.Gallery,
-          GalleryImages = new List<GalleryImage>()
-          {
-            new(){Order = 1, ImageId = _guidGenerator.Create(), NewsContent = "Image 1 Content 2"},  // File dan gelen Id
-            new(){Order = 2, ImageId = _guidGenerator.Create(), NewsContent = "Image 2 Content 2"}   // File dan gelen Id
-          }
+          ListableContentType = ListableContentType.Gallery
         },
         autoSave: true
+      );
+
+      var gallery2Id = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 2")).Id;
+
+      await _galleryImageRepository.InsertManyAsync(
+        new List<GalleryImage>()
+        {
+          new()
+          {
+            GalleryId = gallery2Id,
+            ImageId = uploadImageId,
+            TenantId = tenantId,
+            NewsContent = "Gallery 2 imege 1",
+            Order = 1,
+          },
+          new()
+          {
+            GalleryId =gallery2Id,
+            ImageId = filesImageId,
+            TenantId = tenantId,
+            NewsContent = "Gallery 2 imege 2",
+            Order = 2,
+          }
+        }
       );
 
       await _listableContentTagRepository.InsertAsync(
         new ListableContentTag()
         {
-          ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 2")).Id,
-          TagId = (await _tagRepository.GetAsync(x => x.TagName == "Teknoloji")).Id,
+          ListableContentId = gallery2Id,
+          TagId = tagTeknolojiId,
           TenantId = tenantId
         },
         autoSave: true
@@ -1448,14 +1674,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 2")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Diyarbakır")).Id,
+            ListableContentId = gallery2Id,
+            CityId = cityDiyarbakırId,
             TenantId = tenantId
           },
           new()
           {
-            ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 2")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Mardin")).Id,
+            ListableContentId = gallery2Id,
+            CityId = cityMardinId,
             TenantId = tenantId
           }
         }
@@ -1465,8 +1691,8 @@ namespace NewsManagement
       await _listableContentCategoryRepository.InsertAsync(
         new ListableContentCategory()
         {
-          ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 2")).Id,
-          CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id,
+          ListableContentId = gallery2Id,
+          CategoryId = categoryKulturId,
           TenantId = tenantId
         },
         autoSave: true
@@ -1477,14 +1703,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 2")).Id,
-            RelatedListableContentId = (await _videoRepository.GetAsync(x => x.Title == "Video Haber 1")).Id,
+            ListableContentId = gallery2Id,
+            RelatedListableContentId = video1Id,
             TenantId = tenantId
           },
           new()
           {
-            ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 2")).Id,
-            RelatedListableContentId = (await _newsRepository.GetAsync(x => x.Title == "News Haber 1")).Id,
+            ListableContentId = gallery2Id,
+            RelatedListableContentId = news2Id,
             TenantId = tenantId
           }
         },
@@ -1500,24 +1726,44 @@ namespace NewsManagement
         {
           Title = "Gallery Haber 3",
           Spot = "Gallery haber 3 içeriği",
-          ImageId = _guidGenerator.Create(), // File dan gelen Id
+          ImageId = uploadImageId,
           TenantId = tenantId,
           Status = StatusType.Published,
           PublishTime = DateTime.Now,
-          ListableContentType = ListableContentType.Gallery,
-          GalleryImages = new List<GalleryImage>()
-          {
-            new(){Order = 1, ImageId = _guidGenerator.Create(), NewsContent = "Image 1 Content 3"},  // File dan gelen Id
-          }
+          ListableContentType = ListableContentType.Gallery
         },
         autoSave: true
+      );
+
+      var gallery3Id = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 3")).Id;
+
+      await _galleryImageRepository.InsertManyAsync(
+        new List<GalleryImage>()
+        {
+          new()
+          {
+            GalleryId = gallery3Id,
+            ImageId = uploadImageId,
+            TenantId = tenantId,
+            NewsContent = "Gallery 3 imege 1",
+            Order = 1,
+          },
+          new()
+          {
+            GalleryId = gallery3Id,
+            ImageId = filesImageId,
+            TenantId = tenantId,
+            NewsContent = "Gallery 3 imege 2",
+            Order = 2,
+          }
+        }
       );
 
       await _listableContentTagRepository.InsertAsync(
         new ListableContentTag()
         {
-          ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 3")).Id,
-          TagId = (await _tagRepository.GetAsync(x => x.TagName == "Yaşam")).Id,
+          ListableContentId = gallery3Id,
+          TagId = tagYasamId,
           TenantId = tenantId
         },
         autoSave: true
@@ -1528,14 +1774,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 3")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "Ankara")).Id,
+            ListableContentId = gallery3Id,
+            CityId = cityAnkaraId,
             TenantId = tenantId
           },
           new()
           {
-            ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 3")).Id,
-            CityId = (await _cityRepository.GetAsync(x => x.CityName == "İstanbul")).Id,
+            ListableContentId = gallery3Id,
+            CityId = cityIstanbulId,
             TenantId = tenantId
           }
         }
@@ -1545,8 +1791,8 @@ namespace NewsManagement
       await _listableContentCategoryRepository.InsertAsync(
         new ListableContentCategory()
         {
-          ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 3")).Id,
-          CategoryId = (await _categoryRepository.GetAsync(c => c.CategoryName == "Kültür")).Id,
+          ListableContentId = gallery3Id,
+          CategoryId = categoryEkonomiId,
           TenantId = tenantId
         },
         autoSave: true
@@ -1557,14 +1803,14 @@ namespace NewsManagement
         {
           new()
           {
-            ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 3")).Id,
-            RelatedListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 1")).Id,
+            ListableContentId = gallery3Id,
+            RelatedListableContentId = gallery1Id,
             TenantId = tenantId
           },
           new()
           {
-            ListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 3")).Id,
-            RelatedListableContentId = (await _galleryRepository.GetAsync(x => x.Title == "Gallery Haber 2")).Id,
+            ListableContentId = gallery3Id,
+            RelatedListableContentId = gallery2Id,
             TenantId = tenantId
           }
         },
@@ -1576,6 +1822,8 @@ namespace NewsManagement
     }
 
     #endregion
+
+
 
   }
 }
