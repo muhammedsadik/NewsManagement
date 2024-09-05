@@ -9,9 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Volo.Abp.BlobStoring.Minio" Version="7.2.1" />
     <PackageReference Include="Volo.Abp.TestBase" Version="7.2.1" />
     <PackageReference Include="Volo.Abp.Autofac" Version="7.2.1" />
-    <PackageReference Include="Volo.Abp.Authorization" Version="7.2.1" />
+    <ProjectReference Include="..\..\modules\FileManagement\host\EasyAbp.FileManagement.Web.Unified\EasyAbp.FileManagement.Web.Unified.csproj" />
+    <ProjectReference Include="..\..\src\NewsManagement.Domain.Shared\NewsManagement.Domain.Shared.csproj" />
     <ProjectReference Include="..\..\src\NewsManagement.Domain\NewsManagement.Domain.csproj" />
   </ItemGroup>
 

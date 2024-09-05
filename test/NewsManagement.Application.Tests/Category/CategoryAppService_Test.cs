@@ -1,6 +1,7 @@
 ﻿using NewsManagement.AppService.Categories;
 using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Exceptions;
+using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.EntityDtos.CategoryDtos;
 using NewsManagement.EntityDtos.PagedAndSortedDtos;
 using Shouldly;
@@ -28,7 +29,13 @@ namespace NewsManagement.Category
     [Fact]
     public async Task CreateAsync_MainCategoryNameInValid_AlreadyExistException()
     {
-      CreateCategoryDto category = new() { CategoryName = "Kültür", ColorCode = "#a6e79f", IsActive = true };
+      CreateCategoryDto category = new()
+      {
+        CategoryName = "Kültür",
+        ColorCode = "#a6e79f",
+        IsActive = true,
+        listableContentType = ListableContentType.Gallery
+      };
 
       await Assert.ThrowsAsync<AlreadyExistException>(async () =>
       {
@@ -39,7 +46,14 @@ namespace NewsManagement.Category
     [Fact]
     public async Task CreateAsync_SubCategoryNameInValid_AlreadyExistException()
     {
-      CreateCategoryDto category = new() { CategoryName = "Yaşam", ColorCode = "#a6e79f", IsActive = true, ParentCategoryId = 1 };
+      CreateCategoryDto category = new()
+      {
+        CategoryName = "Yaşam",
+        ColorCode = "#a6e79f",
+        IsActive = true,
+        ParentCategoryId = 1,
+        listableContentType = ListableContentType.Gallery
+      };
 
       await Assert.ThrowsAsync<AlreadyExistException>(async () =>
       {
@@ -50,7 +64,14 @@ namespace NewsManagement.Category
     [Fact]
     public async Task CreateAsync_SubCategory_BusinessException()
     {
-      CreateCategoryDto category = new() { CategoryName = "Spor", ColorCode = "#f6e79f", IsActive = true, ParentCategoryId = 5 };
+      CreateCategoryDto category = new()
+      {
+        CategoryName = "Spor",
+        ColorCode = "#f6e79f",
+        IsActive = true,
+        ParentCategoryId = 6,
+        listableContentType = ListableContentType.Gallery
+      };
 
       await Assert.ThrowsAsync<BusinessException>(async () =>
       {
@@ -62,7 +83,14 @@ namespace NewsManagement.Category
     public async Task UpdateAsync_ReturnValue_CategoryDto()
     {
       int categoryId = 2;
-      UpdateCategoryDto category = new() { CategoryName = "Eğitim", ColorCode = "#ff179a", IsActive = true };
+      UpdateCategoryDto category = new()
+      {
+        CategoryName = "İç Ekonomi",
+        ColorCode = "#ff179a",
+        IsActive = true,
+        ParentCategoryId = null,
+        listableContentType = ListableContentType.Video
+      };
 
       var result = await _categoryAppService.UpdateAsync(categoryId, category);
 
@@ -103,7 +131,7 @@ namespace NewsManagement.Category
     [Fact]
     public async Task GetSubCategoriesById_IdValid_ReturnEntity()
     {
-      var id = 5;
+      var id = 6;
       var categories = await _categoryAppService.GetSubCategoriesById(id);
 
       Assert.NotNull(categories);

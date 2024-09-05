@@ -11,6 +11,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\modules\FileManagement\src\EasyAbp.FileManagement.Domain\EasyAbp.FileManagement.Domain.csproj" />
     <ProjectReference Include="..\..\src\NewsManagement.Application\NewsManagement.Application.csproj" />
+    <ProjectReference Include="..\..\src\NewsManagement.Domain.Shared\NewsManagement.Domain.Shared.csproj" />
+    <ProjectReference Include="..\..\src\NewsManagement.Domain\NewsManagement.Domain.csproj" />
     <ProjectReference Include="..\NewsManagement.Domain.Tests\NewsManagement.Domain.Tests.csproj" />
   </ItemGroup>
 
