@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Localization;
 using NewsManagement.EntityDtos.NewsDtos;
 using NewsManagement.Localization;
+using NewsManagement.Validations.GalleryValidation;
 using NewsManagement.Validations.ListableContentValidation;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace NewsManagement.Validations.NewsValidation
     {
       Include(new CreateListableContentDtoValidator(localizer));
 
-      RuleFor(n => n.DetailImageId).NotNull();
+      RuleFor(x => x.DetailImageIds).ForEach(x => x.SetValidator(new NewsDetailImageDtoValidator()));
     }
   }
 }

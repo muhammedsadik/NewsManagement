@@ -91,7 +91,6 @@ namespace NewsManagement.Entities.Galleries
       }
 
       var gallery = await _genericRepository.InsertAsync(creatingGallery, autoSave: true);
-      await _galleryImageRepository.InsertManyAsync(creatingGallery.GalleryImages);
 
       await CreateCrossEntity(createGalleryDto, gallery.Id);
 
@@ -112,8 +111,8 @@ namespace NewsManagement.Entities.Galleries
         var images = _fileRepository.GetAsync(galleryImage.ImageId).Result;
       }
 
+      await _galleryImageRepository.DeleteAsync(x => x.GalleryId == id);
       var gallery = await _genericRepository.UpdateAsync(updatingGallery, autoSave: true);
-      await _galleryImageRepository.UpdateManyAsync(updatingGallery.GalleryImages);
 
 
       await ReCreateCrossEntity(updateGalleryDto, gallery.Id);

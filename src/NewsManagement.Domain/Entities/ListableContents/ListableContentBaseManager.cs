@@ -297,7 +297,8 @@ namespace NewsManagement.Entities.ListableContents
           .WithData("0", listableContentCategoryDto.Count(x => x.IsPrimary));
 
       if (missingCategoryIds.Any())
-        throw new BusinessException(NewsManagementDomainErrorCodes.WithoutParentCategory).WithData("categoryId", string.Join(", ", missingCategoryIds));
+        throw new BusinessException(NewsManagementDomainErrorCodes.WithoutParentCategory)
+          .WithData("categoryId", string.Join(", ", missingCategoryIds));
 
     }
 

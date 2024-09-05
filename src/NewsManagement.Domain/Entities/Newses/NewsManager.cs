@@ -20,6 +20,7 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.ObjectMapping;
+using static NewsManagement.Permissions.NewsManagementPermissions;
 
 namespace NewsManagement.Entities.Newses
 {
@@ -88,8 +89,6 @@ namespace NewsManagement.Entities.Newses
 
       var news = await _genericRepository.InsertAsync(creatingNews, autoSave: true);
 
-      await _newsDetailImageRepository.InsertManyAsync(creatingNews.DetailImageIds);
-
       await CreateCrossEntity(createNewsDto, news.Id);
 
       var newsDto = _objectMapper.Map<News, NewsDto>(news);
@@ -106,8 +105,8 @@ namespace NewsManagement.Entities.Newses
         var images = _fileRepository.GetAsync(imageId.DetailImageId).Result;
       }
 
+      await _newsDetailImageRepository.DeleteAsync(x => x.NewsId == id);
       var news = await _genericRepository.UpdateAsync(updatingNews, autoSave: true);
-      await _newsDetailImageRepository.UpdateManyAsync(updatingNews.DetailImageIds);
 
       await ReCreateCrossEntity(updateNewsDto, news.Id);
 

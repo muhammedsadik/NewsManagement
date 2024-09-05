@@ -9,13 +9,11 @@ using System.Text;
 
 namespace NewsManagement.Validations.NewsValidation
 {
-  public class UpdateNewsDtoValidator : AbstractValidator<UpdateNewsDto>
+  public class NewsDetailImageDtoValidator : AbstractValidator<NewsDetailImageDto>
   {
-    public UpdateNewsDtoValidator(IStringLocalizer<NewsManagementResource> localizer)
+    public NewsDetailImageDtoValidator()
     {
-      Include(new UpdateListableContentDtoValidator(localizer));
-
-      RuleFor(x => x.DetailImageIds).ForEach(x => x.SetValidator(new NewsDetailImageDtoValidator()));
+      RuleFor(n => n.DetailImageId).NotNull();
     }
   }
 }

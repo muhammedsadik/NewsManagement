@@ -42,6 +42,9 @@ public class NewsManagementApplicationAutoMapperProfile : Profile
     CreateMap<News, NewsDto>().ReverseMap();
     CreateMap<UpdateNewsDto, News>().ReverseMap();
     CreateMap<CreateNewsDto, News>().ReverseMap();
+
+    CreateMap<NewsDetailImageDto, NewsDetailImage>().ReverseMap();
+    CreateMap<CreateNewsDto, UpdateNewsDto>().ReverseMap();
     #endregion
     
     #region Gallery
@@ -50,16 +53,14 @@ public class NewsManagementApplicationAutoMapperProfile : Profile
     CreateMap<CreateGalleryDto, Gallery>().ReverseMap();
     CreateMap<GalleryImage, GalleryImageDto>().ReverseMap();
 
-    CreateMap<CreateGalleryDto, GalleryDto>().ReverseMap();
-    CreateMap<UpdateGalleryDto, GalleryDto>().ReverseMap();
-    CreateMap<UpdateGalleryDto, CreateGalleryDto>().ReverseMap();
-
+    CreateMap<CreateGalleryDto, UpdateGalleryDto>().ReverseMap();
     #endregion
     
     #region Video
     CreateMap<Video, VideoDto>().ReverseMap();
     CreateMap<UpdateVideoDto, Video>().ReverseMap();
     CreateMap<CreateVideoDto, Video>().ReverseMap();
+    CreateMap<CreateVideoDto, UpdateVideoDto>().ReverseMap();
     #endregion
     
     #region ListableContent
