@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.FeatureManagement;
 using Volo.Abp.ObjectMapping;
 using Xunit;
 
@@ -25,9 +26,12 @@ namespace NewsManagement.Video
     private readonly Guid _filesImageId;
     private readonly Guid _uploadImageId;
     private readonly CreateVideoDto _createVideoDto;
+    private readonly IFeatureManager _featureManager;
+
     public VideoAppService_Test()
     {
       _videoAppService = GetRequiredService<VideoAppService>();
+      _featureManager = GetRequiredService<FeatureManager>();
       _objectMapper = GetRequiredService<IObjectMapper>();
       _filesImageId = Guid.Parse("17a4c001-a570-c250-60e0-18b9bf25b001");
       _uploadImageId = Guid.Parse("27a4c002-a570-c250-60e0-18b9bf25b002");
@@ -97,6 +101,8 @@ namespace NewsManagement.Video
     [Fact]
     public async Task GetListAsync_FilterLimitsInValid_BusinessException()
     {
+      //await _featureManager.SetAsync("NewsApp.Video", "true");
+
       var exception = await Assert.ThrowsAsync<BusinessException>(async () =>
       {
         await _videoAppService.GetListAsync(new GetListPagedAndSortedDto() { SkipCount = 10});

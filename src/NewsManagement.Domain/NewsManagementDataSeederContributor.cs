@@ -22,6 +22,8 @@ using System.Threading.Tasks;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.FeatureManagement;
+using Volo.Abp.Features;
 using Volo.Abp.Guids;
 using Volo.Abp.Identity;
 using Volo.Abp.MultiTenancy;
@@ -53,13 +55,13 @@ namespace NewsManagement
     private readonly IdentityUserManager _identityUserManager;
     private readonly IdentityRoleManager _identityRoleManager;
     private readonly IPermissionManager _permissionManager;
-    private readonly ITenantManager _tenantManager;
-    private readonly ITenantRepository _tenantRepository;
+    private readonly FeatureManager _featureManager;
+    private readonly IFeatureChecker _featureChecker;
     private readonly ICurrentTenant _currentTenant;
     private readonly FileManager _fileManager;
-    private readonly IFileContentHashProvider _fileContentHashProvider;
     private readonly IFileRepository _fileRepository;
     private readonly IFileBlobNameGenerator _fileBlobNameGenerator;
+    private readonly IFileContentHashProvider _fileContentHashProvider;
     private readonly IFileContainerConfigurationProvider _configurationProvider;
 
     public NewsManagementDataSeederContributor(
@@ -83,9 +85,9 @@ namespace NewsManagement
       IdentityRoleManager identityRoleManager,
       IdentityUserManager identityUserManager,
       IPermissionManager permissionManager,
-      ITenantManager tenantManager,
-      ITenantRepository tenantRepository,
       ICurrentTenant currentTenant,
+      FeatureManager featureManager,
+      IFeatureChecker featureChecker,
       FileManager fileManager,
       IFileContentHashProvider fileContentHashProvider,
       IFileRepository fileRepository
@@ -96,10 +98,10 @@ namespace NewsManagement
       _guidGenerator = guidGenerator;
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
-      _categoryRepository = categoryRepository;
       _newsRepository = newsRepository;
       _videoRepository = videoRepository;
       _galleryRepository = galleryRepository;
+      _categoryRepository = categoryRepository;
       _listableContentTagRepository = listableContentTagRepository;
       _listableContentCityRepository = listableContentCityRepository;
       _listableContentCategoryRepository = listableContentCategoryRepository;
@@ -109,12 +111,12 @@ namespace NewsManagement
       _identityRoleManager = identityRoleManager;
       _identityUserManager = identityUserManager;
       _permissionManager = permissionManager;
-      _tenantManager = tenantManager;
-      _tenantRepository = tenantRepository;
+      _featureManager = featureManager;
       _currentTenant = currentTenant;
-      _fileManager = fileManager;
-      _fileContentHashProvider = fileContentHashProvider;
+      _fileManager = fileManager; 
+      _featureChecker = featureChecker;
       _fileRepository = fileRepository;
+      _fileContentHashProvider = fileContentHashProvider;
       _newsDetailImageRepository = newsDetailImageRepository;
       _galleryImageRepository = galleryImageRepository;
     }
@@ -122,8 +124,8 @@ namespace NewsManagement
     public async Task SeedAsync(DataSeedContext context)
     {
       Guid? tenantId = _currentTenant.Id;
-      var filesImageId = Guid.Parse("17a4c001-a570-c250-60e0-18b9bf25b001");
-      var uploadImageId = Guid.Parse("27a4c002-a570-c250-60e0-18b9bf25b002");
+      var filesImageId = NewsManagementConsts.FilesImageId;
+      var uploadImageId = NewsManagementConsts.UploadImageId;
 
       using (_currentTenant.Change(tenantId))
       {
@@ -131,6 +133,7 @@ namespace NewsManagement
         await SeedUserAsync(tenantId);
         await SeedTagAsync(tenantId);
         await SeedCityAsync(tenantId);
+        await SeedFeaturesAsync(tenantId);
         await SeedCategoryAsync(tenantId);
         await SeedFileAsync(tenantId, filesImageId, uploadImageId);
         await SeedNewsAsync(tenantId, filesImageId, uploadImageId);
@@ -141,16 +144,19 @@ namespace NewsManagement
 
     #region Tenant
 
-    //private async Task SeedTenantAsync()
-    //{
-    //  var isStaffTenantExist = await _tenantRepository.FindByNameAsync("Staff");
-    //  if (isStaffTenantExist != null)
-    //    return;
+    private async Task SeedFeaturesAsync(Guid? tenantId)
+    {
+      //var featureValue = await _featureChecker.GetOrNullAsync("NewsApp.Video");
+      //if (!string.IsNullOrEmpty(featureValue))
+      //  return;
+   
 
-    //  await _tenantManager.CreateAsync("Staff");
+      //await _featureManager.SetAsync(
+      //    "NewsApp.Video",
+      //    "true"
+      //);
 
-
-    //}
+    }
 
     #endregion
 
