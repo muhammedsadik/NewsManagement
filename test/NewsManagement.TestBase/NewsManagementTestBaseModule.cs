@@ -14,6 +14,7 @@ using Volo.Abp.BackgroundJobs;
 using Volo.Abp.BlobStoring;
 using Volo.Abp.BlobStoring.Minio;
 using Volo.Abp.Data;
+using Volo.Abp.FeatureManagement;
 using Volo.Abp.Hangfire;
 using Volo.Abp.Modularity;
 using Volo.Abp.Threading;

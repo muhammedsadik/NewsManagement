@@ -119,8 +119,8 @@ namespace NewsManagement
     public async Task SeedAsync(DataSeedContext context)
     {
       Guid? tenantId = _currentTenant.Id;
-      var filesImageId = Guid.Parse("17a4c001-a570-c250-60e0-18b9bf25b001");
-      var uploadImageId = Guid.Parse("27a4c002-a570-c250-60e0-18b9bf25b002");
+      var filesImageId = NewsManagementTestConsts.FilesImageId;
+      var uploadImageId = NewsManagementTestConsts.UploadImageId;
 
       using (_currentTenant.Change(tenantId))
       {

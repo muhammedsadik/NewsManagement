@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\modules\FileManagement\host\EasyAbp.FileManagement.Web.Unified\EasyAbp.FileManagement.Web.Unified.csproj" />
     <ProjectReference Include="..\..\modules\FileManagement\src\EasyAbp.FileManagement.Domain\EasyAbp.FileManagement.Domain.csproj" />
     <ProjectReference Include="..\..\src\NewsManagement.Application\NewsManagement.Application.csproj" />
     <ProjectReference Include="..\..\src\NewsManagement.Domain.Shared\NewsManagement.Domain.Shared.csproj" />
@@ -18,7 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-    <PackageReference Include="Volo.Abp.Authorization" Version="7.2.3" />
+    <PackageReference Include="Volo.Abp.Authorization" Version="7.2.1" />
   </ItemGroup>
 
 </Project>
