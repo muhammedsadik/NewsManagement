@@ -26,7 +26,8 @@ public static class NewsManagementDomainErrorCodes
   public const string VideoIdMustBeExistForVideoType = "NewsManagement:521";
   public const string UrlMustBeExistForLinkType = "NewsManagement:522";
   public const string SortingError = "NewsManagement:523";
-
+  public const string SubcategoryCannotHaveSameNameParentCategory = "NewsManagement:524";
+  public const string CityCodeAlreadyExists = "NewsManagement:525";
 
 
 

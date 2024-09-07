@@ -179,13 +179,15 @@ namespace NewsManagement.Entities.ListableContents
       await _genericRepository.HardDeleteAsync(entity);
     }
 
-    public async Task CheckGetEntityByIdBaseAsync(int id)
+    public async Task<TEntity> CheckGetEntityByIdBaseAsync(int id)
     {
       var entity = await _genericRepository.GetAsync(id);
 
       entity.ViewsCount += 1;
 
       await _genericRepository.UpdateAsync(entity);
+
+      return entity;
     }
 
     #region Helper Method

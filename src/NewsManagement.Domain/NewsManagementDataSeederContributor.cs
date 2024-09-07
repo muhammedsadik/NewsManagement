@@ -1,5 +1,6 @@
 ﻿using EasyAbp.FileManagement.Files;
 using EasyAbp.FileManagement.Options.Containers;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles;
 using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Cities;
@@ -129,12 +130,12 @@ namespace NewsManagement
 
       using (_currentTenant.Change(tenantId))
       {
-        await SeedRoleAsync(tenantId);
-        await SeedUserAsync(tenantId);
-        await SeedTagAsync(tenantId);
-        await SeedCityAsync(tenantId);
-        await SeedFeaturesAsync(tenantId);
-        await SeedCategoryAsync(tenantId);
+        //await SeedRoleAsync(tenantId);
+        //await SeedUserAsync(tenantId);
+        //await SeedTagAsync(tenantId);
+        //await SeedCityAsync(tenantId);
+        //await SeedFeaturesAsync(tenantId);
+        //await SeedCategoryAsync(tenantId);
         await SeedFileAsync(tenantId, filesImageId, uploadImageId);
         await SeedNewsAsync(tenantId, filesImageId, uploadImageId);
         await SeedVideoAsync(tenantId, filesImageId, uploadImageId);
@@ -142,7 +143,7 @@ namespace NewsManagement
       }
     }
 
-    #region Tenant
+    #region Feature
 
     private async Task SeedFeaturesAsync(Guid? tenantId)
     {
@@ -522,8 +523,10 @@ namespace NewsManagement
       if (await _fileRepository.CountAsync() > 0)
         return;
 
-      var currentDirectory = Directory.GetCurrentDirectory();
-      var projectRoot = Directory.GetParent(currentDirectory).Parent.Parent.Parent.Parent.CreateSubdirectory("src\\NewsManagement.Web").FullName;
+      var projectRoot = Directory.GetCurrentDirectory();
+      if(tenantId == null)
+        projectRoot = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.CreateSubdirectory("src\\NewsManagement.Web").FullName;
+
       var containerName = "default";
       var typeProvider = new FileExtensionContentTypeProvider();
 

@@ -29,8 +29,8 @@ namespace NewsManagement.Gallery
     {
       _galleryAppService = GetRequiredService<GalleryAppService>();
       _objectMapper = GetRequiredService<IObjectMapper>();
-      _filesImageId = Guid.Parse("17a4c001-a570-c250-60e0-18b9bf25b001");
-      _uploadImageId = Guid.Parse("27a4c002-a570-c250-60e0-18b9bf25b002");
+      _filesImageId = NewsManagementTestConsts.FilesImageId;
+      _uploadImageId = NewsManagementTestConsts.UploadImageId;
 
       _createGalleryDto = new CreateGalleryDto()
       {
@@ -86,7 +86,7 @@ namespace NewsManagement.Gallery
     }
 
     [Fact]
-    public async Task GetListAsync_DateTimeInValid_BusinessException()
+    public async Task GetListAsync_NoFilter_ReturnGallertyList()
     {
       var galleryList = await _galleryAppService.GetListAsync(new GetListPagedAndSortedDto());
 
@@ -95,7 +95,7 @@ namespace NewsManagement.Gallery
     }
 
     [Fact]
-    public async Task DeleteHardAsync_IdValid_EntityNotFoundException()
+    public async Task DeleteHardAsync_IdValid_EntityDeleting()
     {
       int id = 9;
 

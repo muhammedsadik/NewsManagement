@@ -9,9 +9,5 @@ namespace NewsManagement;
     )]
 public class NewsManagementApplicationTestModule : AbpModule
 {
-  public override void ConfigureServices(ServiceConfigurationContext context)
-  {
-    context.Services.AddAlwaysAllowAuthorization();
-  }
 
 }

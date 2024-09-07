@@ -124,12 +124,27 @@ namespace NewsManagement.Entities.Galleries
 
     public async Task<PagedResultDto<GalleryDto>> GetListAsync(GetListPagedAndSortedDto input)
     {
-      return await GetListFilterBaseAsync(input);
+      var filteredList = await GetListFilterBaseAsync(input);
+
+      foreach (var item in filteredList.Items.ToList())
+      {
+        var galleryImage = await _galleryImageRepository.GetListAsync(x => x.GalleryId == item.Id);
+        var galleryImageDto = _objectMapper.Map<List<GalleryImage>, List<GalleryImageDto>>(galleryImage); 
+
+        item.GalleryImages = galleryImageDto;
+      }
+
+      return filteredList;
     }
 
-    public async Task GetEntityByIdAsync(int id)
+    public async Task<Gallery> GetEntityByIdAsync(int id)
     {
-      await CheckGetEntityByIdBaseAsync(id);
+      var gallery = await CheckGetEntityByIdBaseAsync(id);
+
+      var galleryImage = await _galleryImageRepository.GetListAsync(x => x.GalleryId == gallery.Id);
+      gallery.GalleryImages = galleryImage;
+
+      return gallery;
     }
 
     public async Task DeleteAsync(int id)
