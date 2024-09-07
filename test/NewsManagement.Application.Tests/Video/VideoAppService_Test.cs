@@ -1,4 +1,5 @@
-﻿using NewsManagement.AppService.Videos;
+﻿using NewsManagement.AppService.Galleries;
+using NewsManagement.AppService.Videos;
 using NewsManagement.Entities.Exceptions;
 using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.EntityConsts.VideoConsts;
@@ -13,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.ObjectMapping;
 using Xunit;
@@ -33,8 +35,8 @@ namespace NewsManagement.Video
       _videoAppService = GetRequiredService<VideoAppService>();
       _featureManager = GetRequiredService<FeatureManager>();
       _objectMapper = GetRequiredService<IObjectMapper>();
-      _filesImageId = Guid.Parse("17a4c001-a570-c250-60e0-18b9bf25b001");
-      _uploadImageId = Guid.Parse("27a4c002-a570-c250-60e0-18b9bf25b002");
+      _filesImageId = NewsManagementTestConsts.FilesImageId;
+      _uploadImageId = NewsManagementTestConsts.UploadImageId;
 
       _createVideoDto = new CreateVideoDto()
       {
@@ -101,7 +103,7 @@ namespace NewsManagement.Video
     [Fact]
     public async Task GetListAsync_FilterLimitsInValid_BusinessException()
     {
-      //await _featureManager.SetAsync("NewsApp.Video", "true");
+      await _featureManager.SetAsync("NewsApp.Video", "true", "AbpFeatureProvider", "");// bunun üzerinde çalış
 
       var exception = await Assert.ThrowsAsync<BusinessException>(async () =>
       {
@@ -111,7 +113,16 @@ namespace NewsManagement.Video
       Assert.Equal(NewsManagementDomainErrorCodes.FilterLimitsError, exception.Code);
     }
 
+    [Fact]
+    public async Task DeleteAsync_IdInValid_EntityNotFoundException()
+    {
+      int id = 99;
 
+      await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+      {
+        await _videoAppService.DeleteAsync(id);
+      });
+    }
 
 
   }

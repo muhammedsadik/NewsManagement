@@ -11,6 +11,8 @@
     "Scheduled": "Planlanmış ",
     "Deleted": "Silinmiş ",
     "Rejected": "Reddedilmiş",
+    "NewsApp.ListableContent": "Listelenebilir İçerik",
+    "NewsApp.Video": "Video",
 
     "NewsManagement:500": "{0} = {1} Bulunamadı.",
     "NewsManagement:501": "{1} ile aynı isimli bir {0} önceden oluşturulmuş.",
@@ -30,21 +32,23 @@
     "NewsManagement:515": "Planlanmış Durumu için Tarih/Saat Hatası: Gelecekte olmalıdır.",
     "NewsManagement:516": "Alt kategori, üst kategori olmadan atanamaz. Atanamayan alt kategoriler = {categoryId}",
     "NewsManagement:517": "İlgili içerik olarak kendi eklenemez",
-    "NewsManagement:518": "Ekleme işlemi sırasında Durum 'Deleted' olamaz.", //burada Deleted türkçe olmaz ise değiştir. ❗❗❗
+    "NewsManagement:518": "Ekleme işlemi sırasında Durum 'Deleted' olamaz.",
     "NewsManagement:519": "Fiziksel tür için URL null olmalıdır.",
     "NewsManagement:520": "Link türü için VideoId null olmalıdır.",
     "NewsManagement:521": "VideoId Fiziksel tür için VideoId null olamaz.",
     "NewsManagement:522": "Link türü için URL null olamaz.",
     "NewsManagement:523": "Sıralama hatası. Index : {0}",
+    "NewsManagement:524": "Alt kategori, üst kategori ile aynı isme sahip olamaz.",
+    "NewsManagement:525": "Şehir Kodu zaten mevcut. Index : {0}",
 
 
 
 
     //ValidasyonHataları
     "NewsManagement:v401": "Listelenebilir Enum türünde değil. Enum türü şunları içermelidir = { Haber için = 0 , Video için = 1 , Galeri için = 2 }.",
-    "NewsManagement:v402": "Video Enum türünde değil. Enum türü şunları içermelidir = { Video için = 0 , Link için = 1 }.",
-    "NewsManagement:v403": "Sadece bir kategori Birincil Kategori olabilir. Sizin seçiminiz = {0}",
-    "NewsManagement:v404": "Durum Enum türünde değil. Enum türü şunları içermelidir  = { Draft = 0 , Pending Review = 1 , Archived = 2 , Published = 3 , Scheduled = 4 , Deleted = 5 , Rejected = 6 }.",
+    "NewsManagement:v402": "Video Enum türünde değil. Enum türü şunları içermelidir = { Video = 0 , Link = 1 }.",
+    "NewsManagement:v403": "Sadece bir kategori Birincil Kategori olabilir. Seçiminiz = {0}",
+    "NewsManagement:v404": "Durum Enum türünde değil. Enum türü şunları içermelidir  = { Draft = 0 , Archived = 1 , Published = 2 , Scheduled = 3 , Deleted = 4 }.",
 
 
 

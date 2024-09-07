@@ -59,18 +59,22 @@ namespace NewsManagement.Entities.Categories
         throw new AlreadyExistException(typeof(Category), category.CategoryName);
     }
 
-    public async Task<Category> CheckSubCategoryIsValidAsync(Category category, int? id = null)
+    public async Task<Category> CheckSubCategoryIsValidAsync(Category category, int? categoryId = null)
     {
       var isExistCategory = await _categoryRepository.AnyAsync(
         c => c.CategoryName == category.CategoryName
         && c.ParentCategoryId == category.ParentCategoryId
         && c.listableContentType == category.listableContentType
-        && c.Id != id
+        && c.Id != categoryId
       );
+
       if (isExistCategory)
         throw new AlreadyExistException(typeof(Category), category.CategoryName);
 
       var parentCategory = await _categoryRepository.GetAsync((int)category.ParentCategoryId);
+
+      if(parentCategory.CategoryName == category.CategoryName)
+        throw new BusinessException(NewsManagementDomainErrorCodes.SubcategoryCannotHaveSameNameParentCategory);
 
       if (parentCategory.listableContentType != category.listableContentType)
         throw new BusinessException(NewsManagementDomainErrorCodes.MustHaveTheSameContentType);
@@ -157,7 +161,7 @@ namespace NewsManagement.Entities.Categories
 
     public async Task<List<Category>> DeleteAsync(int id)
     {
-      var category = await _categoryRepository.GetAsync(c => c.Id == id);
+      var category = await _categoryRepository.GetAsync(id);
 
       var deletingList = new List<Category>();
 

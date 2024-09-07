@@ -34,8 +34,8 @@ namespace NewsManagement.News
     {
       _newsAppService = GetRequiredService<NewsAppService>();
       _objectMapper = GetRequiredService<IObjectMapper>();
-      _filesImageId = Guid.Parse("17a4c001-a570-c250-60e0-18b9bf25b001");
-      _uploadImageId = Guid.Parse("27a4c002-a570-c250-60e0-18b9bf25b002");
+      _filesImageId = NewsManagementTestConsts.FilesImageId;
+      _uploadImageId = NewsManagementTestConsts.UploadImageId;
 
       _createNewsDto = new CreateNewsDto()
       {

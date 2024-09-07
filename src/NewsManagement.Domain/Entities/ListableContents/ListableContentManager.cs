@@ -16,12 +16,14 @@ using NewsManagement.Entities.Cities;
 using NewsManagement.Entities.Exceptions;
 using NewsManagement.EntityDtos.CityDtos;
 using Volo.Abp;
+using NewsManagement.Entities.Galleries;
 
 namespace NewsManagement.Entities.ListableContents
 {
   public class ListableContentManager : DomainService
   {
     private readonly IObjectMapper _objectMapper;
+    private readonly IRepository<GalleryImage> _galleryImageRepository;
     private readonly IListableContentRepository _listableContentRepository;
     private readonly IRepository<ListableContentTag> _listableContentTagRepository;
     private readonly IRepository<ListableContentCity> _listableContentCityRepository;
@@ -30,6 +32,7 @@ namespace NewsManagement.Entities.ListableContents
 
     public ListableContentManager(
       IObjectMapper objectMapper,
+      IRepository<GalleryImage> galleryImageRepository,
       IListableContentRepository listableContentRepository,
       IRepository<ListableContentTag> listableContentTagRepository,
       IRepository<ListableContentCity> listableContentCityRepository,
@@ -38,6 +41,7 @@ namespace NewsManagement.Entities.ListableContents
       )
     {
       _objectMapper = objectMapper;
+      _galleryImageRepository = galleryImageRepository;
       _listableContentRepository = listableContentRepository;
       _listableContentTagRepository = listableContentTagRepository;
       _listableContentCityRepository = listableContentCityRepository;
@@ -47,7 +51,24 @@ namespace NewsManagement.Entities.ListableContents
 
     public async Task<ListableContentWithCrossDto> GetByIdAsync(int id)
     {
-      var ListableContent = await _listableContentRepository.GetAsync(id);
+      var listableContent = await _listableContentRepository.GetAsync(id);
+      var item = _objectMapper.Map<ListableContent, ListableContentWithCrossDto>(listableContent);
+
+      var listableContentType = listableContent.GetType().Name;
+      if (listableContentType == "Gallery")
+      {
+
+
+        var galleryImage = await _galleryImageRepository.GetListAsync(x => x.GalleryId == id);
+        //gallery.GalleryImages = galleryImage;
+
+  
+
+
+
+        var queryableGalleryImage = await _galleryImageRepository.GetQueryableAsync();
+        var tagIddds = queryableGalleryImage.Where(x => x.GalleryId == id).Select(x => x.ImageId).ToList();
+      }
 
       var queryableTag = await _listableContentTagRepository.GetQueryableAsync();
       var tagIds = queryableTag.Where(x => x.ListableContentId == id).Select(x => x.TagId).ToList();
@@ -61,8 +82,7 @@ namespace NewsManagement.Entities.ListableContents
 
       var queryableRelation = await _listableContentRelationRepository.GetQueryableAsync();
       var relatedListableContentIds = queryableRelation.Where(x => x.ListableContentId == id).Select(x => x.RelatedListableContentId).ToList();
-
-      var item = _objectMapper.Map<ListableContent, ListableContentWithCrossDto>(ListableContent);
+    
       
       item.CityIds = cityIds;
       item.CategoryIds = categoryIds;
@@ -123,7 +143,7 @@ namespace NewsManagement.Entities.ListableContents
 
     }
 
-
+    private async Task
 
   }
 }

@@ -4,7 +4,8 @@
     "Menu:Home": "Home",
     "Welcome": "Welcome",
     "LongWelcomeMessage": "Welcome to the NewsManagement application. This is a startup project based on the ABP framework.",
-
+    "NewsApp.ListableContent": "Listable Content",
+    "NewsApp.Video": "Video",
 
     "NewsManagement:500": "{0} = {1} Not Found.",
     "NewsManagement:501": "There is already {0} with the same name: {1}",
@@ -30,6 +31,8 @@
     "NewsManagement:521": "VideoId must be exist for Video type.",
     "NewsManagement:522": "Url must be exist for link type.",
     "NewsManagement:523": "Sorting error. Index : {0}",
+    "NewsManagement:524": "Subcategory cannot have the same name as the parent category.",
+    "NewsManagement:525": "City Code already exists. Index : {0}",
 
 
     //ValidationErrors

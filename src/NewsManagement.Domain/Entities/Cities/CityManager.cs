@@ -41,7 +41,8 @@ namespace NewsManagement.Entities.Cities
         c.CityCode == createCityDto.CityCode
       );
       if (isExistCityCode)
-        throw new AlreadyExistException(typeof(City), createCityDto.CityCode.ToString());
+        throw new BusinessException(NewsManagementDomainErrorCodes.CityCodeAlreadyExists)
+          .WithData("0", createCityDto.CityCode.ToString());
 
       var createCity = _objectMapper.Map<CreateCityDto, City>(createCityDto);
 
@@ -67,7 +68,8 @@ namespace NewsManagement.Entities.Cities
         c.CityCode == updateCityDto.CityCode && c.Id != id
       );
       if (isExistCityCode)
-        throw new AlreadyExistException(typeof(City), updateCityDto.CityCode.ToString());
+        throw new BusinessException(NewsManagementDomainErrorCodes.CityCodeAlreadyExists)
+          .WithData("0", updateCityDto.CityCode.ToString());
 
 
       _objectMapper.Map(updateCityDto, existingCity);
