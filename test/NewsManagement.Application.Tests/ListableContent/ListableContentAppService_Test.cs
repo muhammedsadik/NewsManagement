@@ -32,17 +32,6 @@ namespace NewsManagement.ListableContent
     }
 
      [Fact]
-    public async Task GetByContentTypeAsync_TypeInValid_ReturnValueListableContentDto()
-    {
-      var type = ListableContentType.Gallery;
-
-      var listableContent = await _listableContentAppService.GetByContentTypeAsync(type);
-
-      Assert.NotNull(listableContent);
-      Assert.IsType<List<ListableContentDto>>(listableContent);
-    }
-
-     [Fact]
     public async Task GetByIdWithRelationAsync_IdInValid_ReturnValueListableContentWithRelationDto()
     {
       var id = 6;

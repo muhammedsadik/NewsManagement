@@ -39,11 +39,9 @@ namespace NewsManagement.AppService.Newses
       return await _newsManager.UpdateAsync(id, updateNewsDto);
     }
 
-    protected override async Task<News> GetEntityByIdAsync(int id)
-    {
-      await _newsManager.GetEntityByIdAsync(id);
-
-      return await base.GetEntityByIdAsync(id);
+    public async override Task<NewsDto> GetAsync(int id)
+    {    
+      return await _newsManager.GetByIdAsync(id);
     }
 
     public async override Task<PagedResultDto<NewsDto>> GetListAsync(GetListPagedAndSortedDto input)

@@ -114,7 +114,7 @@ namespace NewsManagement
       _permissionManager = permissionManager;
       _featureManager = featureManager;
       _currentTenant = currentTenant;
-      _fileManager = fileManager; 
+      _fileManager = fileManager;
       _featureChecker = featureChecker;
       _fileRepository = fileRepository;
       _fileContentHashProvider = fileContentHashProvider;
@@ -125,17 +125,24 @@ namespace NewsManagement
     public async Task SeedAsync(DataSeedContext context)
     {
       Guid? tenantId = _currentTenant.Id;
-      var filesImageId = NewsManagementConsts.FilesImageId;
-      var uploadImageId = NewsManagementConsts.UploadImageId;
 
       using (_currentTenant.Change(tenantId))
       {
-        //await SeedRoleAsync(tenantId);
-        //await SeedUserAsync(tenantId);
-        //await SeedTagAsync(tenantId);
-        //await SeedCityAsync(tenantId);
+        var filesImageId = NewsManagementConsts.FilesImageId;
+        var uploadImageId = NewsManagementConsts.UploadImageId;
+
+        if (tenantId != null)
+        {
+          filesImageId = _guidGenerator.Create();
+          uploadImageId = _guidGenerator.Create();
+        }
+
+        await SeedRoleAsync(tenantId);
+        await SeedUserAsync(tenantId);
+        await SeedTagAsync(tenantId);
+        await SeedCityAsync(tenantId);
         //await SeedFeaturesAsync(tenantId);
-        //await SeedCategoryAsync(tenantId);
+        await SeedCategoryAsync(tenantId);
         await SeedFileAsync(tenantId, filesImageId, uploadImageId);
         await SeedNewsAsync(tenantId, filesImageId, uploadImageId);
         await SeedVideoAsync(tenantId, filesImageId, uploadImageId);
@@ -150,7 +157,7 @@ namespace NewsManagement
       //var featureValue = await _featureChecker.GetOrNullAsync("NewsApp.Video");
       //if (!string.IsNullOrEmpty(featureValue))
       //  return;
-   
+
 
       //await _featureManager.SetAsync(
       //    "NewsApp.Video",
@@ -524,7 +531,7 @@ namespace NewsManagement
         return;
 
       var projectRoot = Directory.GetCurrentDirectory();
-      if(tenantId == null)
+      if (tenantId == null)
         projectRoot = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.CreateSubdirectory("src\\NewsManagement.Web").FullName;
 
       var containerName = "default";
@@ -702,6 +709,7 @@ namespace NewsManagement
           {
             ListableContentId = news1Id,
             CategoryId = categoryEkonomiId,
+            IsPrimary = true,
             TenantId =tenantId
           },
           new()
@@ -803,6 +811,7 @@ namespace NewsManagement
           {
             ListableContentId = news2Id,
             CategoryId = categoryAsyaKulturId,
+             IsPrimary = true,
             TenantId =tenantId
           }
         }
@@ -902,6 +911,7 @@ namespace NewsManagement
           {
             ListableContentId = news3Id,
             CategoryId = categoryKulturId,
+             IsPrimary = true,
             TenantId =tenantId
           },
           new()
@@ -1016,6 +1026,7 @@ namespace NewsManagement
           {
             ListableContentId = news4Id,
             CategoryId = categorySaglıkId,
+             IsPrimary = true,
             TenantId =tenantId
           },
           new()
@@ -1146,6 +1157,7 @@ namespace NewsManagement
         {
           ListableContentId = video1Id,
           CategoryId = categorySiyasetId,
+          IsPrimary = true,
           TenantId = tenantId
         },
         autoSave: true
@@ -1228,6 +1240,7 @@ namespace NewsManagement
           {
             ListableContentId = video2Id,
             CategoryId = categoryEkonomiId,
+             IsPrimary = true,
             TenantId =tenantId
           },
           new()
@@ -1362,6 +1375,7 @@ namespace NewsManagement
           {
             ListableContentId = video3Id,
             CategoryId = categorySiyasetId,
+             IsPrimary = true,
             TenantId =tenantId
           }
         },
@@ -1461,6 +1475,7 @@ namespace NewsManagement
         {
           ListableContentId = video4Id,
           CategoryId = categoryEgitimId,
+          IsPrimary = true,
           TenantId = tenantId
         },
         autoSave: true
@@ -1602,6 +1617,7 @@ namespace NewsManagement
         {
           ListableContentId = gallery1Id,
           CategoryId = categoryKulturId,
+          IsPrimary = true,
           TenantId = tenantId
         },
         autoSave: true
@@ -1702,6 +1718,7 @@ namespace NewsManagement
         {
           ListableContentId = gallery2Id,
           CategoryId = categoryKulturId,
+          IsPrimary = true,
           TenantId = tenantId
         },
         autoSave: true
@@ -1802,6 +1819,7 @@ namespace NewsManagement
         {
           ListableContentId = gallery3Id,
           CategoryId = categoryEkonomiId,
+          IsPrimary = true,
           TenantId = tenantId
         },
         autoSave: true
