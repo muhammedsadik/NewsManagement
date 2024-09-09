@@ -25,24 +25,10 @@ namespace NewsManagement.AppService.ListableContents
     }
 
     
-    public async Task<ListableContentWithCrossDto> GetByIdAsync(int id)
+    public async Task<ListableContentDto> GetByIdAsync(int id)
     {
       return await _listableContentManager.GetByIdAsync(id);
     }
 
-    public async Task<List<ListableContentDto>> GetByContentTypeAsync(ListableContentType type)
-    {
-      return await _listableContentManager.GetByContentTypeAsync(type);
-    }
-
-    public async Task<ListableContentWithRelationDto> GetByIdWithRelationAsync(int id)
-    {
-      return await _listableContentManager.GetByIdWithRelationAsync(id);
-    }
-
-    public async Task<PagedResultDto<ListableContentDto>> GetListAsync(GetListPagedAndSortedDto getListPagedAndSortedDto)
-    {
-      return await _listableContentManager.GetListAsync(getListPagedAndSortedDto);
-    }
   }
 }

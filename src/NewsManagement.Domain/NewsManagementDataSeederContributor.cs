@@ -1,6 +1,5 @@
 ﻿using EasyAbp.FileManagement.Files;
 using EasyAbp.FileManagement.Options.Containers;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles;
 using NewsManagement.Entities.Categories;
 using NewsManagement.Entities.Cities;

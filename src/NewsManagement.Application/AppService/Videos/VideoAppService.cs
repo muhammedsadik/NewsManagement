@@ -39,7 +39,7 @@ namespace NewsManagement.AppService.Videos
       return await _videoManager.GetByIdAsync(id);
     }
 
-    //[RequiresFeature("NewsApp.Video")]
+    [RequiresFeature("NewsApp.Video")]
     public async override Task<PagedResultDto<VideoDto>> GetListAsync(GetListPagedAndSortedDto input)
     {
      return await _videoManager.GetListAsync(input);

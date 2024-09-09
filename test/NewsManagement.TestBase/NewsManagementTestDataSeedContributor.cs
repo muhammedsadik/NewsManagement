@@ -22,11 +22,12 @@ using System.Threading.Tasks;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.FeatureManagement;
+using Volo.Abp.Features;
 using Volo.Abp.Guids;
 using Volo.Abp.Identity;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.PermissionManagement;
-using Volo.Abp.TenantManagement;
 
 namespace NewsManagement
 {
@@ -50,17 +51,17 @@ namespace NewsManagement
     private readonly IdentityUserManager _identityUserManager;
     private readonly IdentityRoleManager _identityRoleManager;
     private readonly IPermissionManager _permissionManager;
-    private readonly ITenantManager _tenantManager;
-    private readonly ITenantRepository _tenantRepository;
+    private readonly FeatureManager _featureManager;
+    private readonly IFeatureChecker _featureChecker;
     private readonly ICurrentTenant _currentTenant;
     private readonly FileManager _fileManager;
-    private readonly IFileContentHashProvider _fileContentHashProvider;
     private readonly IFileRepository _fileRepository;
     private readonly IFileBlobNameGenerator _fileBlobNameGenerator;
+    private readonly IFileContentHashProvider _fileContentHashProvider;
     private readonly IFileContainerConfigurationProvider _configurationProvider;
 
     public NewsManagementTestDataSeedContributor(
-     IFileBlobNameGenerator fileBlobNameGenerator,
+      IFileBlobNameGenerator fileBlobNameGenerator,
       IFileContainerConfigurationProvider configurationProvider,
       IGuidGenerator guidGenerator,
       IRepository<Tag, int> tagRepository,
@@ -80,9 +81,9 @@ namespace NewsManagement
       IdentityRoleManager identityRoleManager,
       IdentityUserManager identityUserManager,
       IPermissionManager permissionManager,
-      ITenantManager tenantManager,
-      ITenantRepository tenantRepository,
       ICurrentTenant currentTenant,
+      FeatureManager featureManager,
+      IFeatureChecker featureChecker,
       FileManager fileManager,
       IFileContentHashProvider fileContentHashProvider,
       IFileRepository fileRepository
@@ -93,10 +94,10 @@ namespace NewsManagement
       _guidGenerator = guidGenerator;
       _tagRepository = tagRepository;
       _cityRepository = cityRepository;
-      _categoryRepository = categoryRepository;
       _newsRepository = newsRepository;
       _videoRepository = videoRepository;
       _galleryRepository = galleryRepository;
+      _categoryRepository = categoryRepository;
       _listableContentTagRepository = listableContentTagRepository;
       _listableContentCityRepository = listableContentCityRepository;
       _listableContentCategoryRepository = listableContentCategoryRepository;
@@ -106,12 +107,12 @@ namespace NewsManagement
       _identityRoleManager = identityRoleManager;
       _identityUserManager = identityUserManager;
       _permissionManager = permissionManager;
-      _tenantManager = tenantManager;
-      _tenantRepository = tenantRepository;
+      _featureManager = featureManager;
       _currentTenant = currentTenant;
       _fileManager = fileManager;
-      _fileContentHashProvider = fileContentHashProvider;
+      _featureChecker = featureChecker;
       _fileRepository = fileRepository;
+      _fileContentHashProvider = fileContentHashProvider;
       _newsDetailImageRepository = newsDetailImageRepository;
       _galleryImageRepository = galleryImageRepository;
     }
@@ -499,8 +500,10 @@ namespace NewsManagement
       if (await _fileRepository.CountAsync() > 0)
         return;
 
-      var currentDirectory = Directory.GetCurrentDirectory();
-      var projectRoot = Directory.GetParent(currentDirectory).Parent.Parent.Parent.Parent.CreateSubdirectory("src\\NewsManagement.Web").FullName;
+      var projectRoot = Directory.GetCurrentDirectory();
+      if (tenantId == null)
+        projectRoot = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.CreateSubdirectory("src\\NewsManagement.Web").FullName;
+
       var containerName = "default";
       var typeProvider = new FileExtensionContentTypeProvider();
 
@@ -676,6 +679,7 @@ namespace NewsManagement
           {
             ListableContentId = news1Id,
             CategoryId = categoryEkonomiId,
+            IsPrimary = true,
             TenantId =tenantId
           },
           new()
@@ -777,6 +781,7 @@ namespace NewsManagement
           {
             ListableContentId = news2Id,
             CategoryId = categoryAsyaKulturId,
+             IsPrimary = true,
             TenantId =tenantId
           }
         }
@@ -876,6 +881,7 @@ namespace NewsManagement
           {
             ListableContentId = news3Id,
             CategoryId = categoryKulturId,
+             IsPrimary = true,
             TenantId =tenantId
           },
           new()
@@ -990,6 +996,7 @@ namespace NewsManagement
           {
             ListableContentId = news4Id,
             CategoryId = categorySaglıkId,
+             IsPrimary = true,
             TenantId =tenantId
           },
           new()
@@ -1120,6 +1127,7 @@ namespace NewsManagement
         {
           ListableContentId = video1Id,
           CategoryId = categorySiyasetId,
+          IsPrimary = true,
           TenantId = tenantId
         },
         autoSave: true
@@ -1202,6 +1210,7 @@ namespace NewsManagement
           {
             ListableContentId = video2Id,
             CategoryId = categoryEkonomiId,
+             IsPrimary = true,
             TenantId =tenantId
           },
           new()
@@ -1336,6 +1345,7 @@ namespace NewsManagement
           {
             ListableContentId = video3Id,
             CategoryId = categorySiyasetId,
+             IsPrimary = true,
             TenantId =tenantId
           }
         },
@@ -1435,6 +1445,7 @@ namespace NewsManagement
         {
           ListableContentId = video4Id,
           CategoryId = categoryEgitimId,
+          IsPrimary = true,
           TenantId = tenantId
         },
         autoSave: true
@@ -1576,6 +1587,7 @@ namespace NewsManagement
         {
           ListableContentId = gallery1Id,
           CategoryId = categoryKulturId,
+          IsPrimary = true,
           TenantId = tenantId
         },
         autoSave: true
@@ -1676,6 +1688,7 @@ namespace NewsManagement
         {
           ListableContentId = gallery2Id,
           CategoryId = categoryKulturId,
+          IsPrimary = true,
           TenantId = tenantId
         },
         autoSave: true
@@ -1776,6 +1789,7 @@ namespace NewsManagement
         {
           ListableContentId = gallery3Id,
           CategoryId = categoryEkonomiId,
+          IsPrimary = true,
           TenantId = tenantId
         },
         autoSave: true

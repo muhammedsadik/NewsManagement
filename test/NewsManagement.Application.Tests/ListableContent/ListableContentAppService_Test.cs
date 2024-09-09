@@ -1,6 +1,7 @@
 ﻿using NewsManagement.AppService.ListableContents;
 using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.EntityDtos.ListableContentDtos;
+using NewsManagement.EntityDtos.NewsDtos;
 using NewsManagement.EntityDtos.PagedAndSortedDtos;
 using System;
 using System.Collections.Generic;
@@ -21,36 +22,14 @@ namespace NewsManagement.ListableContent
     }
 
     [Fact]
-    public async Task GetByIdAsync_IdInValid_ReturnValueListableContentWithCrossDto()
+    public async Task GetByIdAsync_ReturnValue_NewsDto()
     {
       var id = 1;
 
       var listableContent = await _listableContentAppService.GetByIdAsync(id);
 
       Assert.NotNull(listableContent);
-      Assert.IsType<ListableContentWithCrossDto>(listableContent);
-    }
-
-     [Fact]
-    public async Task GetByIdWithRelationAsync_IdInValid_ReturnValueListableContentWithRelationDto()
-    {
-      var id = 6;
-
-      var listableContent = await _listableContentAppService.GetByIdWithRelationAsync(id);
-
-      Assert.NotNull(listableContent);
-      Assert.Equal(5, listableContent.ListableContents.Count);
-      Assert.IsType<ListableContentWithRelationDto>(listableContent);
-    }
-
-     [Fact]
-    public async Task GetListAsync_InputInValid_ReturnValuePagedResultDto()
-    {
-      var listableContent = await _listableContentAppService.GetListAsync(new GetListPagedAndSortedDto() { Filter = "Haber 1"});
-
-      Assert.NotNull(listableContent);
-      Assert.Equal(3, listableContent.TotalCount);
-      Assert.IsType<ListableContentWithRelationDto>(listableContent);
+      Assert.IsType<NewsDto>(listableContent);
     }
 
   }

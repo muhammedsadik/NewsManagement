@@ -107,7 +107,7 @@ namespace NewsManagement.News
     }  
 
     [Fact]
-    public async Task GetEntityByIdAsync_IdValid_ViewsCountIncrease()
+    public async Task GetAsync_IdValid_ViewsCountIncrease()
     {
       int id = 1;
 

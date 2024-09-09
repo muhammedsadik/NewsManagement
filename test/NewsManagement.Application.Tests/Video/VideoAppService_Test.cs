@@ -28,12 +28,10 @@ namespace NewsManagement.Video
     private readonly Guid _filesImageId;
     private readonly Guid _uploadImageId;
     private readonly CreateVideoDto _createVideoDto;
-    private readonly IFeatureManager _featureManager;
 
     public VideoAppService_Test()
     {
       _videoAppService = GetRequiredService<VideoAppService>();
-      _featureManager = GetRequiredService<FeatureManager>();
       _objectMapper = GetRequiredService<IObjectMapper>();
       _filesImageId = NewsManagementTestConsts.FilesImageId;
       _uploadImageId = NewsManagementTestConsts.UploadImageId;
@@ -103,8 +101,6 @@ namespace NewsManagement.Video
     [Fact]
     public async Task GetListAsync_FilterLimitsInValid_BusinessException()
     {
-      await _featureManager.SetAsync("NewsApp.Video", "true", "AbpFeatureProvider", "");// bunun üzerinde çalış
-
       var exception = await Assert.ThrowsAsync<BusinessException>(async () =>
       {
         await _videoAppService.GetListAsync(new GetListPagedAndSortedDto() { SkipCount = 10});

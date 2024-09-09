@@ -76,11 +76,6 @@ public class NewsManagementApplicationAutoMapperProfile : Profile
     CreateMap<UpdateListableContentDto, ListableContent>().ReverseMap();
     CreateMap<CreateListableContentDto, ListableContent>().ReverseMap();
 
-    CreateMap<ListableContentWithRelationDto, ListableContent>().ReverseMap();
-
-
-    CreateMap<ListableContentWithCrossDto, ListableContent>().ReverseMap();
-
     CreateMap<ListableContentCategory, ReturnCategoryDto>()
         .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CategoryId))
         .ForMember(dest => dest.IsPrimary, opt => opt.MapFrom(src => src.IsPrimary))

@@ -12,10 +12,7 @@ namespace NewsManagement.EntityDtos.ListableContentDtos
   public interface IListableContentAppService : IApplicationService
   {
 
-    Task<ListableContentWithCrossDto> GetByIdAsync(int id);
-    Task<ListableContentWithRelationDto> GetByIdWithRelationAsync(int id);
-    Task<List<ListableContentDto>> GetByContentTypeAsync(ListableContentType type);
-    Task<PagedResultDto<ListableContentDto>> GetListAsync(GetListPagedAndSortedDto getListPagedAndSortedDto);
+    Task<ListableContentDto> GetByIdAsync(int id);
 
 
   }
