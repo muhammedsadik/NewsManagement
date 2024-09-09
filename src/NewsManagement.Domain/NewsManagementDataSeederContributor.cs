@@ -138,9 +138,9 @@ namespace NewsManagement
 
         await SeedRoleAsync(tenantId);
         await SeedUserAsync(tenantId);
+        //await SeedFeaturesAsync(tenantId);
         await SeedTagAsync(tenantId);
         await SeedCityAsync(tenantId);
-        //await SeedFeaturesAsync(tenantId);
         await SeedCategoryAsync(tenantId);
         await SeedFileAsync(tenantId, filesImageId, uploadImageId);
         await SeedNewsAsync(tenantId, filesImageId, uploadImageId);
@@ -148,24 +148,6 @@ namespace NewsManagement
         await SeedGalleryAsync(tenantId, filesImageId, uploadImageId);
       }
     }
-
-    #region Feature
-
-    private async Task SeedFeaturesAsync(Guid? tenantId)
-    {
-      //var featureValue = await _featureChecker.GetOrNullAsync("NewsApp.Video");
-      //if (!string.IsNullOrEmpty(featureValue))
-      //  return;
-
-
-      //await _featureManager.SetAsync(
-      //    "NewsApp.Video",
-      //    "true"
-      //);
-
-    }
-
-    #endregion
 
     #region Role
 
@@ -288,6 +270,24 @@ namespace NewsManagement
         await _identityUserManager.CreateAsync(userMurat, "1q2w3E*");
         await _identityUserManager.SetRolesAsync(userMurat, new List<string> { RoleConst.Reporter });
       }
+
+    }
+
+    #endregion
+
+    #region Feature
+
+    private async Task SeedFeaturesAsync(Guid? tenantId)
+    {
+      var featureValue = await _featureChecker.GetOrNullAsync("NewsApp.Video");
+      //if (!string.IsNullOrEmpty(featureValue))
+      //  return;
+
+
+      //await _featureManager.SetAsync(
+      //    "NewsApp.Video",
+      //    "true"
+      //);
 
     }
 
@@ -1848,7 +1848,6 @@ namespace NewsManagement
     }
 
     #endregion
-
 
 
   }

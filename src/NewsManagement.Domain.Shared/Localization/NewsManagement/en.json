@@ -6,6 +6,8 @@
     "LongWelcomeMessage": "Welcome to the NewsManagement application. This is a startup project based on the ABP framework.",
     "NewsApp.ListableContent": "Listable Content",
     "NewsApp.Video": "Video",
+    "NewsApp.Gallery": "Gallery",
+
 
     "NewsManagement:500": "{0} = {1} Not Found.",
     "NewsManagement:501": "There is already {0} with the same name: {1}",

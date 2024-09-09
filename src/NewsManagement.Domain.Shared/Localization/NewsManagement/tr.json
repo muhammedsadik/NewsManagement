@@ -13,6 +13,8 @@
     "Rejected": "Reddedilmiş",
     "NewsApp.ListableContent": "Listelenebilir İçerik",
     "NewsApp.Video": "Video",
+    "NewsApp.Gallery": "Galeri",
+
 
     "NewsManagement:500": "{0} = {1} Bulunamadı.",
     "NewsManagement:501": "{1} ile aynı isimli bir {0} önceden oluşturulmuş.",
