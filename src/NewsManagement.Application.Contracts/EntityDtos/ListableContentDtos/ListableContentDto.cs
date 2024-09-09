@@ -1,4 +1,5 @@
 ﻿using NewsManagement.EntityConsts.ListableContentConsts;
+using NewsManagement.EntityDtos.CategoryDtos;
 using NewsManagement.EntityDtos.CityDtos;
 using NewsManagement.EntityDtos.TagDtos;
 using System;
@@ -17,6 +18,9 @@ namespace NewsManagement.EntityDtos.ListableContentDtos
     public StatusType Status { get; set; }
     public DateTime? PublishTime { get; set; }
     public ListableContentType ListableContentType { get; set; }
-
+    public List<ReturnTagDto> Tags { get; set; }
+    public List<ReturnCityDto> Cities { get; set; }
+    public List<ReturnCategoryDto> Categories { get; set; }
+    public List<ReturnListableContentRelationDto> ListableContentRelations { get; set; }
   }
 }

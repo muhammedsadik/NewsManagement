@@ -8,8 +8,12 @@ using NewsManagement.Entities.Newses;
 using NewsManagement.Entities.Tags;
 using NewsManagement.Entities.Videos;
 using NewsManagement.EntityConsts.ListableContentConsts;
+using NewsManagement.EntityDtos.CategoryDtos;
+using NewsManagement.EntityDtos.CityDtos;
 using NewsManagement.EntityDtos.GalleryDtos;
+using NewsManagement.EntityDtos.ListableContentDtos;
 using NewsManagement.EntityDtos.PagedAndSortedDtos;
+using NewsManagement.EntityDtos.TagDtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,10 +39,11 @@ namespace NewsManagement.Entities.Galleries
     private readonly ICategoryRepository _categoryRepository;
     private readonly IRepository<GalleryImage> _galleryImageRepository;
     private readonly IListableContentGenericRepository<Gallery> _genericRepository;
-    private readonly IRepository<ListableContentTag> _listableContentTagRepository;
-    private readonly IRepository<ListableContentCity> _listableContentCityRepository;
-    private readonly IRepository<ListableContentCategory> _listableContentCategoryRepository;
-    private readonly IRepository<ListableContentRelation> _listableContentRelationRepository;
+    private readonly IListableContentTagRepository _listableContentTagRepository;
+    private readonly IListableContentCityRepository _listableContentCityRepository;
+    private readonly IListableContentCategoryRepository _listableContentCategoryRepository;
+    private readonly IListableContentRelationRepository _listableContentRelationRepository;
+
 
     public GalleryManager(
       IObjectMapper objectMapper,
@@ -51,10 +56,14 @@ namespace NewsManagement.Entities.Galleries
       ICategoryRepository categoryRepository,
       IRepository<GalleryImage> galleryImageRepository,
       IListableContentGenericRepository<Gallery> genericRepository,
-      IRepository<ListableContentTag> listableContentTagRepository,
-      IRepository<ListableContentCity> listableContentCityRepository,
-      IRepository<ListableContentCategory> listableContentCategoryRepository,
-      IRepository<ListableContentRelation> listableContentRelationRepository
+      IListableContentTagRepository listableContentTagRepository1,
+      IListableContentCityRepository listableContentCityRepository1,
+      IListableContentRelationRepository listableContentRelationRepository1,
+      IListableContentCategoryRepository listableContentCategoryRepository1,
+      IListableContentTagRepository listableContentTagRepository,
+      IListableContentCityRepository listableContentCityRepository,
+      IListableContentCategoryRepository listableContentCategoryRepository,
+      IListableContentRelationRepository listableContentRelationRepository
       ) : base(objectMapper, tagRepository, cityRepository, newsRepository,
         videoRepository, galleryRepository, categoryRepository, genericRepository, listableContentTagRepository,
         listableContentCityRepository, listableContentCategoryRepository, listableContentRelationRepository, fileRepository
@@ -96,6 +105,8 @@ namespace NewsManagement.Entities.Galleries
 
       var galleryDto = _objectMapper.Map<Gallery, GalleryDto>(gallery);
 
+      await GetCrossEntityAsync(galleryDto);
+
       return galleryDto;
     }
 
@@ -119,6 +130,8 @@ namespace NewsManagement.Entities.Galleries
 
       var galleryDto = _objectMapper.Map<Gallery, GalleryDto>(gallery);
 
+      await GetCrossEntityAsync(galleryDto);
+      
       return galleryDto;
     }
 
@@ -129,20 +142,18 @@ namespace NewsManagement.Entities.Galleries
       foreach (var item in filteredList.Items.ToList())
       {
         var galleryImage = await _galleryImageRepository.GetListAsync(x => x.GalleryId == item.Id);
-        var galleryImageDto = _objectMapper.Map<List<GalleryImage>, List<GalleryImageDto>>(galleryImage); 
-
-        item.GalleryImages = galleryImageDto;
+        item.GalleryImages  = _objectMapper.Map<List<GalleryImage>, List<GalleryImageDto>>(galleryImage);
       }
 
       return filteredList;
     }
 
-    public async Task<Gallery> GetEntityByIdAsync(int id)
+    public async Task<GalleryDto> GetByIdAsync(int id)
     {
-      var gallery = await CheckGetEntityByIdBaseAsync(id);
+      var gallery = await GetByIdBaseAsync(id);
 
       var galleryImage = await _galleryImageRepository.GetListAsync(x => x.GalleryId == gallery.Id);
-      gallery.GalleryImages = galleryImage;
+      gallery.GalleryImages = _objectMapper.Map<List<GalleryImage>, List<GalleryImageDto>>(galleryImage);
 
       return gallery;
     }

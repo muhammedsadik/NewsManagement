@@ -39,10 +39,11 @@ namespace NewsManagement.AppService.Galleries
       return await _galleryManager.UpdateAsync(id, updateGalleryDto);
     }
 
-    protected override async Task<Gallery> GetEntityByIdAsync(int id)
+    public async override Task<GalleryDto> GetAsync(int id)
     {
-      return await _galleryManager.GetEntityByIdAsync(id);
+      return await _galleryManager.GetByIdAsync(id);
     }
+
 
     public async override Task<PagedResultDto<GalleryDto>> GetListAsync(GetListPagedAndSortedDto input)
     {

@@ -34,11 +34,9 @@ namespace NewsManagement.AppService.Videos
       return await _videoManager.UpdateAsync(id, updateVideoDto);
     }
 
-    protected override async Task<Video> GetEntityByIdAsync(int id)
-    {
-      await _videoManager.GetEntityByIdAsync(id);
-
-      return await base.GetEntityByIdAsync(id);
+    public async override  Task<VideoDto> GetAsync(int id)
+    {    
+      return await _videoManager.GetByIdAsync(id);
     }
 
     //[RequiresFeature("NewsApp.Video")]

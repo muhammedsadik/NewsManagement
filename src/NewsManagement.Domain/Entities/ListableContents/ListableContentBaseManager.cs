@@ -24,6 +24,9 @@ using NewsManagement.Entities.Videos;
 using NewsManagement.Entities.Galleries;
 using NewsManagement.EntityDtos.GalleryDtos;
 using Microsoft.AspNetCore.Http.HttpResults;
+using NewsManagement.EntityDtos.CategoryDtos;
+using NewsManagement.EntityDtos.CityDtos;
+using NewsManagement.EntityDtos.TagDtos;
 
 
 namespace NewsManagement.Entities.ListableContents
@@ -44,10 +47,10 @@ namespace NewsManagement.Entities.ListableContents
     private readonly IGalleryRepository _galleryRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IListableContentGenericRepository<TEntity> _genericRepository;
-    private readonly IRepository<ListableContentTag> _listableContentTagRepository;
-    private readonly IRepository<ListableContentCity> _listableContentCityRepository;
-    private readonly IRepository<ListableContentCategory> _listableContentCategoryRepository;
-    private readonly IRepository<ListableContentRelation> _listableContentRelationRepository;
+    private readonly IListableContentTagRepository _listableContentTagRepository;
+    private readonly IListableContentCityRepository _listableContentCityRepository;
+    private readonly IListableContentCategoryRepository _listableContentCategoryRepository;
+    private readonly IListableContentRelationRepository _listableContentRelationRepository;
     private readonly IFileRepository _fileRepository;
 
     protected ListableContentBaseManager(
@@ -59,10 +62,10 @@ namespace NewsManagement.Entities.ListableContents
       IGalleryRepository galleryRepository,
       ICategoryRepository categoryRepository,
       IListableContentGenericRepository<TEntity> genericRepository,
-      IRepository<ListableContentTag> listableContentTagRepository,
-      IRepository<ListableContentCity> listableContentCityRepository,
-      IRepository<ListableContentCategory> listableContentCategoryRepository,
-      IRepository<ListableContentRelation> listableContentRelationRepository,
+      IListableContentTagRepository listableContentTagRepository,
+      IListableContentCityRepository listableContentCityRepository,
+      IListableContentCategoryRepository listableContentCategoryRepository,
+      IListableContentRelationRepository listableContentRelationRepository,
       IFileRepository fileRepository
     )
     {
@@ -81,7 +84,7 @@ namespace NewsManagement.Entities.ListableContents
       _fileRepository = fileRepository;
     }
 
-    public async Task<TEntity> CheckCreateInputBaseAsync(TEntityCreateDto createDto)
+    protected async Task<TEntity> CheckCreateInputBaseAsync(TEntityCreateDto createDto)
     {
       var isExist = await _genericRepository.AnyAsync(x => x.Title == createDto.Title);
       if (isExist)
@@ -91,7 +94,7 @@ namespace NewsManagement.Entities.ListableContents
         throw new BusinessException(NewsManagementDomainErrorCodes.OnCreationStatusCannotBeDelete);
 
       if (createDto.ImageId != null)
-       await _fileRepository.GetAsync((Guid)createDto.ImageId);
+        await _fileRepository.GetAsync((Guid)createDto.ImageId);
 
       var entity = _objectMapper.Map<TEntityCreateDto, TEntity>(createDto);
 
@@ -110,7 +113,7 @@ namespace NewsManagement.Entities.ListableContents
       return entity;
     }
 
-    public async Task<TEntity> CheckUpdateInputBaseAsync(int id, TEntityUpdateDto updateDto)
+    protected async Task<TEntity> CheckUpdateInputBaseAsync(int id, TEntityUpdateDto updateDto)
     {
       var isExistId = await _genericRepository.AnyAsync(x => x.Id == id);
       if (!isExistId)
@@ -143,7 +146,7 @@ namespace NewsManagement.Entities.ListableContents
       return entity;
     }
 
-    public async Task<PagedResultDto<TEntityDto>> GetListFilterBaseAsync(TPagedDto input)
+    protected async Task<PagedResultDto<TEntityDto>> GetListFilterBaseAsync(TPagedDto input)
     {
       var totalCount = input.Filter == null
          ? await _genericRepository.CountAsync()
@@ -162,24 +165,29 @@ namespace NewsManagement.Entities.ListableContents
 
       var entityDtoList = _objectMapper.Map<List<TEntity>, List<TEntityDto>>(entityList);
 
+      foreach (var entityDto in entityDtoList)
+      {
+        await GetCrossEntityAsync(entityDto);
+      }
+
       return new PagedResultDto<TEntityDto>(totalCount, entityDtoList);
     }
 
-    public async Task CheckDeleteInputBaseAsync(int id)
+    protected async Task CheckDeleteInputBaseAsync(int id)
     {
       var isExist = await _genericRepository.AnyAsync(t => t.Id == id);
       if (!isExist)
         throw new EntityNotFoundException(typeof(TEntity), id);
     }
 
-    public async Task CheckDeleteHardInputBaseAsync(int id)
+    protected async Task CheckDeleteHardInputBaseAsync(int id)
     {
       var entity = await _genericRepository.GetAsync(id);
 
       await _genericRepository.HardDeleteAsync(entity);
     }
 
-    public async Task<TEntity> CheckGetEntityByIdBaseAsync(int id)
+    protected async Task<TEntityDto> GetByIdBaseAsync(int id)
     {
       var entity = await _genericRepository.GetAsync(id);
 
@@ -187,12 +195,16 @@ namespace NewsManagement.Entities.ListableContents
 
       await _genericRepository.UpdateAsync(entity);
 
-      return entity;
+      var entityDto = _objectMapper.Map<TEntity, TEntityDto>(entity);
+
+      await GetCrossEntityAsync(entityDto);
+
+      return entityDto;
     }
 
     #region Helper Method
 
-    public async Task CheckTagByIdBaseAsync(List<int> tagIds)
+    protected async Task CheckTagByIdBaseAsync(List<int> tagIds)
     {
       CheckDuplicateInputsBase(nameof(tagIds), tagIds);
 
@@ -204,7 +216,7 @@ namespace NewsManagement.Entities.ListableContents
       }
     }
 
-    public async Task CheckCityByIdBaseAsync(List<int> cityIds)
+    protected async Task CheckCityByIdBaseAsync(List<int> cityIds)
     {
       CheckDuplicateInputsBase(nameof(cityIds), cityIds);
 
@@ -216,7 +228,7 @@ namespace NewsManagement.Entities.ListableContents
       }
     }
 
-    public void CheckDuplicateInputsBase(string inputName, List<int> inputId)
+    protected void CheckDuplicateInputsBase(string inputName, List<int> inputId)
     {
       var duplicates = inputId.GroupBy(x => x)
         .Where(u => u.Count() > 1).Select(u => u.Key).ToList();
@@ -229,8 +241,7 @@ namespace NewsManagement.Entities.ListableContents
       }
     }
 
-
-    public void CheckStatusAndDateTimeBaseAsync(StatusType type, DateTime? dateTime)
+    protected void CheckStatusAndDateTimeBaseAsync(StatusType type, DateTime? dateTime)
     {
       if (type == StatusType.Draft && dateTime.HasValue)//eğer üzerinde çalışılıyor ise tarih olamaz
         throw new BusinessException(NewsManagementDomainErrorCodes.DraftStatusCannotHaveaPublishingTime);
@@ -256,7 +267,7 @@ namespace NewsManagement.Entities.ListableContents
 
     }
 
-    public async Task CheckListableContentByIdBaseAsync(List<int> RelatedListableContentIds)
+    protected async Task CheckListableContentByIdBaseAsync(List<int> RelatedListableContentIds)
     {
       CheckDuplicateInputsBase(nameof(RelatedListableContentIds), RelatedListableContentIds);
 
@@ -271,7 +282,7 @@ namespace NewsManagement.Entities.ListableContents
       }
     }
 
-    public async Task CheckListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, ListableContentType type)
+    protected async Task CheckListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, ListableContentType type)
     {
       var categoryIds = listableContentCategoryDto.Select(x => x.CategoryId).ToList();
 
@@ -308,7 +319,7 @@ namespace NewsManagement.Entities.ListableContents
 
     #region CreateListableContent Cross entity
 
-    public async Task CreateCrossEntity(TEntityCreateDto createDto, int listableContentId)
+    protected async Task CreateCrossEntity(TEntityCreateDto createDto, int listableContentId)
     {
       await CreateListableContentTagBaseAsync(createDto.TagIds, listableContentId);
       await CreateListableContentCityBaseAsync(createDto.CityIds, listableContentId);
@@ -318,7 +329,7 @@ namespace NewsManagement.Entities.ListableContents
         await CreateListableContentRelationBaseAsync(createDto.RelatedListableContentIds, listableContentId);
     }
 
-    public async Task ReCreateCrossEntity(TEntityUpdateDto updateDto, int listableContentId)
+    protected async Task ReCreateCrossEntity(TEntityUpdateDto updateDto, int listableContentId)
     {
       await DeleteAllCrossEntitiesByListableContentId(listableContentId);
 
@@ -330,7 +341,25 @@ namespace NewsManagement.Entities.ListableContents
         await CreateListableContentRelationBaseAsync(updateDto.RelatedListableContentIds, listableContentId);
     }
 
-    public async Task DeleteAllCrossEntitiesByListableContentId(int listableContentId)
+    protected async Task GetCrossEntityAsync(TEntityDto entityDto)
+    {
+      var tags = await _listableContentTagRepository.GetCrossListAsync(entityDto.Id);
+      var cities = await _listableContentCityRepository.GetCrossListAsync(entityDto.Id);
+      var relations = await _listableContentRelationRepository.GetCrossListAsync(entityDto.Id);
+      var categiries = await _listableContentCategoryRepository.GetCrossListAsync(entityDto.Id);
+
+      var returnTagDto = _objectMapper.Map<List<ListableContentTag>, List<ReturnTagDto>>(tags);
+      var returnCityDto = _objectMapper.Map<List<ListableContentCity>, List<ReturnCityDto>>(cities);
+      var returnCategoryDto = _objectMapper.Map<List<ListableContentCategory>, List<ReturnCategoryDto>>(categiries);
+      var returnRelationDto = _objectMapper.Map<List<ListableContentRelation>, List<ReturnListableContentRelationDto>>(relations);
+
+      entityDto.Tags = returnTagDto;
+      entityDto.Cities = returnCityDto;
+      entityDto.Categories = returnCategoryDto;
+      entityDto.ListableContentRelations = returnRelationDto;
+    }
+
+    protected async Task DeleteAllCrossEntitiesByListableContentId(int listableContentId)
     {
       await _listableContentCategoryRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
       await _listableContentCityRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
@@ -338,8 +367,7 @@ namespace NewsManagement.Entities.ListableContents
       await _listableContentRelationRepository.DeleteAsync(x => x.ListableContentId == listableContentId);
     }
 
-
-    public async Task CreateListableContentTagBaseAsync(List<int> tagIds, int listableContentId)
+    protected async Task CreateListableContentTagBaseAsync(List<int> tagIds, int listableContentId)
     {
       List<ListableContentTag> listableContentTags = new();
       foreach (var tagId in tagIds)
@@ -351,7 +379,7 @@ namespace NewsManagement.Entities.ListableContents
       await _listableContentTagRepository.InsertManyAsync(listableContentTags, autoSave: true);
     }
 
-    public async Task CreateListableContentCityBaseAsync(List<int> cityIds, int listableContentId)
+    protected async Task CreateListableContentCityBaseAsync(List<int> cityIds, int listableContentId)
     {
       List<ListableContentCity> listableContentCitis = new();
       foreach (var cityId in cityIds)
@@ -363,7 +391,7 @@ namespace NewsManagement.Entities.ListableContents
       await _listableContentCityRepository.InsertManyAsync(listableContentCitis, autoSave: true);
     }
 
-    public async Task CreateListableContentRelationBaseAsync(List<int> RelatedListableContentIds, int listableContentId)
+    protected async Task CreateListableContentRelationBaseAsync(List<int> RelatedListableContentIds, int listableContentId)
     {
       List<ListableContentRelation> listableContentRelations = new();
       foreach (var RelatedId in RelatedListableContentIds)
@@ -380,7 +408,7 @@ namespace NewsManagement.Entities.ListableContents
       await _listableContentRelationRepository.InsertManyAsync(listableContentRelations, autoSave: true);
     }
 
-    public async Task CreateListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)
+    protected async Task CreateListableContentCategoryBaseAsync(List<ListableContentCategoryDto> listableContentCategoryDto, int listableContentId)
     {
       List<ListableContentCategory> listableContentCategories = new();
       foreach (var item in listableContentCategoryDto)
@@ -392,7 +420,7 @@ namespace NewsManagement.Entities.ListableContents
       await _listableContentCategoryRepository.InsertManyAsync(listableContentCategories, autoSave: true);
     }
 
-    public async Task ReCreateListableContentRelationBaseAsync(List<int> RelatedListableContentIds, int listableContentId)
+    protected async Task ReCreateListableContentRelationBaseAsync(List<int> RelatedListableContentIds, int listableContentId)
     {
       var isExist = await _listableContentRelationRepository.GetListAsync(x => x.ListableContentId == listableContentId);
 
@@ -406,7 +434,5 @@ namespace NewsManagement.Entities.ListableContents
 
     #endregion
 
-
   }
 }
-

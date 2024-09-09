@@ -10,6 +10,7 @@ using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.EntityDtos.GalleryDtos;
 using NewsManagement.EntityDtos.NewsDtos;
 using NewsManagement.EntityDtos.PagedAndSortedDtos;
+using NewsManagement.EntityDtos.VideoDtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,12 +37,12 @@ namespace NewsManagement.Entities.Newses
     private readonly ICategoryRepository _categoryRepository;
     private readonly IRepository<NewsDetailImage> _newsDetailImageRepository;
     private readonly IListableContentGenericRepository<News> _genericRepository;
-    private readonly IRepository<ListableContentTag> _listableContentTagRepository;
-    private readonly IRepository<ListableContentCity> _listableContentCityRepository;
-    private readonly IRepository<ListableContentCategory> _listableContentCategoryRepository;
-    private readonly IRepository<ListableContentRelation> _listableContentRelationRepository;
+    private readonly IListableContentTagRepository _listableContentTagRepository;
+    private readonly IListableContentCityRepository _listableContentCityRepository;
+    private readonly IListableContentCategoryRepository _listableContentCategoryRepository;
+    private readonly IListableContentRelationRepository _listableContentRelationRepository;
 
-    
+
     public NewsManager(
       IObjectMapper objectMapper,
       ITagRepository tagRepository,
@@ -53,10 +54,10 @@ namespace NewsManagement.Entities.Newses
       ICategoryRepository categoryRepository,
       IRepository<NewsDetailImage> newsDetailImageRepository,
       IListableContentGenericRepository<News> genericRepository,
-      IRepository<ListableContentTag> listableContentTagRepository,
-      IRepository<ListableContentCity> listableContentCityRepository,
-      IRepository<ListableContentCategory> listableContentCategoryRepository,
-      IRepository<ListableContentRelation> listableContentRelationRepository
+      IListableContentTagRepository listableContentTagRepository,
+      IListableContentCityRepository listableContentCityRepository,
+      IListableContentCategoryRepository listableContentCategoryRepository,
+      IListableContentRelationRepository listableContentRelationRepository
       ) : base(objectMapper, tagRepository, cityRepository, newsRepository,
         videoRepository, galleryRepository, categoryRepository, genericRepository, listableContentTagRepository,
         listableContentCityRepository, listableContentCategoryRepository, listableContentRelationRepository, fileRepository
@@ -93,6 +94,8 @@ namespace NewsManagement.Entities.Newses
 
       var newsDto = _objectMapper.Map<News, NewsDto>(news);
 
+      await GetCrossEntityAsync(newsDto);
+
       return newsDto;
     }
 
@@ -112,17 +115,34 @@ namespace NewsManagement.Entities.Newses
 
       var newsDto = _objectMapper.Map<News, NewsDto>(news);
 
+      await GetCrossEntityAsync(newsDto);
+
       return newsDto;
     }
 
     public async Task<PagedResultDto<NewsDto>> GetListAsync(GetListPagedAndSortedDto input)
     {
-      return await GetListFilterBaseAsync(input);
+      var filteredList = await GetListFilterBaseAsync(input);
+
+      foreach (var item in filteredList.Items.ToList())
+      {
+        var newsDetailImage = await _newsDetailImageRepository.GetListAsync(x => x.NewsId == item.Id);
+        item.DetailImageId = newsDetailImage.Select(x => x.DetailImageId).ToList();
+      }
+
+      return filteredList;
     }
 
-    public async Task GetEntityByIdAsync(int id)
+    public async Task<NewsDto> GetByIdAsync(int id)
     {
-      await CheckGetEntityByIdBaseAsync(id);
+      var news = await GetByIdBaseAsync(id);
+
+      var newsDetailImage = await _newsDetailImageRepository.GetListAsync(x => x.NewsId == id);
+      news.DetailImageId = newsDetailImage.Select(x => x.DetailImageId).ToList();
+
+      await GetCrossEntityAsync(news);
+
+      return news;
     }
 
     public async Task DeleteAsync(int id)

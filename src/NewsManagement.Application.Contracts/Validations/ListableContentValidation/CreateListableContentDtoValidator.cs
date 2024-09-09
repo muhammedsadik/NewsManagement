@@ -27,7 +27,6 @@ namespace NewsManagement.Validations.ListableContentValidation
         );
 
 
-      //RuleFor(x => x.ListableContentCategoryDtos).ForEach(x => x.SetValidator(new ListableContentCategoryDtoValidator()));
     }
   }
 }

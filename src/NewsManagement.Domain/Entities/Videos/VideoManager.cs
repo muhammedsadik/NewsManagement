@@ -23,6 +23,7 @@ using NewsManagement.Entities.Newses;
 using NewsManagement.EntityDtos.GalleryDtos;
 using NewsManagement.EntityConsts.VideoConsts;
 using EasyAbp.FileManagement.Files;
+using NewsManagement.EntityDtos.NewsDtos;
 
 namespace NewsManagement.Entities.Videos
 {
@@ -37,10 +38,10 @@ namespace NewsManagement.Entities.Videos
     private readonly IGalleryRepository _galleryRepository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IListableContentGenericRepository<Video> _genericRepository;
-    private readonly IRepository<ListableContentTag> _listableContentTagRepository;
-    private readonly IRepository<ListableContentCity> _listableContentCityRepository;
-    private readonly IRepository<ListableContentCategory> _listableContentCategoryRepository;
-    private readonly IRepository<ListableContentRelation> _listableContentRelationRepository;
+    private readonly IListableContentTagRepository _listableContentTagRepository;
+    private readonly IListableContentCityRepository _listableContentCityRepository;
+    private readonly IListableContentCategoryRepository _listableContentCategoryRepository;
+    private readonly IListableContentRelationRepository _listableContentRelationRepository;
 
     public VideoManager(
       IObjectMapper objectMapper,
@@ -52,10 +53,10 @@ namespace NewsManagement.Entities.Videos
       IGalleryRepository galleryRepository,
       ICategoryRepository categoryRepository,
       IListableContentGenericRepository<Video> genericRepository,
-      IRepository<ListableContentTag> listableContentTagRepository,
-      IRepository<ListableContentCity> listableContentCityRepository,
-      IRepository<ListableContentCategory> listableContentCategoryRepository,
-      IRepository<ListableContentRelation> listableContentRelationRepository
+      IListableContentTagRepository listableContentTagRepository,
+      IListableContentCityRepository listableContentCityRepository,
+      IListableContentCategoryRepository listableContentCategoryRepository,
+      IListableContentRelationRepository listableContentRelationRepository
       ) : base(objectMapper, tagRepository, cityRepository, newsRepository,
         videoRepository, galleryRepository, categoryRepository, genericRepository, listableContentTagRepository,
         listableContentCityRepository, listableContentCategoryRepository, listableContentRelationRepository, fileRepository
@@ -83,9 +84,9 @@ namespace NewsManagement.Entities.Videos
 
       if (creatingVideo.VideoType == VideoType.Video)
       {
-        if(creatingVideo.VideoId == null)
+        if (creatingVideo.VideoId == null)
           throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeExistForVideoType);
-        
+
         if (creatingVideo.Url != null)
           throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeNullForVideoType);
 
@@ -98,7 +99,7 @@ namespace NewsManagement.Entities.Videos
           throw new BusinessException(NewsManagementDomainErrorCodes.UrlMustBeExistForLinkType);
 
         if (creatingVideo.VideoId != null)
-        throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeNullForLinkType);
+          throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeNullForLinkType);
       }
 
       var video = await _genericRepository.InsertAsync(creatingVideo, autoSave: true);
@@ -107,6 +108,8 @@ namespace NewsManagement.Entities.Videos
 
       var videoDto = _objectMapper.Map<Video, VideoDto>(video);
 
+      await GetCrossEntityAsync(videoDto);
+
       return videoDto;
     }
 
@@ -114,7 +117,7 @@ namespace NewsManagement.Entities.Videos
     {
       var updatingVideo = await CheckUpdateInputBaseAsync(id, updateVideoDto);
 
-      if(updatingVideo.VideoType == VideoType.Video)
+      if (updatingVideo.VideoType == VideoType.Video)
       {
         if (updatingVideo.VideoId == null)
           throw new BusinessException(NewsManagementDomainErrorCodes.VideoIdMustBeExistForVideoType);
@@ -140,6 +143,8 @@ namespace NewsManagement.Entities.Videos
 
       var videoDto = _objectMapper.Map<Video, VideoDto>(video);
 
+      await GetCrossEntityAsync(videoDto);
+
       return videoDto;
     }
 
@@ -148,9 +153,11 @@ namespace NewsManagement.Entities.Videos
       return await GetListFilterBaseAsync(input);
     }
 
-    public async Task GetEntityByIdAsync(int id)
+    public async Task<VideoDto> GetByIdAsync(int id)
     {
-      await CheckGetEntityByIdBaseAsync(id);
+      var video = await GetByIdBaseAsync(id);
+
+      return video;
     }
 
     public async Task DeleteAsync(int id)
