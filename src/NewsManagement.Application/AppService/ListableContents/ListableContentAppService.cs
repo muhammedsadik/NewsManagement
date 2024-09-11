@@ -14,7 +14,6 @@ using Volo.Abp.Features;
 
 namespace NewsManagement.AppService.ListableContents
 {
-  //[RequiresFeature("NewsApp.ListableContent")]
   public class ListableContentAppService : NewsManagementAppService, IListableContentAppService
   {
     private readonly ListableContentManager _listableContentManager;
@@ -23,7 +22,6 @@ namespace NewsManagement.AppService.ListableContents
     {
       _listableContentManager = listableContentManager;
     }
-
     
     public async Task<ListableContentDto> GetByIdAsync(int id)
     {

@@ -11,6 +11,7 @@ using NewsManagement.Entities.Videos;
 using NewsManagement.EntityConsts.ListableContentConsts;
 using NewsManagement.EntityConsts.RoleConsts;
 using NewsManagement.EntityConsts.VideoConsts;
+using NewsManagement.MultiTenancy;
 using NewsManagement.Permissions;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,7 @@ using Volo.Abp.Guids;
 using Volo.Abp.Identity;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.PermissionManagement;
+using Volo.Abp.TenantManagement;
 
 namespace NewsManagement
 {
@@ -51,9 +53,11 @@ namespace NewsManagement
     private readonly IdentityUserManager _identityUserManager;
     private readonly IdentityRoleManager _identityRoleManager;
     private readonly IPermissionManager _permissionManager;
-    private readonly FeatureManager _featureManager;
-    private readonly IFeatureChecker _featureChecker;
+    private readonly TenantManager _tenantManager;
+    private readonly ITenantRepository _tenantRepository;
     private readonly ICurrentTenant _currentTenant;
+    private readonly IFeatureManager _featureManager;
+    private readonly IFeatureChecker _featureChecker;
     private readonly FileManager _fileManager;
     private readonly IFileRepository _fileRepository;
     private readonly IFileBlobNameGenerator _fileBlobNameGenerator;
@@ -81,8 +85,10 @@ namespace NewsManagement
       IdentityRoleManager identityRoleManager,
       IdentityUserManager identityUserManager,
       IPermissionManager permissionManager,
+      TenantManager tenantManager,
+      ITenantRepository tenantRepository,
       ICurrentTenant currentTenant,
-      FeatureManager featureManager,
+      IFeatureManager featureManager,
       IFeatureChecker featureChecker,
       FileManager fileManager,
       IFileContentHashProvider fileContentHashProvider,
@@ -107,10 +113,12 @@ namespace NewsManagement
       _identityRoleManager = identityRoleManager;
       _identityUserManager = identityUserManager;
       _permissionManager = permissionManager;
-      _featureManager = featureManager;
+      _tenantManager = tenantManager;
+      _tenantRepository = tenantRepository;
       _currentTenant = currentTenant;
-      _fileManager = fileManager;
+      _featureManager = featureManager;
       _featureChecker = featureChecker;
+      _fileManager = fileManager;
       _fileRepository = fileRepository;
       _fileContentHashProvider = fileContentHashProvider;
       _newsDetailImageRepository = newsDetailImageRepository;
@@ -119,27 +127,67 @@ namespace NewsManagement
 
     public async Task SeedAsync(DataSeedContext context)
     {
-      Guid? tenantId = _currentTenant.Id;
-      var filesImageId = NewsManagementTestConsts.FilesImageId;
-      var uploadImageId = NewsManagementTestConsts.UploadImageId;
+      await SeedTenantAsync();
+    }
 
-      using (_currentTenant.Change(tenantId))
+    #region Tenants
+
+    private async Task SeedTenantAsync()
+    {
+
+      if (await _tenantRepository.FindByNameAsync(NewsManagementConsts.ChildTenanName) == null)
       {
-        await SeedRoleAsync(tenantId);
-        await SeedUserAsync(tenantId);
-        await SeedTagAsync(tenantId);
-        await SeedCityAsync(tenantId);
-        await SeedCategoryAsync(tenantId);
-        await SeedFileAsync(tenantId, filesImageId, uploadImageId);
-        await SeedNewsAsync(tenantId, filesImageId, uploadImageId);
-        await SeedVideoAsync(tenantId, filesImageId, uploadImageId);
-        await SeedGalleryAsync(tenantId, filesImageId, uploadImageId);
+        var childTenant = await _tenantManager.CreateAsync(NewsManagementConsts.ChildTenanName);
+        await _tenantRepository.InsertAsync(childTenant);
+
+        using (_currentTenant.Change(childTenant.Id))
+        {
+          await _featureManager.SetForTenantAsync(childTenant.Id, MultiTenancyConsts.Gallery, true.ToString());
+
+          var filesImageId = NewsManagementConsts.ChildTenanFilesImageId;
+          var uploadImageId = NewsManagementConsts.ChildTenanUploadImageId;
+
+          await SeedRoleAsync(childTenant.Id);
+          await SeedUserAsync(childTenant.Id);
+          await SeedTagAsync(childTenant.Id);
+          await SeedCityAsync(childTenant.Id);
+          await SeedCategoryAsync(childTenant.Id);
+          await SeedFileAsync(childTenant.Id, filesImageId, uploadImageId);
+          await SeedNewsAsync(childTenant.Id, filesImageId, uploadImageId);
+          await SeedVideoAsync(childTenant.Id, filesImageId, uploadImageId);
+          await SeedGalleryAsync(childTenant.Id, filesImageId, uploadImageId);
+        }
+      } 
+
+      if (await _tenantRepository.FindByNameAsync(NewsManagementConsts.YoungTenanName) == null)
+      {
+        var youngTenant = await _tenantManager.CreateAsync(NewsManagementConsts.YoungTenanName);
+        await _tenantRepository.InsertAsync(youngTenant);
+
+        using (_currentTenant.Change(youngTenant.Id))
+        {
+          await _featureManager.SetForTenantAsync(youngTenant.Id, MultiTenancyConsts.Video, true.ToString());
+
+          var filesImageId = NewsManagementConsts.YoungTenanFilesImageId;
+          var uploadImageId = NewsManagementConsts.YoungTenanUploadImageId;
+
+          await SeedRoleAsync(youngTenant.Id);
+          await SeedUserAsync(youngTenant.Id);
+          await SeedTagAsync(youngTenant.Id);
+          await SeedCityAsync(youngTenant.Id);
+          await SeedCategoryAsync(youngTenant.Id);
+          await SeedFileAsync(youngTenant.Id, filesImageId, uploadImageId);
+          await SeedNewsAsync(youngTenant.Id, filesImageId, uploadImageId);
+          await SeedVideoAsync(youngTenant.Id, filesImageId, uploadImageId);
+          await SeedGalleryAsync(youngTenant.Id, filesImageId, uploadImageId);
+        }
+
       }
     }
 
+    #endregion
 
-    #region Role
-
+    #region Roles
     private async Task SeedRoleAsync(Guid? tenantId)
     {
 
@@ -212,7 +260,7 @@ namespace NewsManagement
 
     #endregion
 
-    #region User
+    #region Users
 
     private async Task SeedUserAsync(Guid? tenantId)
     {
@@ -264,7 +312,7 @@ namespace NewsManagement
 
     #endregion
 
-    #region Tag
+    #region Tags
     private async Task SeedTagAsync(Guid? tenantId)
     {
       if (await _tagRepository.CountAsync() > 0)
@@ -309,7 +357,7 @@ namespace NewsManagement
     }
     #endregion
 
-    #region City
+    #region Cities
     private async Task SeedCityAsync(Guid? tenantId)
     {
       if (await _cityRepository.CountAsync() > 0)
@@ -368,7 +416,7 @@ namespace NewsManagement
     }
     #endregion
 
-    #region Category
+    #region Categories
     private async Task SeedCategoryAsync(Guid? tenantId)
     {
       if (await _categoryRepository.CountAsync() > 0)
@@ -494,15 +542,15 @@ namespace NewsManagement
     }
     #endregion
 
-    #region File
+    #region Files
     private async Task SeedFileAsync(Guid? tenantId, Guid filesImageId, Guid uploadImageId)
     {
       if (await _fileRepository.CountAsync() > 0)
         return;
 
       var projectRoot = Directory.GetCurrentDirectory();
-      if (tenantId == null)
-        projectRoot = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.CreateSubdirectory("src\\NewsManagement.Web").FullName;
+      //if (tenantId == null)
+      projectRoot = Directory.GetParent(projectRoot).Parent.Parent.Parent.Parent.CreateSubdirectory("src\\NewsManagement.Web").FullName;
 
       var containerName = "default";
       var typeProvider = new FileExtensionContentTypeProvider();
@@ -573,7 +621,7 @@ namespace NewsManagement
 
     #endregion
 
-    #region News
+    #region Newses
 
     private async Task SeedNewsAsync(Guid? tenantId, Guid filesImageId, Guid uploadImageId)
     {
@@ -1040,7 +1088,7 @@ namespace NewsManagement
 
     #endregion
 
-    #region Video
+    #region Videos
 
     private async Task SeedVideoAsync(Guid? tenantId, Guid filesImageId, Guid uploadImageId)
     {
@@ -1476,7 +1524,7 @@ namespace NewsManagement
 
     #endregion
 
-    #region Gallery
+    #region Galleries
     private async Task SeedGalleryAsync(Guid? tenantId, Guid filesImageId, Guid uploadImageId)
     {
       if (await _galleryRepository.CountAsync() > 0)
