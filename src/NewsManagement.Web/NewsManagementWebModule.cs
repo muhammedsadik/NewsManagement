@@ -153,18 +153,18 @@ public class NewsManagementWebModule : AbpModule
     ConfigureNavigationServices();
     ConfigureAutoApiControllers();
     ConfigureSwaggerServices(context.Services);
-    //ConfigureHangfire(context, configuration);
-    //context.Services.AddHangfireServer();
+    ConfigureHangfire(context, configuration);
+    context.Services.AddHangfireServer();
   }
 
-  //private void ConfigureHangfire(ServiceConfigurationContext context, IConfiguration configuration)
-  //{
+  private void ConfigureHangfire(ServiceConfigurationContext context, IConfiguration configuration)
+  {
 
-  //  context.Services.AddHangfire(config =>
-  //  {
-  //    config.UsePostgreSqlStorage(configuration.GetConnectionString("Default"));
-  //  });
-  //}
+    context.Services.AddHangfire(config =>
+    {
+      config.UsePostgreSqlStorage(configuration.GetConnectionString("Default"));
+    });
+  }
 
   private void ConfigureAuthentication(ServiceConfigurationContext context)
   {

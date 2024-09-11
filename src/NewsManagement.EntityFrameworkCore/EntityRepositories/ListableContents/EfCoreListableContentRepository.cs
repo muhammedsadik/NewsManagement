@@ -19,7 +19,7 @@ namespace NewsManagement.EntityRepositories.ListableContents
     public EfCoreListableContentRepository(IDbContextProvider<NewsManagementDbContext> dbContextProvider) : base(dbContextProvider)
     {
     }
-    public async Task<List<ListableContent>> GetListAsync(int skipCount, int maxResultCount, string sorting, string filter = null)
+    public async Task<List<ListableContent>> GetListFilterAsync(int skipCount, int maxResultCount, string sorting, string filter = null)
     {
       var dbSet = await GetDbSetAsync();
 

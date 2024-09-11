@@ -10,7 +10,7 @@ namespace NewsManagement.Entities.ListableContents
   public interface IListableContentRepository : IRepository<ListableContent, int>
   {
 
-    Task<List<ListableContent>> GetListAsync(int skipCount, int maxResultCount, string sorting, string filter = null);
+    Task<List<ListableContent>> GetListFilterAsync(int skipCount, int maxResultCount, string sorting, string filter = null);
 
 
   }
