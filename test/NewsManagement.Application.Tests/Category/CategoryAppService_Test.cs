@@ -11,7 +11,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.MultiTenancy;
 using Xunit;
 
 namespace NewsManagement.Category
@@ -19,123 +21,148 @@ namespace NewsManagement.Category
   public class CategoryAppService_Test : NewsManagementApplicationTestBase
   {
     private readonly CategoryAppService _categoryAppService;
+    private readonly IDataFilter<IMultiTenant> _dataFilter;
 
     public CategoryAppService_Test()
     {
       _categoryAppService = GetRequiredService<CategoryAppService>();
-
+      _dataFilter = GetRequiredService<IDataFilter<IMultiTenant>>();
     }
 
     [Fact]
     public async Task CreateAsync_MainCategoryNameInValid_AlreadyExistException()
     {
-      CreateCategoryDto category = new()
+      using (_dataFilter.Disable())
       {
-        CategoryName = "Kültür",
-        ColorCode = "#a6e79f",
-        IsActive = true,
-        listableContentType = ListableContentType.Gallery
-      };
+        CreateCategoryDto category = new()
+        {
+          CategoryName = "Kültür",
+          ColorCode = "#a6e79f",
+          IsActive = true,
+          listableContentType = ListableContentType.Gallery
+        };
 
-      await Assert.ThrowsAsync<AlreadyExistException>(async () =>
-      {
-        await _categoryAppService.CreateAsync(category);
-      });
+        await Assert.ThrowsAsync<AlreadyExistException>(async () =>
+        {
+          await _categoryAppService.CreateAsync(category);
+        });
+      }
     }
 
     [Fact]
     public async Task CreateAsync_SubCategoryNameInValid_AlreadyExistException()
     {
-      CreateCategoryDto category = new()
+      using (_dataFilter.Disable())
       {
-        CategoryName = "Yaşam",
-        ColorCode = "#a6e79f",
-        IsActive = true,
-        ParentCategoryId = 1,
-        listableContentType = ListableContentType.Gallery
-      };
+        CreateCategoryDto category = new()
+        {
+          CategoryName = "Yaşam",
+          ColorCode = "#a6e79f",
+          IsActive = true,
+          ParentCategoryId = 1,
+          listableContentType = ListableContentType.Gallery
+        };
 
-      await Assert.ThrowsAsync<AlreadyExistException>(async () =>
-      {
-        await _categoryAppService.CreateAsync(category);
-      });
+        await Assert.ThrowsAsync<AlreadyExistException>(async () =>
+        {
+          await _categoryAppService.CreateAsync(category);
+        });
+      }
     }
 
     [Fact]
     public async Task CreateAsync_SubCategory_BusinessException()
     {
-      CreateCategoryDto category = new()
+      using (_dataFilter.Disable())
       {
-        CategoryName = "Spor",
-        ColorCode = "#f6e79f",
-        IsActive = true,
-        ParentCategoryId = 6,
-        listableContentType = ListableContentType.Gallery
-      };
+        CreateCategoryDto category = new()
+        {
+          CategoryName = "Spor",
+          ColorCode = "#f6e79f",
+          IsActive = true,
+          ParentCategoryId = 6,
+          listableContentType = ListableContentType.Gallery
+        };
 
-      await Assert.ThrowsAsync<BusinessException>(async () =>
-      {
-        await _categoryAppService.CreateAsync(category);
-      });
+        await Assert.ThrowsAsync<BusinessException>(async () =>
+        {
+          await _categoryAppService.CreateAsync(category);
+        });
+      }
     }
 
     [Fact]
     public async Task UpdateAsync_ReturnValue_CategoryDto()
     {
-      int categoryId = 2;
-      UpdateCategoryDto category = new()
+      using (_dataFilter.Disable())
       {
-        CategoryName = "İç Ekonomi",
-        ColorCode = "#ff179a",
-        IsActive = true,
-        ParentCategoryId = null,
-        listableContentType = ListableContentType.Video
-      };
+        int categoryId = 2;
+        UpdateCategoryDto category = new()
+        {
+          CategoryName = "İç Ekonomi",
+          ColorCode = "#ff179a",
+          IsActive = true,
+          ParentCategoryId = null,
+          listableContentType = ListableContentType.Video
+        };
 
-      var result = await _categoryAppService.UpdateAsync(categoryId, category);
+        var result = await _categoryAppService.UpdateAsync(categoryId, category);
 
-      Assert.NotNull(result);
-      Assert.IsType<CategoryDto>(result);
+        Assert.NotNull(result);
+        Assert.IsType<CategoryDto>(result);
+      }
     }
 
     [Fact]
     public async Task GetListAsync_RetrunValue_FilterData()
     {
-      var categoryList = await _categoryAppService.GetListAsync(new GetListPagedAndSortedDto() { Filter = "Siya" });
+      using (_dataFilter.Disable())
+      {
+        var categoryList = await _categoryAppService.GetListAsync(new GetListPagedAndSortedDto() { Filter = "Siya" });
 
-      categoryList.Items.ShouldContain(c => c.CategoryName == "Siyaset");
+        categoryList.Items.ShouldContain(c => c.CategoryName == "Siyaset");
+      }
     }
 
     [Fact]
     public async Task DeleteAsync_IdInValid_EntityNotFoundException()
     {
-      int categoryId = 0;
-
-      await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+      using (_dataFilter.Disable())
       {
-        await _categoryAppService.DeleteAsync(categoryId);
-      });
+        int categoryId = 0;
+
+        await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+        {
+          await _categoryAppService.DeleteAsync(categoryId);
+        });
+      }
     }
 
     [Fact]
     public async Task DeleteHardAsync_IdInValid_EntityNotFoundException()
     {
-      int categoryId = 0;
-
-      await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+      using (_dataFilter.Disable())
       {
-        await _categoryAppService.DeleteHardAsync(categoryId);
-      });
+        int categoryId = 0;
+
+        await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+        {
+          await _categoryAppService.DeleteHardAsync(categoryId);
+        });
+      }
     }
 
     [Fact]
     public async Task GetSubCategoriesById_IdValid_ReturnEntity()
     {
-      var id = 6;
-      var categories = await _categoryAppService.GetSubCategoriesById(id);
+      using (_dataFilter.Disable())
+      {
+        var id = 6;
+        var categories = await _categoryAppService.GetSubCategoriesById(id);
 
-      Assert.NotNull(categories);
-      Assert.Equal(3, categories.Count);
+        Assert.NotNull(categories);
+        Assert.Equal(3, categories.Count);
+      }
     }
 
 

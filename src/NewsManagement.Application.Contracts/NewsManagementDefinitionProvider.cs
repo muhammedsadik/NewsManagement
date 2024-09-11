@@ -1,4 +1,5 @@
 ﻿using NewsManagement.Localization;
+using NewsManagement.MultiTenancy;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,23 +15,24 @@ namespace NewsManagement
       var newsGroup = context.AddGroup("NewsApp");
 
       newsGroup.AddFeature(
-        "NewsApp.Video", 
-        defaultValue: "false", 
+       MultiTenancyConsts.News,
+       displayName: LocalizableString.Create<NewsManagementResource>("News")
+      );
+
+      newsGroup.AddFeature(
+        MultiTenancyConsts.Video, 
         displayName: LocalizableString.Create<NewsManagementResource>("Video")
       );
 
       newsGroup.AddFeature(
-        "NewsApp.ListableContent",
-        defaultValue: "false",
-        displayName: LocalizableString.Create<NewsManagementResource>("ListableContent")
-      );
-
-      newsGroup.AddFeature(
-       "NewsApp.Gallery",
-       defaultValue: "false",
+       MultiTenancyConsts.Gallery,
        displayName: LocalizableString.Create<NewsManagementResource>("Gallery")
       );
-
+      
+      newsGroup.AddFeature(
+       MultiTenancyConsts.ListableContent,
+        displayName: LocalizableString.Create<NewsManagementResource>("ListableContent")
+      );
 
     }
   }

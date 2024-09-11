@@ -10,7 +10,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities;
+using Volo.Abp.MultiTenancy;
 using Xunit;
 
 namespace NewsManagement.City
@@ -18,67 +20,83 @@ namespace NewsManagement.City
   public class CityAppService_Test : NewsManagementApplicationTestBase
   {
     private readonly CityAppService _cityAppService;
-
+    private readonly IDataFilter<IMultiTenant> _dataFilter;
     public CityAppService_Test()
     {
       _cityAppService = GetRequiredService<CityAppService>();
+      _dataFilter = GetRequiredService<IDataFilter<IMultiTenant>>();
     }
 
 
     [Fact]
     public async Task CreateAsync_ReturnValue_CityDto()
     {
-      CreateCityDto city = new() { CityName = "Adana", CityCode = 01 };
+      using (_dataFilter.Disable())
+      {
+        CreateCityDto city = new() { CityName = "Adana", CityCode = 01 };
 
-      var result = await _cityAppService.CreateAsync(city);
+        var result = await _cityAppService.CreateAsync(city);
 
-      Assert.NotNull(result);
-      Assert.IsType<CityDto>(result);
+        Assert.NotNull(result);
+        Assert.IsType<CityDto>(result);
+      }
     }
 
     [Fact]
     public async Task UpdateAsync_CityNameInValid_AlreadyExistException()
     {
-      int cityId = 1;
-      UpdateCityDto city = new() { CityName = "Ankara", CityCode = 01 };
-
-      await Assert.ThrowsAsync<AlreadyExistException>(async () =>
+      using (_dataFilter.Disable())
       {
-        await _cityAppService.UpdateAsync(cityId, city);
-      });
+        int cityId = 1;
+        UpdateCityDto city = new() { CityName = "Ankara", CityCode = 01 };
+
+        await Assert.ThrowsAsync<AlreadyExistException>(async () =>
+        {
+          await _cityAppService.UpdateAsync(cityId, city);
+        });
+      }
     }
 
     [Fact]
     public async Task GetListAsync_SkipCountBiggerThanTotalCount_BusinessException()
     {
-      var skipCount = 15;
-
-      await Assert.ThrowsAsync<BusinessException>(async () =>
+      using (_dataFilter.Disable())
       {
-        await _cityAppService.GetListAsync(new GetListPagedAndSortedDto() { SkipCount = skipCount });
-      });
+        var skipCount = 15;
+
+        await Assert.ThrowsAsync<BusinessException>(async () =>
+        {
+          await _cityAppService.GetListAsync(new GetListPagedAndSortedDto() { SkipCount = skipCount });
+        });
+      }
     }
 
     [Fact]
     public async Task DeleteAsync_IdInValid_EntityNotFoundException()
     {
-      int cityId = 30;
-
-      await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+      using (_dataFilter.Disable())
       {
-        await _cityAppService.DeleteAsync(cityId);
-      });
+        int cityId = 30;
+
+        await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+        {
+          await _cityAppService.DeleteAsync(cityId);
+        });
+      }
     }
 
     [Fact]
     public async Task DeleteHardAsync_IdInValid_EntityNotFoundException()
     {
-      int cityId = 30;
-
-      await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+      using (_dataFilter.Disable())
       {
-        await _cityAppService.DeleteHardAsync(cityId);
-      });
+        int cityId = 30;
+
+        await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+        {
+          await _cityAppService.DeleteHardAsync(cityId);
+        });
+      }
     }
 
 

@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Features;
 
 namespace NewsManagement.AppService.Galleries
 {
@@ -44,7 +45,6 @@ namespace NewsManagement.AppService.Galleries
       return await _galleryManager.GetByIdAsync(id);
     }
 
-
     public async override Task<PagedResultDto<GalleryDto>> GetListAsync(GetListPagedAndSortedDto input)
     {
       return await _galleryManager.GetListAsync(input);
@@ -58,6 +58,7 @@ namespace NewsManagement.AppService.Galleries
       await base.DeleteAsync(id);
     }
 
+    [RequiresFeature("NewsApp.Gallery")]
     [Authorize(NewsManagementPermissions.Galleries.Delete)]
     public async Task DeleteHardAsync(int id)
     {

@@ -19,6 +19,8 @@ using NewsManagement.Entities.Newses;
 using NewsManagement.EntityDtos.CategoryDtos;
 using NewsManagement.AppService.Categories;
 using Shouldly;
+using Volo.Abp.MultiTenancy;
+using Volo.Abp.TenantManagement;
 
 namespace NewsManagement.News
 {
@@ -29,13 +31,20 @@ namespace NewsManagement.News
     private readonly Guid _filesImageId;
     private readonly Guid _uploadImageId;
     private readonly CreateNewsDto _createNewsDto;
+    private readonly ICurrentTenant _currentTenant;
+    private readonly ITenantRepository _tenantRepository;
+    private readonly Guid? _tenantId;
 
     public NewsAppService_Test()
     {
       _newsAppService = GetRequiredService<NewsAppService>();
       _objectMapper = GetRequiredService<IObjectMapper>();
-      _filesImageId = NewsManagementTestConsts.FilesImageId;
-      _uploadImageId = NewsManagementTestConsts.UploadImageId;
+      _filesImageId = NewsManagementConsts.ChildTenanFilesImageId;
+      _uploadImageId = NewsManagementConsts.ChildTenanUploadImageId;
+      _currentTenant = GetRequiredService<CurrentTenant>();
+      _tenantRepository = GetRequiredService<ITenantRepository>();
+
+      _tenantId = _tenantRepository.FindByName(NewsManagementConsts.ChildTenanName).Id;
 
       _createNewsDto = new CreateNewsDto()
       {
@@ -72,50 +81,62 @@ namespace NewsManagement.News
     [Fact]
     public async Task CreateAsync_CheckTagDuplicateInput_BusinessException()
     {
-      _createNewsDto.Title = "News Haber 0";
-      _createNewsDto.TagIds = new List<int>() { 1, 1 };
-
-      var exception = await Assert.ThrowsAsync<BusinessException>(async () =>
+      using (_currentTenant.Change(_tenantId))
       {
-        await _newsAppService.CreateAsync(_createNewsDto);
-      });
+        _createNewsDto.Title = "News Haber 0";
+        _createNewsDto.TagIds = new List<int>() { 1, 1 };
 
-      Assert.Equal(NewsManagementDomainErrorCodes.RepeatedDataError, exception.Code);
-      Assert.Equal("tagIds", exception.Data["0"]);
-      Assert.Equal("1", exception.Data["1"]);
+        var exception = await Assert.ThrowsAsync<BusinessException>(async () =>
+        {
+          await _newsAppService.CreateAsync(_createNewsDto);
+        });
+
+        Assert.Equal(NewsManagementDomainErrorCodes.RepeatedDataError, exception.Code);
+        Assert.Equal("tagIds", exception.Data["0"]);
+        Assert.Equal("1", exception.Data["1"]);
+      }
     }
 
     [Fact]
     public async Task UpdateAsync_ReturnValue_NewsDto()
     {
-      var updateNews = _objectMapper.Map<CreateNewsDto, UpdateNewsDto>(_createNewsDto);  
-      updateNews.Title = "News Haber 0";
-      var id = 3;
+      using (_currentTenant.Change(_tenantId))
+      {
+        var updateNews = _objectMapper.Map<CreateNewsDto, UpdateNewsDto>(_createNewsDto);
+        updateNews.Title = "News Haber 0";
+        var id = 3;
 
-      var result = await _newsAppService.UpdateAsync(id, updateNews);     
+        var result = await _newsAppService.UpdateAsync(id, updateNews);
 
-      Assert.NotNull(result);
-      Assert.IsType<NewsDto>(result);
+        Assert.NotNull(result);
+        Assert.IsType<NewsDto>(result);
+      }
     }
 
     [Fact]
     public async Task GetListAsync_FilterValid_NewsDto()
     {
-      var categoryList = await _newsAppService.GetListAsync(new GetListPagedAndSortedDto() { Filter = "Haber 1" });
+      using (_currentTenant.Change(_tenantId))
+      {
+        var categoryList = await _newsAppService.GetListAsync(new GetListPagedAndSortedDto() { Filter = "Haber 1" });
 
-      categoryList.Items.ShouldContain(x => x.Title == "News Haber 1");
-    }  
+        categoryList.Items.ShouldContain(x => x.Title == "News Haber 1");
+      }
+    }
 
     [Fact]
     public async Task GetAsync_IdValid_ViewsCountIncrease()
     {
-      int id = 1;
+      using (_currentTenant.Change(_tenantId))
+      {
+        int id = 1;
 
-      var viewsCount1 = (await _newsAppService.GetAsync(id)).ViewsCount;
-      var viewsCount2 = (await _newsAppService.GetAsync(id)).ViewsCount;
+        var viewsCount1 = (await _newsAppService.GetAsync(id)).ViewsCount;
+        var viewsCount2 = (await _newsAppService.GetAsync(id)).ViewsCount;
 
-      Assert.Equal(viewsCount1 + 1, viewsCount2);
+        Assert.Equal(viewsCount1 + 1, viewsCount2);
+      }
     }
-    
+
   }
 }

@@ -14,9 +14,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Data;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.FeatureManagement;
+using Volo.Abp.MultiTenancy;
 using Volo.Abp.ObjectMapping;
+using Volo.Abp.TenantManagement;
 using Xunit;
 
 namespace NewsManagement.Video
@@ -28,98 +31,119 @@ namespace NewsManagement.Video
     private readonly Guid _filesImageId;
     private readonly Guid _uploadImageId;
     private readonly CreateVideoDto _createVideoDto;
+    private readonly IDataFilter<IMultiTenant> _dataFilter;
+    private readonly ICurrentTenant _currentTenant;
+    private readonly ITenantRepository _tenantRepository;
+    private readonly Guid? _tenantId;
 
     public VideoAppService_Test()
     {
       _videoAppService = GetRequiredService<VideoAppService>();
       _objectMapper = GetRequiredService<IObjectMapper>();
-      _filesImageId = NewsManagementTestConsts.FilesImageId;
-      _uploadImageId = NewsManagementTestConsts.UploadImageId;
+      _filesImageId = NewsManagementConsts.YoungTenanFilesImageId;
+      _uploadImageId = NewsManagementConsts.YoungTenanFilesImageId;
+      _dataFilter = GetRequiredService<IDataFilter<IMultiTenant>>();
+      _currentTenant = GetRequiredService<CurrentTenant>();
+      _tenantRepository = GetRequiredService<ITenantRepository>();
+
+      _tenantId = _tenantRepository.FindByName(NewsManagementConsts.YoungTenanName).Id;
 
       _createVideoDto = new CreateVideoDto()
       {
+
         Title = "Video Haber 1",
         Spot = "string",
         ImageId = _filesImageId,
-        TagIds = new List<int>() { 1 },
-        CityIds = new List<int>() { 1 },
-        RelatedListableContentIds = new List<int>() { 1 },
+        TagIds = new List<int>() { 5 },
+        CityIds = new List<int>() { 8 },
+        RelatedListableContentIds = new List<int>() { 12 },
         ListableContentCategoryDtos = new List<ListableContentCategoryDto>()
         {
           new()
           {
-            CategoryId = 2, IsPrimary = true
+            CategoryId = 11, IsPrimary = true
           }
         },
         PublishTime = null,
         Status = StatusType.Draft,
         VideoType = VideoType.Video,
-        VideoId = _uploadImageId,
+        VideoId = _filesImageId,
+
       };
     }
 
     [Fact]
     public async Task CreateAsync_ParentCategoryInValid_BusinessException()
     {
-      _createVideoDto.Title = "Video Haber 0";
-      _createVideoDto.ListableContentCategoryDtos = new List<ListableContentCategoryDto>()
+      using (_currentTenant.Change(_tenantId))
       {
-        new()
+        _createVideoDto.Title = "Video Haber 0";
+        _createVideoDto.ListableContentCategoryDtos = new List<ListableContentCategoryDto>()
         {
-          CategoryId = 8, IsPrimary = true
-        },
-        new()
+          new()
+          {
+            CategoryId = 17, IsPrimary = true
+          },
+          new()
+          {
+            CategoryId = 18, IsPrimary = false
+          }
+        };
+
+        var exception = await Assert.ThrowsAsync<BusinessException>(async () =>
         {
-          CategoryId = 9, IsPrimary = false
-        }
-      };
+          await _videoAppService.CreateAsync(_createVideoDto);
+        });
 
-      var exception = await Assert.ThrowsAsync<BusinessException>(async () =>
-      {
-        await _videoAppService.CreateAsync(_createVideoDto);
-      });
-
-      Assert.Equal(NewsManagementDomainErrorCodes.WithoutParentCategory, exception.Code);
-      Assert.Equal("8, 9", exception.Data["categoryId"]);
+        Assert.Equal(NewsManagementDomainErrorCodes.WithoutParentCategory, exception.Code);
+        Assert.Equal("17, 18", exception.Data["categoryId"]);
+      }
     }
 
     [Fact]
     public async Task UpdateAsync_VideoTypeUrlNull_BusinessException()
     {
-      var updateVideo = _objectMapper.Map<CreateVideoDto, UpdateVideoDto>(_createVideoDto);
-      updateVideo.Url = "www.google.com.tr";
-      var id = 5;
-
-      var exception = await Assert.ThrowsAsync<BusinessException>(async () =>
+      using (_currentTenant.Change(_tenantId))
       {
-        await _videoAppService.UpdateAsync(id, updateVideo);
-      });
+        var updateVideo = _objectMapper.Map<CreateVideoDto, UpdateVideoDto>(_createVideoDto);
+        updateVideo.Url = "www.google.com.tr";
+        var id = 16;
 
-      Assert.Equal(NewsManagementDomainErrorCodes.UrlMustBeNullForVideoType, exception.Code);
+        var exception = await Assert.ThrowsAsync<BusinessException>(async () =>
+        {
+          await _videoAppService.UpdateAsync(id, updateVideo);
+        });
+
+        Assert.Equal(NewsManagementDomainErrorCodes.UrlMustBeNullForVideoType, exception.Code);
+      }
     }
 
     [Fact]
     public async Task GetListAsync_FilterLimitsInValid_BusinessException()
     {
-      var exception = await Assert.ThrowsAsync<BusinessException>(async () =>
+      using (_currentTenant.Change(_tenantId))
       {
-        await _videoAppService.GetListAsync(new GetListPagedAndSortedDto() { SkipCount = 10});
-      });
+        var exception = await Assert.ThrowsAsync<BusinessException>(async () =>
+        {
+          await _videoAppService.GetListAsync(new GetListPagedAndSortedDto() { SkipCount = 5 });
+        });
 
-      Assert.Equal(NewsManagementDomainErrorCodes.FilterLimitsError, exception.Code);
+        Assert.Equal(NewsManagementDomainErrorCodes.FilterLimitsError, exception.Code);
+      }
     }
 
     [Fact]
     public async Task DeleteAsync_IdInValid_EntityNotFoundException()
     {
       int id = 99;
-
-      await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+      using (_currentTenant.Change(_tenantId))
       {
-        await _videoAppService.DeleteAsync(id);
-      });
+        await Assert.ThrowsAsync<EntityNotFoundException>(async () =>
+        {
+          await _videoAppService.DeleteAsync(id);
+        });
+      }
     }
-
 
   }
 }
